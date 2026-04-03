@@ -13,6 +13,7 @@ const storageCloud = require('./storage-cloud');
 const analytics    = require('./analytics');
 const scraper      = require('./scraper');
 const migrator     = require('./migrator');
+const googleAnalytics = require('./google-analytics');
 
 // Log which integrations are running in mock mode at startup.
 const mocks = [];
@@ -32,6 +33,9 @@ if (!process.env.R2_ACCESS_KEY_ID && !process.env.GCS_BUCKET) {
 if (!process.env.ANTHROPIC_API_KEY) {
   mocks.push('migrator (cheerio)');
 }
+if (!process.env.GOOGLE_CLIENT_ID) {
+  mocks.push('google-analytics (mock)');
+}
 
 // Analytics is always local in this version.
 mocks.push('analytics (local)');
@@ -40,4 +44,4 @@ if (mocks.length > 0) {
   console.log(`[integrations] Mock mode active for: ${mocks.join(', ')}`);
 }
 
-module.exports = { stripe, email, cloudflare, storageCloud, analytics, scraper, migrator };
+module.exports = { stripe, email, cloudflare, storageCloud, analytics, scraper, migrator, googleAnalytics };

@@ -179,6 +179,56 @@
         `.n3-rev-msg{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`,
         `.n3-rev-empty{color:${T.muted};padding:16px;text-align:center}`,
         `.n3-rev-rollback-btn{flex-shrink:0;font-size:11px;padding:4px 8px}`,
+        // ── Floating Action Button cluster ──────────────────────────────────
+        `.n3-fab{position:fixed;bottom:24px;right:24px;z-index:999999;display:flex;flex-direction:column-reverse;align-items:center;gap:10px}`,
+        `.n3-fab-toggle{width:48px;height:48px;border-radius:50%;background:${T.accent};color:#fff;border:none;cursor:pointer;font:700 16px/1 system-ui,sans-serif;letter-spacing:-.5px;box-shadow:0 4px 24px rgba(59,130,246,.45);display:flex;align-items:center;justify-content:center;transition:all .25s cubic-bezier(.34,1.56,.64,1)}`,
+        `.n3-fab-toggle:hover{background:${T.accentDark};transform:scale(1.1)}`,
+        `.n3-fab-toggle.n3-editing{background:#EF4444;box-shadow:0 4px 24px rgba(239,68,68,.5);transform:rotate(45deg)}`,
+        `.n3-fab-actions{display:flex;flex-direction:column-reverse;align-items:center;gap:8px;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .2s}`,
+        `.n3-fab.n3-expanded .n3-fab-actions{max-height:200px;opacity:1}`,
+        `.n3-fab-btn{width:40px;height:40px;border-radius:50%;background:${T.bgPanel};color:${T.text};border:1px solid ${T.border};cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}`,
+        `.n3-fab-btn:hover{background:rgba(255,255,255,.12);border-color:${T.accent};transform:scale(1.08)}`,
+        `.n3-fab-btn.n3-active{background:${T.accent};border-color:${T.accent};box-shadow:0 0 0 3px rgba(59,130,246,.3)}`,
+        `.n3-fab-btn.n3-editing{background:#EF4444;border-color:#EF4444}`,
+        // ── Analytics overlay ────────────────────────────────────────────────
+        `.n3-analytics-overlay{position:fixed;bottom:0;left:0;right:0;z-index:999995;background:rgba(15,23,42,.97);border-top:1px solid ${T.border};transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:50vh;overflow-y:auto;font:13px/1.5 system-ui,sans-serif;color:${T.text};backdrop-filter:blur(8px)}`,
+        `.n3-analytics-overlay.n3-open{transform:translateY(0)}`,
+        `.n3-an-header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid ${T.border};background:${T.bgPanel};position:sticky;top:0;z-index:1}`,
+        `.n3-an-tabs{display:flex;gap:4px;flex:1}`,
+        `.n3-an-tab{background:transparent;border:1px solid transparent;color:${T.muted};padding:4px 12px;border-radius:6px;cursor:pointer;font:inherit;font-size:12px;font-weight:600;transition:all .12s}`,
+        `.n3-an-tab.n3-an-active{background:rgba(255,255,255,.08);border-color:${T.border};color:${T.text}}`,
+        `.n3-an-periods{display:flex;gap:2px}`,
+        `.n3-an-period{background:transparent;border:1px solid transparent;color:${T.muted};padding:3px 8px;border-radius:5px;cursor:pointer;font:600 11px/1 system-ui;transition:all .12s}`,
+        `.n3-an-period.n3-an-active{background:rgba(59,130,246,.2);border-color:rgba(59,130,246,.4);color:${T.accent}}`,
+        `.n3-an-close{background:transparent;border:none;color:${T.muted};cursor:pointer;font-size:16px;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}`,
+        `.n3-an-close:hover{background:rgba(255,255,255,.1);color:${T.text}}`,
+        `.n3-an-body{padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}`,
+        `.n3-an-loading{color:${T.muted};font-size:12px;padding:16px 0;width:100%;text-align:center}`,
+        `.n3-an-error{color:#F87171;font-size:12px;padding:8px 0;width:100%}`,
+        `.n3-an-stats{display:flex;gap:8px;flex-wrap:wrap;width:100%}`,
+        `.n3-an-stat{background:rgba(255,255,255,.05);border:1px solid ${T.border};border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:4px;min-width:80px}`,
+        `.n3-an-stat-val{font-size:20px;font-weight:700;line-height:1;display:flex;align-items:center;gap:6px}`,
+        `.n3-an-stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:${T.muted}}`,
+        `.n3-an-pulse{width:8px;height:8px;border-radius:50%;background:#22C55E;animation:n3-pulse 2s ease-in-out infinite;display:inline-block}`,
+        `@keyframes n3-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}`,
+        `.n3-an-chart-wrap{width:100%}`,
+        `.n3-an-chart-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:${T.muted};margin-bottom:6px}`,
+        `.n3-an-chart{width:100%;overflow:visible}`,
+        `.n3-an-section{width:100%}`,
+        `.n3-an-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:${T.muted};margin-bottom:8px}`,
+        `.n3-an-sources{display:flex;align-items:center;gap:12px}`,
+        `.n3-an-donut{flex-shrink:0}`,
+        `.n3-an-legend{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}`,
+        `.n3-an-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;overflow:hidden}`,
+        `.n3-an-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}`,
+        `.n3-an-legend-val{margin-left:auto;color:${T.muted};flex-shrink:0}`,
+        `.n3-an-device-bar{height:8px;border-radius:4px;overflow:hidden;display:flex;background:${T.border};margin-bottom:6px}`,
+        `.n3-an-device-seg{height:100%;transition:width .5s ease}`,
+        `.n3-an-device-labels{display:flex;gap:12px;font-size:11px;color:${T.muted}}`,
+        `.n3-an-top-item{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}`,
+        `.n3-an-top-path{color:${T.muted};truncate:true;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:70%}`,
+        `.n3-an-top-count{color:${T.text};font-weight:600;flex-shrink:0}`,
+        `.n3-an-connect-prompt{display:flex;align-items:center;gap:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:10px 14px;font-size:12px;color:${T.muted};width:100%}`,
       ].join('\n');
       document.head.appendChild(s);
     }
@@ -246,7 +296,8 @@
         el.closest('.n3-format-bar')      ||
         el.closest('.n3-style-panel')     ||
         el.closest('.n3-toolbar')         ||
-        el.closest('.n3-edit-btn')        ||
+        el.closest('.n3-fab')              ||
+        el.closest('.n3-analytics-overlay') ||
         el.closest('.n3-confirm-overlay') ||
         el.closest('.n3-toast')
       ));
@@ -1092,6 +1143,235 @@
     try { return new Date(iso).toLocaleString(undefined, { dateStyle:'short', timeStyle:'short' }); }
     catch { return iso || ''; }
   }
+  function _fmtNum(n) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n || 0); }
+  function _fmtDur(s) { if (!s) return '—'; if (s < 60) return Math.round(s) + 's'; return Math.floor(s / 60) + 'm ' + Math.round(s % 60) + 's'; }
+  function _svgArc(cx, cy, r, startDeg, endDeg, color) {
+    const toRad = d => (d - 90) * Math.PI / 180;
+    const inner = r * 0.56;
+    const x1 = cx + r     * Math.cos(toRad(startDeg));
+    const y1 = cy + r     * Math.sin(toRad(startDeg));
+    const x2 = cx + r     * Math.cos(toRad(endDeg));
+    const y2 = cy + r     * Math.sin(toRad(endDeg));
+    const ix1= cx + inner * Math.cos(toRad(endDeg));
+    const iy1= cy + inner * Math.sin(toRad(endDeg));
+    const ix2= cx + inner * Math.cos(toRad(startDeg));
+    const iy2= cy + inner * Math.sin(toRad(startDeg));
+    const large = endDeg - startDeg > 180 ? 1 : 0;
+    return `<path d="M${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2} L${ix1} ${iy1} A${inner} ${inner} 0 ${large} 0 ${ix2} ${iy2} Z" fill="${color}" opacity="0.9"/>`;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // N3Analytics — page-level analytics overlay
+  // ═══════════════════════════════════════════════════════════════════════════
+  class N3Analytics {
+    /**
+     * @param {{ api: string, site: string, key: string }|null} cloudCfg
+     */
+    constructor(cloudCfg) {
+      this._cfg      = cloudCfg;
+      this._el       = null;
+      this._open     = false;
+      this._tab      = 'page';
+      this._period   = '7d';
+      this._cache    = {};
+      this._cacheTtl = 5 * 60 * 1000;
+    }
+
+    /** Append the overlay to the document body. */
+    mount() {
+      this._el = document.createElement('div');
+      this._el.className = 'n3-analytics-overlay';
+      this._el.setAttribute('data-n3-ui', '1');
+      const skelHtml = this._skeleton();
+      this._el.innerHTML = skelHtml;
+      this._el.querySelector('.n3-an-close').addEventListener('click', () => this.close());
+      this._el.querySelector('.n3-an-tabs').addEventListener('click', e => {
+        const tab = e.target.closest('[data-tab]');
+        if (tab) this._switchTab(tab.dataset.tab);
+      });
+      this._el.querySelector('.n3-an-periods').addEventListener('click', e => {
+        const btn = e.target.closest('[data-period]');
+        if (btn) this._setPeriod(btn.dataset.period);
+      });
+      document.body.appendChild(this._el);
+    }
+
+    toggle() { this._open ? this.close() : this.open(); }
+
+    open() {
+      if (!this._el) return;
+      this._el.classList.add('n3-open');
+      this._open = true;
+      this._load();
+    }
+
+    close() {
+      if (!this._el) return;
+      this._el.classList.remove('n3-open');
+      this._open = false;
+    }
+
+    /** @returns {boolean} */
+    isOpen() { return this._open; }
+
+    // ── Private ───────────────────────────────────────────────────────────────
+
+    _skeleton() {
+      return `<div class="n3-an-header">
+        <div class="n3-an-tabs">
+          <button class="n3-an-tab n3-an-active" data-tab="page">This Page</button>
+          <button class="n3-an-tab" data-tab="all">All Pages</button>
+        </div>
+        <div class="n3-an-periods">
+          <button class="n3-an-period n3-an-active" data-period="7d">7d</button>
+          <button class="n3-an-period" data-period="30d">30d</button>
+          <button class="n3-an-period" data-period="90d">90d</button>
+        </div>
+        <button class="n3-an-close" title="Close">✕</button>
+      </div>
+      <div class="n3-an-body"><p class="n3-an-loading">Loading analytics…</p></div>`;
+    }
+
+    _switchTab(tab) {
+      this._tab = tab;
+      this._el.querySelectorAll('.n3-an-tab').forEach(b => b.classList.toggle('n3-an-active', b.dataset.tab === tab));
+      this._load();
+    }
+
+    _setPeriod(p) {
+      this._period = p;
+      this._el.querySelectorAll('.n3-an-period').forEach(b => b.classList.toggle('n3-an-active', b.dataset.period === p));
+      this._load();
+    }
+
+    async _load() {
+      const key    = `${this._tab}-${this._period}`;
+      const cached = this._cache[key];
+      if (cached && Date.now() - cached.ts < this._cacheTtl) { this._render(cached.data); return; }
+      this._el.querySelector('.n3-an-body').innerHTML = '<p class="n3-an-loading">Loading…</p>';
+      try {
+        const data = await this._fetch();
+        this._cache[key] = { data, ts: Date.now() };
+        this._render(data);
+      } catch (e) {
+        this._el.querySelector('.n3-an-body').innerHTML = `<p class="n3-an-error">Error: ${_esc(e.message)}</p>`;
+      }
+    }
+
+    async _fetch() {
+      if (!this._cfg) return this._empty();
+      const { api, site, key } = this._cfg;
+      const h = key ? { 'X-API-Key': key } : {};
+      const periodQ = `period=${this._period}`;
+
+      if (this._tab === 'page') {
+        const pagePath = window.location.pathname;
+        const res = await fetch(`${api}/sites/${site}/ga/page?path=${encodeURIComponent(pagePath)}&${periodQ}`, { headers: h });
+        if (res.status === 404) return this._fallback();
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      } else {
+        const res = await fetch(`${api}/sites/${site}/ga/stats?${periodQ}`, { headers: h });
+        if (res.status === 404) return this._fallback();
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      }
+    }
+
+    async _fallback() {
+      if (!this._cfg) return this._empty();
+      const { api, site, key } = this._cfg;
+      const h = key ? { 'X-API-Key': key } : {};
+      const [stats, daily] = await Promise.all([
+        fetch(`${api}/analytics/${site}?period=${this._period}`, { headers: h }).then(r => r.json()).catch(() => ({})),
+        fetch(`${api}/analytics/${site}/daily?days=14`,          { headers: h }).then(r => r.json()).catch(() => ({})),
+      ]);
+      return { views: stats.views || 0, uniqueVisitors: stats.uniqueVisitors || 0, avgDuration: null, bounceRate: null, daily: (daily.daily || []).slice(-14), sources: [], devices: {}, topPages: stats.topPages || [], realtime: null, gaConnected: false };
+    }
+
+    _empty() { return { views: 0, uniqueVisitors: 0, avgDuration: null, bounceRate: null, daily: [], sources: [], devices: {}, topPages: [], realtime: null, gaConnected: false }; }
+
+    _render(data) {
+      const body = this._el.querySelector('.n3-an-body');
+
+      // Stat cards
+      const statsHtml = `<div class="n3-an-stats">
+        <div class="n3-an-stat"><span class="n3-an-stat-val">${_fmtNum(data.views)}</span><span class="n3-an-stat-label">Views</span></div>
+        <div class="n3-an-stat"><span class="n3-an-stat-val">${_fmtNum(data.uniqueVisitors)}</span><span class="n3-an-stat-label">Visitors</span></div>
+        ${data.avgDuration != null ? `<div class="n3-an-stat"><span class="n3-an-stat-val">${_fmtDur(data.avgDuration)}</span><span class="n3-an-stat-label">Avg Time</span></div>` : ''}
+        ${data.bounceRate  != null ? `<div class="n3-an-stat"><span class="n3-an-stat-val">${Math.round(data.bounceRate)}%</span><span class="n3-an-stat-label">Bounce</span></div>` : ''}
+        ${data.realtime    != null ? `<div class="n3-an-stat"><span class="n3-an-stat-val"><span class="n3-an-pulse"></span>${data.realtime}</span><span class="n3-an-stat-label">Live Now</span></div>` : ''}
+      </div>`;
+
+      // SVG bar chart (14 days)
+      let chartHtml = '';
+      if (data.daily && data.daily.length) {
+        const days = data.daily.slice(-14);
+        const max  = Math.max(...days.map(d => d.views), 1);
+        const W    = days.length * 14;
+        const bars = days.map((d, i) => {
+          const h = Math.max(Math.round((d.views / max) * 80), 2);
+          return `<rect x="${i * 14 + 1}" y="${100 - h}" width="10" height="${h}" fill="${T.accent}" rx="2" opacity=".9"><title>${d.date}: ${d.views} views</title></rect>`;
+        }).join('');
+        chartHtml = `<div class="n3-an-chart-wrap"><p class="n3-an-chart-title">Daily Views (${days.length}d)</p><svg class="n3-an-chart" viewBox="0 0 ${W} 100" preserveAspectRatio="none" height="56">${bars}</svg></div>`;
+      }
+
+      // Traffic sources donut
+      let sourcesHtml = '';
+      if (data.sources && data.sources.length) {
+        const total  = data.sources.reduce((s, x) => s + (x.sessions || 0), 0) || 1;
+        const colors = [T.accent, '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+        let   offset = 0;
+        const slices = data.sources.slice(0, 5).map((src, i) => {
+          const deg   = (src.sessions || 0) / total * 360;
+          const slice = _svgArc(32, 32, 28, offset, offset + deg, colors[i % colors.length]);
+          offset += deg;
+          return `<g>${slice}<title>${_esc(src.source || src.medium)}: ${src.sessions}</title></g>`;
+        }).join('');
+        const legend = data.sources.slice(0, 5).map((src, i) =>
+          `<div class="n3-an-legend-item"><span class="n3-an-legend-dot" style="background:${colors[i % colors.length]}"></span><span>${_esc(src.source || src.medium || 'Other')}</span><span class="n3-an-legend-val">${_fmtNum(src.sessions || 0)}</span></div>`
+        ).join('');
+        sourcesHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Traffic Sources</p><div class="n3-an-sources"><svg class="n3-an-donut" viewBox="0 0 64 64" width="72" height="72">${slices}</svg><div class="n3-an-legend">${legend}</div></div></div>`;
+      }
+
+      // Device breakdown
+      let devHtml = '';
+      if (data.devices && (data.devices.mobile || data.devices.desktop)) {
+        const { mobile = 0, desktop = 0, tablet = 0 } = data.devices;
+        const tot = mobile + desktop + tablet || 1;
+        const mP = Math.round(mobile  / tot * 100);
+        const dP = Math.round(desktop / tot * 100);
+        const tP = 100 - mP - dP;
+        devHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Devices</p>
+          <div class="n3-an-device-bar">
+            ${mP ? `<div class="n3-an-device-seg" style="width:${mP}%;background:${T.accent}" title="Mobile ${mP}%"></div>` : ''}
+            ${dP ? `<div class="n3-an-device-seg" style="width:${dP}%;background:#10B981"   title="Desktop ${dP}%"></div>` : ''}
+            ${tP ? `<div class="n3-an-device-seg" style="width:${tP}%;background:#F59E0B"   title="Tablet ${tP}%"></div>` : ''}
+          </div>
+          <div class="n3-an-device-labels">
+            ${mP ? `<span style="color:${T.accent}">📱 ${mP}%</span>` : ''}
+            ${dP ? `<span style="color:#10B981">🖥 ${dP}%</span>` : ''}
+            ${tP ? `<span style="color:#F59E0B">⬜ ${tP}%</span>` : ''}
+          </div></div>`;
+      }
+
+      // Top pages
+      let topHtml = '';
+      if (data.topPages && data.topPages.length) {
+        const items = data.topPages.slice(0, 5).map(p =>
+          `<div class="n3-an-top-item"><span class="n3-an-top-path">${_esc(p.path)}</span><span class="n3-an-top-count">${_fmtNum(p.views || p.count || 0)}</span></div>`
+        ).join('');
+        topHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Top Pages</p>${items}</div>`;
+      }
+
+      // GA4 connect prompt
+      const connectHtml = !data.gaConnected && this._cfg
+        ? `<div class="n3-an-connect-prompt"><span>📊</span><span>Connect Google Analytics for richer insights — available in dashboard settings</span></div>` : '';
+
+      const renderedHtml = statsHtml + chartHtml + sourcesHtml + devHtml + topHtml + connectHtml;
+      body.innerHTML = renderedHtml;
+    }
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // N3Editor — main orchestrator + public-facing API
@@ -1123,8 +1403,10 @@
       this.cloud    = this._cloudCfg
         ? new N3Cloud(this._cloudCfg.api, this._cloudCfg.site, this._cloudCfg.key)
         : null;
-      this.revPanel = this.cloud ? new N3RevPanel(this.events, this.cloud) : null;
-      this._editBtn = null;
+      this.revPanel  = this.cloud ? new N3RevPanel(this.events, this.cloud) : null;
+      this.analytics = new N3Analytics(this._cloudCfg);
+      this._fab      = null;
+      this._fabOpen  = false;
 
       this._onKeyDown = this._handleKeyDown.bind(this);
     }
@@ -1135,7 +1417,8 @@
       this.toolbar.mount();
       this.panel.mount();
       if (this.revPanel) this.revPanel.mount();
-      this._buildEditButton();
+      this.analytics.mount();
+      this._buildControlPanel();
       this._wireEvents();
       document.addEventListener('keydown', this._onKeyDown);
     }
@@ -1182,30 +1465,64 @@
           events: this.events, history: this.history, exporter: this.exporter,
           text: this.text, drag: this.drag, controls: this.controls,
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
+          analytics: this.analytics,
         },
       };
     }
 
     // ── Private ──────────────────────────────────────────────────────────────
 
-    _buildEditButton() {
-      this._editBtn = document.createElement('button');
-      this._editBtn.className = 'n3-edit-btn';
-      this._editBtn.setAttribute('data-n3-ui', '1');
-      this._editBtn.title = 'Toggle Edit Mode (Ctrl+Shift+E)';
-      this._syncEditBtn(false);
-      this._editBtn.addEventListener('click', () => this.toggle());
-      document.body.appendChild(this._editBtn);
+    _buildControlPanel() {
+      const PENCIL = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+      const CHART  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>`;
+
+      this._fab = document.createElement('div');
+      this._fab.className = 'n3-fab';
+      this._fab.setAttribute('data-n3-ui', '1');
+
+      // Action buttons (hidden until expanded)
+      const actions = document.createElement('div');
+      actions.className = 'n3-fab-actions';
+
+      // Analytics button
+      const analyticsBtn = document.createElement('button');
+      analyticsBtn.className = 'n3-fab-btn';
+      analyticsBtn.innerHTML = CHART;
+      analyticsBtn.title = 'Analytics';
+      analyticsBtn.addEventListener('click', e => { e.stopPropagation(); this.analytics.toggle(); analyticsBtn.classList.toggle('n3-active', this.analytics.isOpen()); });
+
+      // Edit button
+      const editBtn = document.createElement('button');
+      editBtn.className = 'n3-fab-btn';
+      editBtn.innerHTML = PENCIL;
+      editBtn.title = 'Toggle Edit Mode (Ctrl+Shift+E)';
+      editBtn.addEventListener('click', e => { e.stopPropagation(); this.toggle(); });
+
+      actions.appendChild(analyticsBtn);
+      actions.appendChild(editBtn);
+      this._editFabBtn     = editBtn;
+      this._analyticsFabBtn = analyticsBtn;
+
+      // Main toggle ("n") button
+      const toggle = document.createElement('button');
+      toggle.className = 'n3-fab-toggle';
+      toggle.innerHTML = 'n';
+      toggle.title = 'n3ware';
+      toggle.addEventListener('click', () => {
+        this._fabOpen = !this._fabOpen;
+        this._fab.classList.toggle('n3-expanded', this._fabOpen);
+      });
+
+      this._fab.appendChild(actions);
+      this._fab.appendChild(toggle);
+      document.body.appendChild(this._fab);
     }
 
     _syncEditBtn(on) {
-      if (on) {
-        this._editBtn.className = 'n3-edit-btn n3-active';
-        this._editBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> Editing`;
-      } else {
-        this._editBtn.className = 'n3-edit-btn';
-        this._editBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit`;
-      }
+      if (!this._editFabBtn) return;
+      this._editFabBtn.classList.toggle('n3-editing', on);
+      const toggle = this._fab && this._fab.querySelector('.n3-fab-toggle');
+      if (toggle) toggle.classList.toggle('n3-editing', on);
     }
 
     _enter() {

@@ -85,6 +85,8 @@
             class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-slate-800">Sites</button>
           <button onclick="showView('billing')" id="nav-billing"
             class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800">Billing</button>
+          <button onclick="showView('analytics')" id="nav-analytics"
+            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800">Analytics</button>
         </nav>
       </div>
       <div class="flex items-center gap-3">
@@ -122,6 +124,15 @@
           Create Your First Site
         </button>
       </div>
+    </div>
+
+    <!-- ── Analytics view ── -->
+    <div id="view-analytics" class="hidden">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold">Analytics</h1>
+        <p class="text-slate-400 text-sm mt-0.5">Traffic across all connected sites.</p>
+      </div>
+      <div id="analytics-view-content" class="space-y-5"></div>
     </div>
 
     <!-- ── Billing view ── -->
@@ -298,6 +309,8 @@
         class="tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-slate-700">General</button>
       <button onclick="switchSettingsTab('files')" id="stab-files"
         class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-slate-400 hover:text-white">Files</button>
+      <button onclick="switchSettingsTab('ga')" id="stab-ga"
+        class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-slate-400 hover:text-white">Analytics</button>
     </div>
 
     <!-- General tab -->
@@ -351,6 +364,38 @@
         <h3 class="text-sm font-bold text-red-400 mb-1">Danger Zone</h3>
         <p class="text-xs text-slate-400 mb-4">Deleting this site is permanent. All revisions will be lost.</p>
         <button onclick="confirmDeleteSite()" class="text-sm bg-red-900/40 hover:bg-red-900/70 text-red-400 border border-red-900/50 px-5 py-2 rounded-lg transition">Delete This Site</button>
+      </div>
+    </div>
+
+    <!-- Analytics / GA tab -->
+    <div id="settings-ga" class="settings-tab p-6 space-y-5">
+      <div>
+        <p class="text-sm font-semibold text-slate-300 mb-1">Google Analytics 4</p>
+        <p class="text-xs text-slate-400 mb-4">Connect a GA4 property to get richer analytics — traffic sources, device breakdown, geography, and real-time data.</p>
+        <!-- Connected state -->
+        <div id="ga-connected-state" class="hidden mb-4">
+          <div class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
+            <div>
+              <p id="ga-property-name" class="text-sm font-semibold text-emerald-400"></p>
+              <p class="text-xs text-slate-400 mt-0.5">Google Analytics 4 connected</p>
+            </div>
+            <button onclick="disconnectGA()" class="text-xs text-red-400 hover:text-red-300 transition">Disconnect</button>
+          </div>
+        </div>
+        <!-- Connect form -->
+        <div id="ga-connect-form">
+          <button onclick="loadGAProperties()" id="ga-load-props-btn"
+            class="text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition mb-3">
+            Load GA4 Properties
+          </button>
+          <div id="ga-properties-list" class="hidden space-y-2 mb-3"></div>
+          <p id="ga-connect-error" class="text-red-400 text-xs mt-2 hidden"></p>
+        </div>
+      </div>
+      <!-- Quick stats for connected site -->
+      <div id="ga-quick-stats" class="hidden">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Last 7 Days</p>
+        <div id="ga-stats-cards" class="grid grid-cols-2 gap-3"></div>
       </div>
     </div>
 
@@ -486,13 +531,16 @@ async function showDashboard() {
 // ── View switching ────────────────────────────────────────────────────────────
 function showView(view) {
   S.currentView = view;
-  ['sites', 'billing'].forEach(v => {
+  ['sites', 'billing', 'analytics'].forEach(v => {
     document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
     const nb = document.getElementById(`nav-${v}`);
-    if (v === view) { nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-slate-800'; }
-    else { nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800'; }
+    if (nb) {
+      if (v === view) nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-slate-800';
+      else            nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800';
+    }
   });
-  if (view === 'billing') loadBilling();
+  if (view === 'billing')   loadBilling();
+  if (view === 'analytics') loadAnalyticsView();
 }
 
 // ── Sites ─────────────────────────────────────────────────────────────────────
@@ -877,13 +925,14 @@ function renderAnalytics(stats, daily) {
 
 // ── Settings modal ────────────────────────────────────────────────────────────
 function switchSettingsTab(tab) {
-  ['general','files'].forEach(t => {
+  ['general','files','ga'].forEach(t => {
     document.getElementById(`settings-${t}`).classList.toggle('active', t === tab);
     document.getElementById(`stab-${t}`).className = t === tab
       ? 'tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-slate-700'
       : 'tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-slate-400 hover:text-white';
   });
   if (tab === 'files') loadFiles();
+  if (tab === 'ga')    loadGATab();
 }
 function openSettings(siteId) {
   const site = S.sites.find(s => s.id === siteId);
@@ -1037,6 +1086,125 @@ async function deleteFile(name) {
     toast('File deleted', 'info');
     loadFiles();
   } catch (err) { toast('Delete failed: ' + err.message, 'error'); }
+}
+
+// ── Google Analytics settings tab ────────────────────────────────────────────
+async function loadGATab() {
+  if (!S.activeSite) return;
+  const errEl = document.getElementById('ga-connect-error');
+  errEl.classList.add('hidden');
+  try {
+    const data = await api('GET', `/api/sites/${S.activeSite}/ga/stats?period=7d`).catch(() => null);
+    if (data && data.gaConnected) {
+      document.getElementById('ga-connected-state').classList.remove('hidden');
+      document.getElementById('ga-connect-form').classList.add('hidden');
+      document.getElementById('ga-property-name').textContent = data.propertyName || data.propertyId || 'Connected';
+      _renderGAQuickStats(data);
+    } else {
+      document.getElementById('ga-connected-state').classList.add('hidden');
+      document.getElementById('ga-connect-form').classList.remove('hidden');
+      document.getElementById('ga-quick-stats').classList.add('hidden');
+    }
+  } catch { /* silent */ }
+}
+
+async function loadGAProperties() {
+  const btn   = document.getElementById('ga-load-props-btn');
+  const list  = document.getElementById('ga-properties-list');
+  const errEl = document.getElementById('ga-connect-error');
+  errEl.classList.add('hidden');
+  btn.disabled = true; btn.textContent = 'Loading…';
+  try {
+    const data = await api('GET', '/api/ga/properties');
+    const props = data.properties || [];
+    if (!props.length) { errEl.textContent = 'No GA4 properties found.'; errEl.classList.remove('hidden'); return; }
+    list.innerHTML = props.map(p => `
+      <div class="flex items-center justify-between bg-slate-700/50 rounded-xl px-4 py-3">
+        <div>
+          <p class="text-sm font-semibold">${esc(p.displayName)}</p>
+          <p class="text-xs text-slate-400">ID: ${esc(p.propertyId)}</p>
+        </div>
+        <button onclick="connectGAProperty('${esc(p.propertyId)}','${esc(p.displayName)}')"
+          class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition font-semibold">Connect</button>
+      </div>`).join('');
+    list.classList.remove('hidden');
+  } catch (err) { errEl.textContent = err.message; errEl.classList.remove('hidden'); }
+  finally { btn.disabled = false; btn.textContent = 'Load GA4 Properties'; }
+}
+
+async function connectGAProperty(propertyId, propertyName) {
+  try {
+    await api('POST', `/api/sites/${S.activeSite}/ga/connect`, { propertyId, propertyName });
+    toast(`Connected to "${propertyName}"`, 'success');
+    loadGATab();
+  } catch (err) { toast('Connect failed: ' + err.message, 'error'); }
+}
+
+async function disconnectGA() {
+  if (!confirm('Disconnect Google Analytics from this site?')) return;
+  try {
+    await api('DELETE', `/api/sites/${S.activeSite}/ga`);
+    toast('GA4 disconnected', 'info');
+    loadGATab();
+  } catch (err) { toast('Failed: ' + err.message, 'error'); }
+}
+
+function _renderGAQuickStats(data) {
+  const el = document.getElementById('ga-quick-stats');
+  const cards = document.getElementById('ga-stats-cards');
+  el.classList.remove('hidden');
+  cards.innerHTML = [
+    ['Views',    fmtNum(data.views || 0)],
+    ['Visitors', fmtNum(data.uniqueVisitors || 0)],
+    ['Live Now', data.realtime != null ? data.realtime : '—'],
+    ['Top Page', (data.topPages || [])[0]?.path || '—'],
+  ].map(([label, val]) => `
+    <div class="bg-slate-700/50 rounded-xl p-3 text-center">
+      <p class="text-lg font-bold truncate">${esc(String(val))}</p>
+      <p class="text-xs text-slate-400 mt-0.5">${esc(label)}</p>
+    </div>`).join('');
+}
+
+// ── Analytics view (main nav tab) ─────────────────────────────────────────────
+async function loadAnalyticsView() {
+  const el = document.getElementById('analytics-view-content');
+  el.innerHTML = '<p class="text-slate-400 text-sm text-center py-12">Loading…</p>';
+  if (!S.sites.length) { el.innerHTML = '<p class="text-slate-500 text-sm text-center py-12">No sites yet. Create a site to see analytics.</p>'; return; }
+
+  const rows = await Promise.all(S.sites.map(async site => {
+    try {
+      const data = await api('GET', `/api/sites/${site.id}/ga/stats?period=7d`);
+      return { site, data };
+    } catch { return { site, data: null }; }
+  }));
+
+  el.innerHTML = rows.map(({ site, data }) => {
+    const [c1, c2] = siteColours(site.id);
+    if (!data) return `
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white/50 text-lg" style="background:linear-gradient(135deg,${c1},${c2})">${esc((site.name||'U')[0].toUpperCase())}</div>
+          <p class="font-semibold text-sm">${esc(site.name||'Untitled')}</p>
+        </div>
+        <button onclick="openSettings('${esc(site.id)}')" class="text-xs text-blue-400 hover:text-blue-300 transition">Connect GA4 →</button>
+      </div>`;
+    return `
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white/50" style="background:linear-gradient(135deg,${c1},${c2})">${esc((site.name||'U')[0].toUpperCase())}</div>
+            <div>
+              <p class="font-semibold text-sm">${esc(site.name||'Untitled')}</p>
+              ${data.propertyName ? `<p class="text-xs text-emerald-400">${esc(data.propertyName)}</p>` : ''}
+            </div>
+          </div>
+          <button onclick="openAnalytics('${esc(site.id)}')" class="text-xs text-slate-400 hover:text-white transition">Details →</button>
+        </div>
+        <div class="grid grid-cols-4 gap-3">
+          ${[['Views',fmtNum(data.views||0)],['Visitors',fmtNum(data.uniqueVisitors||0)],['Live',data.realtime??'—'],['Top',((data.topPages||[])[0]?.path||'—')]].map(([l,v])=>`<div class="bg-slate-700/50 rounded-xl p-3 text-center"><p class="text-base font-bold truncate">${esc(String(v))}</p><p class="text-xs text-slate-400 mt-0.5">${esc(l)}</p></div>`).join('')}
+        </div>
+      </div>`;
+  }).join('');
 }
 
 // ── Billing ───────────────────────────────────────────────────────────────────

@@ -15,6 +15,7 @@ const domainsApi   = require('./src/api/domains');
 const uploadsApi   = require('./src/api/uploads');
 const analyticsApi = require('./src/api/analytics-routes');
 const migrateApi   = require('./src/api/migrate');
+const gaApi        = require('./src/api/ga');
 
 // Initialize integrations (logs mock-mode notices)
 require('./src/integrations');
@@ -76,6 +77,10 @@ app.use('/api/analytics', analyticsApi);
 
 // ── Migration ─────────────────────────────────────────────────────────────────
 app.use('/api/migrate', migrateApi);
+
+// ── Google Analytics ──────────────────────────────────────────────────────────
+app.use('/api/ga',           gaApi);
+app.use('/api/sites',        gaApi);  // nested: /api/sites/:id/ga/*
 
 // ── Cache stats (internal) ───────────────────────────────────────────────────
 app.get('/api/cache/stats', (req, res) => {
