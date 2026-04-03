@@ -18,6 +18,10 @@
 (function (global) {
   'use strict';
 
+  // Capture script element at parse time so data-n3-* attributes are readable
+  // even after DOMContentLoaded fires.
+  const _n3Script = (typeof document !== 'undefined') ? document.currentScript : null;
+
   // ─── Design tokens ────────────────────────────────────────────────────────
   const T = {
     accent:     '#3B82F6',
@@ -165,6 +169,15 @@
         `.n3-confirm-cancel:hover{background:rgba(255,255,255,.14)}`,
         `.n3-confirm-ok{background:#EF4444;color:#fff}`,
         `.n3-confirm-ok:hover{background:#DC2626}`,
+        `.n3-toolbar-btn.n3-primary{background:${T.accent};color:#fff}`,
+        `.n3-toolbar-btn.n3-primary:hover{background:${T.accentDark}}`,
+        `.n3-rev-box{min-width:480px;max-width:600px}`,
+        `.n3-rev-list{max-height:320px;overflow-y:auto;margin:0 -4px 16px;padding:0 4px}`,
+        `.n3-rev-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid ${T.border};font:13px/1 system-ui,sans-serif}`,
+        `.n3-rev-row:last-child{border-bottom:none}`,
+        `.n3-rev-date{flex:1;color:${T.text}}`,
+        `.n3-rev-id{font-family:monospace;font-size:11px;color:${T.muted}}`,
+        `.n3-rev-empty{color:${T.muted};font-size:13px;padding:12px 0;text-align:center}`,
       ].join('\n');
       document.head.appendChild(s);
     }
@@ -861,9 +874,13 @@
   // N3Toolbar — top toolbar in edit mode
   // ═══════════════════════════════════════════════════════════════════════════
   class N3Toolbar {
-    /** @param {N3Events} events */
-    constructor(events) {
+    /**
+     * @param {N3Events} events
+     * @param {{api:string,site:string,key:string}|null} [cloudConfig]
+     */
+    constructor(events, cloudConfig) {
       this._events = events;
+      this._cloud  = cloudConfig || null;
       /** @type {HTMLElement|null} */
       this._el = null;
     }
@@ -883,6 +900,7 @@
         <button class="n3-toolbar-btn" data-action="save-html">⬇ Download</button>
         <button class="n3-toolbar-btn" data-action="copy-html">⎘ Copy HTML</button>
         <button class="n3-toolbar-btn" data-action="json-diff">{ } Diff</button>
+        ${this._cloud ? `<div class="n3-toolbar-sep"></div><button class="n3-toolbar-btn n3-primary" data-action="cloud-save">&#x2601; Publish</button><button class="n3-toolbar-btn" data-action="revisions">&#x21BA; Revisions</button>` : ''}
         <div class="n3-toolbar-spacer"></div>
         <button class="n3-toolbar-btn n3-danger" data-action="exit-edit">✕ Exit Editor</button>`;
       this._el.addEventListener('click', e => {
@@ -915,10 +933,14 @@
   // N3Editor — main orchestrator + public-facing API
   // ═══════════════════════════════════════════════════════════════════════════
   class N3Editor {
-    constructor() {
+    /**
+     * @param {{api:string,site:string,key:string}|null} [cloudConfig]
+     */
+    constructor(cloudConfig) {
       this._editMode    = false;
       this._activeEl    = null;
       this._initialHTML = null;
+      this._cloudConfig = cloudConfig || null;
 
       // Module instantiation
       this.events   = new N3Events();
@@ -928,7 +950,7 @@
       this.drag     = new N3DragManager(this.events);
       this.controls = new N3ElementControls(this.events, this.drag);
       this.panel    = new N3StylePanel(this.events);
-      this.toolbar  = new N3Toolbar(this.events);
+      this.toolbar  = new N3Toolbar(this.events, this._cloudConfig);
       this._editBtn = null;
 
       this._onKeyDown = this._handleKeyDown.bind(this);
@@ -991,6 +1013,84 @@
     }
 
     // ── Private ──────────────────────────────────────────────────────────────
+
+    _doCloudSave() {
+      if (!this._cloudConfig) return;
+      const html = this.exporter.cleanHTML();
+      N3UI.toast('Publishing\u2026', 'info', 5000);
+      fetch(this._cloudConfig.api + '/api/sites/' + this._cloudConfig.site + '/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': this._cloudConfig.key },
+        body: JSON.stringify({ html }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.revisionId) {
+            N3UI.toast('Published \u2713 Rev ' + data.revisionId.slice(0, 8), 'success');
+          } else {
+            N3UI.toast('Publish failed: ' + (data.error || 'unknown error'), 'error');
+          }
+        })
+        .catch(err => N3UI.toast('Publish error: ' + err.message, 'error'));
+    }
+
+    _doShowRevisions() {
+      if (!this._cloudConfig) return;
+      fetch(this._cloudConfig.api + '/api/sites/' + this._cloudConfig.site + '/revisions', {
+        headers: { 'X-API-Key': this._cloudConfig.key },
+      })
+        .then(r => r.json())
+        .then(revs => this._openRevisionModal(revs))
+        .catch(err => N3UI.toast('Could not load revisions: ' + err.message, 'error'));
+    }
+
+    _openRevisionModal(revisions) {
+      const existing = document.querySelector('.n3-rev-modal');
+      if (existing) existing.remove();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'n3-confirm-overlay n3-rev-modal';
+      overlay.setAttribute('data-n3-ui', '1');
+
+      const noRevs = '<div class="n3-rev-empty">No revisions yet \u2014 save to create one.</div>';
+      const rows = revisions.length
+        ? revisions.map(r =>
+          `<div class="n3-rev-row"><span class="n3-rev-date">${new Date(r.createdAt).toLocaleString()}</span><span class="n3-rev-id">${r.id.slice(0, 8)}</span><button class="n3-toolbar-btn" data-rev-id="${r.id}">Restore</button></div>`
+        ).join('')
+        : noRevs;
+
+      overlay.innerHTML = `<div class="n3-confirm-box n3-rev-box"><div class="n3-confirm-title">Revisions</div><div class="n3-rev-list">${rows}</div><div class="n3-confirm-actions"><button class="n3-confirm-btn n3-confirm-cancel">Close</button></div></div>`;
+      document.body.appendChild(overlay);
+
+      const close = () => overlay.remove();
+      overlay.querySelector('.n3-confirm-cancel').onclick = close;
+      overlay.onclick = e => { if (e.target === overlay) close(); };
+
+      overlay.querySelectorAll('[data-rev-id]').forEach(btn => {
+        btn.onclick = () => {
+          N3UI.confirm('Restore revision', 'This will replace the current live page. Continue?')
+            .then(ok => {
+              if (!ok) return;
+              const revId = btn.getAttribute('data-rev-id');
+              fetch(this._cloudConfig.api + '/api/sites/' + this._cloudConfig.site + '/revisions/' + revId + '/rollback', {
+                method: 'POST',
+                headers: { 'X-API-Key': this._cloudConfig.key },
+              })
+                .then(r => r.json())
+                .then(data => {
+                  if (data.revisionId) {
+                    close();
+                    N3UI.toast('Revision restored \u2014 reloading\u2026', 'success');
+                    setTimeout(() => location.reload(), 1800);
+                  } else {
+                    N3UI.toast('Rollback failed: ' + (data.error || 'unknown'), 'error');
+                  }
+                })
+                .catch(err => N3UI.toast('Rollback error: ' + err.message, 'error'));
+            });
+        };
+      });
+    }
 
     _buildEditButton() {
       this._editBtn = document.createElement('button');
@@ -1089,12 +1189,14 @@
       this.events.on('history:change', s => this.toolbar.updateHistory(s));
       this.events.on('toolbar:action', action => {
         const map = {
-          'undo':      () => this._doUndo(),
-          'redo':      () => this._doRedo(),
-          'save-html': () => this.exporter.downloadHTML(),
-          'copy-html': () => this.exporter.copyHTML(),
-          'json-diff': () => this.exporter.downloadDiff(this._initialHTML || this.exporter.cleanHTML()),
-          'exit-edit': () => this.toggle(false),
+          'undo':        () => this._doUndo(),
+          'redo':        () => this._doRedo(),
+          'save-html':   () => this.exporter.downloadHTML(),
+          'copy-html':   () => this.exporter.copyHTML(),
+          'json-diff':   () => this.exporter.downloadDiff(this._initialHTML || this.exporter.cleanHTML()),
+          'exit-edit':   () => this.toggle(false),
+          'cloud-save':  () => this._doCloudSave(),
+          'revisions':   () => this._doShowRevisions(),
         };
         if (map[action]) map[action]();
       });
@@ -1175,7 +1277,14 @@
   }
 
   // ─── Bootstrap ─────────────────────────────────────────────────────────────
-  const _editor = new N3Editor();
+  const _cc = _n3Script ? {
+    api:  _n3Script.getAttribute('data-n3-api'),
+    site: _n3Script.getAttribute('data-n3-site'),
+    key:  _n3Script.getAttribute('data-n3-key'),
+  } : null;
+  const _cloudConfig = (_cc && _cc.api && _cc.site && _cc.key) ? _cc : null;
+
+  const _editor = new N3Editor(_cloudConfig);
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => _editor.init());
   } else {

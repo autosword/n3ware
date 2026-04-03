@@ -1,16 +1,22 @@
 {
   "name": "n3ware",
   "version": "1.0.0",
-  "description": "Drop-in JavaScript library for visual webpage editing",
+  "description": "Drop-in JavaScript library for visual webpage editing — n3ware Cloud hosted platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "node tests/run-tests.js && node tests/api.test.js"
   },
-  "keywords": ["visual-editor", "drag-drop", "contenteditable", "wysiwyg"],
+  "keywords": ["visual-editor", "drag-drop", "contenteditable", "wysiwyg", "cloud"],
   "author": "autosword",
   "license": "MIT",
   "dependencies": {
-    "express": "^5.2.1"
+    "@google-cloud/firestore": "^7.10.0",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "morgan": "^1.10.0",
+    "sanitize-html": "^2.13.1",
+    "uuid": "^11.1.0"
   }
 }
