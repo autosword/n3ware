@@ -165,6 +165,20 @@
         `.n3-confirm-cancel:hover{background:rgba(255,255,255,.14)}`,
         `.n3-confirm-ok{background:#EF4444;color:#fff}`,
         `.n3-confirm-ok:hover{background:#DC2626}`,
+        `.n3-cloud-btn{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4)!important;color:${T.accent}}`,
+        `.n3-cloud-btn:hover{background:rgba(59,130,246,.25)!important}`,
+        `.n3-rev-panel{position:fixed;top:48px;right:0;width:320px;height:calc(100vh - 48px);background:${T.bgPanel};border-left:1px solid ${T.border};z-index:999997;overflow-y:auto;font:13px/1 system-ui,sans-serif;color:${T.text};display:none;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.3);animation:n3-slide-in .2s ease}`,
+        `.n3-rev-panel.n3-rev-visible{display:flex}`,
+        `.n3-rev-header{padding:14px 16px;border-bottom:1px solid ${T.border};display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:${T.bgPanel};font-weight:600;font-size:14px}`,
+        `.n3-rev-close{background:transparent;border:none;color:${T.muted};cursor:pointer;font-size:16px;width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .12s}`,
+        `.n3-rev-close:hover{background:rgba(255,255,255,.1);color:${T.text}}`,
+        `.n3-rev-list{display:flex;flex-direction:column;gap:1px;padding:8px}`,
+        `.n3-rev-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 8px;border-radius:6px;border:1px solid ${T.border}}`,
+        `.n3-rev-meta{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}`,
+        `.n3-rev-ts{font-size:11px;color:${T.muted}}`,
+        `.n3-rev-msg{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`,
+        `.n3-rev-empty{color:${T.muted};padding:16px;text-align:center}`,
+        `.n3-rev-rollback-btn{flex-shrink:0;font-size:11px;padding:4px 8px}`,
       ].join('\n');
       document.head.appendChild(s);
     }
@@ -861,9 +875,13 @@
   // N3Toolbar — top toolbar in edit mode
   // ═══════════════════════════════════════════════════════════════════════════
   class N3Toolbar {
-    /** @param {N3Events} events */
-    constructor(events) {
+    /**
+     * @param {N3Events} events
+     * @param {{cloud:boolean}} [opts]
+     */
+    constructor(events, opts) {
       this._events = events;
+      this._cloud  = !!(opts && opts.cloud);
       /** @type {HTMLElement|null} */
       this._el = null;
     }
@@ -873,6 +891,11 @@
       this._el = document.createElement('div');
       this._el.className = 'n3-toolbar';
       this._el.setAttribute('data-n3-ui', '1');
+      const saveBtn = this._cloud
+        ? `<button class="n3-toolbar-btn n3-cloud-btn" data-action="cloud-save" title="Publish to cloud">☁ Publish</button>
+           <button class="n3-toolbar-btn" data-action="cloud-revisions" title="Revision history">↺ History</button>
+           <button class="n3-toolbar-btn" data-action="save-html" title="Download HTML backup">⬇ Download</button>`
+        : `<button class="n3-toolbar-btn" data-action="save-html">⬇ Download</button>`;
       this._el.innerHTML = `
         <span class="n3-toolbar-logo">n3ware</span>
         <div class="n3-toolbar-sep"></div>
@@ -880,7 +903,7 @@
         <button class="n3-toolbar-btn" data-action="redo" title="Redo (Ctrl+Shift+Z)">↪ Redo</button>
         <span class="n3-history-count">1/1</span>
         <div class="n3-toolbar-sep"></div>
-        <button class="n3-toolbar-btn" data-action="save-html">⬇ Download</button>
+        ${saveBtn}
         <button class="n3-toolbar-btn" data-action="copy-html">⎘ Copy HTML</button>
         <button class="n3-toolbar-btn" data-action="json-diff">{ } Diff</button>
         <div class="n3-toolbar-spacer"></div>
@@ -912,6 +935,165 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // N3Cloud — cloud save / revision integration
+  // ═══════════════════════════════════════════════════════════════════════════
+  class N3Cloud {
+    /**
+     * @param {string} apiBase   e.g. 'https://n3ware.onrender.com/api'
+     * @param {string} siteId    site identifier
+     * @param {string} apiKey    site API key
+     */
+    constructor(apiBase, siteId, apiKey) {
+      this._api    = apiBase.replace(/\/$/, '');
+      this._site   = siteId;
+      this._key    = apiKey;
+    }
+
+    /**
+     * POST clean HTML to the save endpoint.
+     * @param {string} html
+     * @param {string} [message]
+     * @returns {Promise<{site:object}>}
+     */
+    async save(html, message = '') {
+      const res = await fetch(`${this._api}/sites/${this._site}/save`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': this._key },
+        body:    JSON.stringify({ html, message }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+      return res.json();
+    }
+
+    /**
+     * GET revision list.
+     * @returns {Promise<object[]>}
+     */
+    async listRevisions() {
+      const res = await fetch(`${this._api}/sites/${this._site}/revisions`, {
+        headers: { 'X-API-Key': this._key },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return data.revisions || [];
+    }
+
+    /**
+     * POST rollback to a revision.
+     * @param {string} revId
+     * @returns {Promise<object>}
+     */
+    async rollback(revId) {
+      const res = await fetch(
+        `${this._api}/sites/${this._site}/revisions/${revId}/rollback`,
+        { method: 'POST', headers: { 'X-API-Key': this._key } }
+      );
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+      return res.json();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // N3RevPanel — revision history side panel
+  // ═══════════════════════════════════════════════════════════════════════════
+  class N3RevPanel {
+    /**
+     * @param {N3Events} events
+     * @param {N3Cloud}  cloud
+     */
+    constructor(events, cloud) {
+      this._events = events;
+      this._cloud  = cloud;
+      this._el     = null;
+      this._open   = false;
+    }
+
+    /** Inject the revisions panel into the DOM. */
+    mount() {
+      this._el = document.createElement('div');
+      this._el.className = 'n3-rev-panel';
+      this._el.setAttribute('data-n3-ui', '1');
+      this._el.innerHTML = `
+        <div class="n3-rev-header">
+          <span>Revision History</span>
+          <button class="n3-rev-close" title="Close">✕</button>
+        </div>
+        <div class="n3-rev-list"><p class="n3-rev-empty">Loading…</p></div>`;
+      this._el.querySelector('.n3-rev-close').addEventListener('click', () => this.close());
+      document.body.appendChild(this._el);
+    }
+
+    unmount() { if (this._el) { this._el.remove(); this._el = null; } }
+
+    /** Open the panel and load revisions. */
+    async open() {
+      if (!this._el) return;
+      this._el.classList.add('n3-rev-visible');
+      this._open = true;
+      await this._load();
+    }
+
+    close() {
+      if (this._el) this._el.classList.remove('n3-rev-visible');
+      this._open = false;
+    }
+
+    toggle() { this._open ? this.close() : this.open(); }
+
+    /** @private */
+    async _load() {
+      const list = this._el.querySelector('.n3-rev-list');
+      list.innerHTML = '<p class="n3-rev-empty">Loading…</p>';
+      try {
+        const revisions = await this._cloud.listRevisions();
+        if (!revisions.length) {
+          list.innerHTML = '<p class="n3-rev-empty">No revisions yet.</p>';
+          return;
+        }
+        const revHtml = revisions.map(r => `
+          <div class="n3-rev-item" data-rev-id="${_esc(r.id)}">
+            <div class="n3-rev-meta">
+              <span class="n3-rev-ts">${_fmtDate(r.createdAt)}</span>
+              <span class="n3-rev-msg">${_esc(r.message || 'Saved')}</span>
+            </div>
+            <button class="n3-toolbar-btn n3-rev-rollback-btn" data-rev-id="${_esc(r.id)}">↺ Restore</button>
+          </div>`).join('');
+        list.innerHTML = revHtml;
+        list.querySelectorAll('.n3-rev-rollback-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            if (!confirm('Restore this revision? The page will reload.')) return;
+            btn.textContent = '…';
+            btn.disabled = true;
+            try {
+              await this._cloud.rollback(btn.dataset.revId);
+              N3UI.toast('Restored! Reloading…', 'success', 2000);
+              setTimeout(() => location.reload(), 1500);
+            } catch (e) {
+              N3UI.toast('Rollback failed: ' + e.message, 'error');
+              btn.textContent = '↺ Restore';
+              btn.disabled = false;
+            }
+          });
+        });
+      } catch (e) {
+        list.innerHTML = `<p class="n3-rev-empty">Error: ${_esc(e.message)}</p>`;
+      }
+    }
+  }
+
+  function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+  function _fmtDate(iso) {
+    try { return new Date(iso).toLocaleString(undefined, { dateStyle:'short', timeStyle:'short' }); }
+    catch { return iso || ''; }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // N3Editor — main orchestrator + public-facing API
   // ═══════════════════════════════════════════════════════════════════════════
   class N3Editor {
@@ -919,6 +1101,15 @@
       this._editMode    = false;
       this._activeEl    = null;
       this._initialHTML = null;
+
+      // Detect cloud config from script tag data attributes
+      const scriptTag = document.currentScript ||
+        (document.querySelectorAll('script[data-n3-site]').length
+          ? [...document.querySelectorAll('script[data-n3-site]')].pop() : null);
+      const cloudApi  = scriptTag && scriptTag.dataset.n3Api;
+      const cloudSite = scriptTag && scriptTag.dataset.n3Site;
+      const cloudKey  = scriptTag && scriptTag.dataset.n3Key;
+      this._cloudCfg  = (cloudApi && cloudSite) ? { api: cloudApi, site: cloudSite, key: cloudKey || '' } : null;
 
       // Module instantiation
       this.events   = new N3Events();
@@ -928,7 +1119,11 @@
       this.drag     = new N3DragManager(this.events);
       this.controls = new N3ElementControls(this.events, this.drag);
       this.panel    = new N3StylePanel(this.events);
-      this.toolbar  = new N3Toolbar(this.events);
+      this.toolbar  = new N3Toolbar(this.events, { cloud: !!this._cloudCfg });
+      this.cloud    = this._cloudCfg
+        ? new N3Cloud(this._cloudCfg.api, this._cloudCfg.site, this._cloudCfg.key)
+        : null;
+      this.revPanel = this.cloud ? new N3RevPanel(this.events, this.cloud) : null;
       this._editBtn = null;
 
       this._onKeyDown = this._handleKeyDown.bind(this);
@@ -939,6 +1134,7 @@
       N3UI.injectStyles();
       this.toolbar.mount();
       this.panel.mount();
+      if (this.revPanel) this.revPanel.mount();
       this._buildEditButton();
       this._wireEvents();
       document.addEventListener('keydown', this._onKeyDown);
@@ -985,7 +1181,7 @@
         _modules: {
           events: this.events, history: this.history, exporter: this.exporter,
           text: this.text, drag: this.drag, controls: this.controls,
-          panel: this.panel, toolbar: this.toolbar,
+          panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
         },
       };
     }
@@ -1089,12 +1285,14 @@
       this.events.on('history:change', s => this.toolbar.updateHistory(s));
       this.events.on('toolbar:action', action => {
         const map = {
-          'undo':      () => this._doUndo(),
-          'redo':      () => this._doRedo(),
-          'save-html': () => this.exporter.downloadHTML(),
-          'copy-html': () => this.exporter.copyHTML(),
-          'json-diff': () => this.exporter.downloadDiff(this._initialHTML || this.exporter.cleanHTML()),
-          'exit-edit': () => this.toggle(false),
+          'undo':             () => this._doUndo(),
+          'redo':             () => this._doRedo(),
+          'save-html':        () => this.exporter.downloadHTML(),
+          'copy-html':        () => this.exporter.copyHTML(),
+          'json-diff':        () => this.exporter.downloadDiff(this._initialHTML || this.exporter.cleanHTML()),
+          'exit-edit':        () => this.toggle(false),
+          'cloud-save':       () => this._doCloudSave(),
+          'cloud-revisions':  () => this.revPanel && this.revPanel.toggle(),
         };
         if (map[action]) map[action]();
       });
@@ -1145,6 +1343,19 @@
       if (e.key === 'Escape') this._deactivate();
     }
 
+    async _doCloudSave() {
+      if (!this.cloud) return;
+      const html = this.exporter.cleanHTML();
+      N3UI.toast('Publishing…', 'info', 60000);
+      try {
+        await this.cloud.save(html, 'Saved from editor');
+        // Dismiss the long-lived "Publishing…" toast by showing success
+        N3UI.toast('Published!', 'success', 3000);
+      } catch (e) {
+        N3UI.toast('Publish failed: ' + e.message, 'error', 4000);
+      }
+    }
+
     _doUndo() {
       const s = this.history.undo();
       if (s) { this._restore(s); N3UI.toast('Undo', 'info', 1200); }
@@ -1173,7 +1384,6 @@
       N3UI.toast('Duplicated', 'success', 1500);
     }
   }
-
   // ─── Bootstrap ─────────────────────────────────────────────────────────────
   const _editor = new N3Editor();
   if (document.readyState === 'loading') {
