@@ -161,3 +161,77 @@ node tests/run-tests.js
 # Both
 npm test
 ```
+
+## Production Deployment with Secret Manager
+
+All sensitive credentials are stored in [Google Secret Manager](https://cloud.google.com/secret-manager) and loaded automatically at startup in production. `src/secrets.js` fetches them before any integration is initialised, so the app sees them as normal environment variables.
+
+### 1. Enable the API
+
+```bash
+gcloud services enable secretmanager.googleapis.com --project=YOUR_PROJECT_ID
+```
+
+### 2. Create secrets
+
+Run the interactive setup script once per project:
+
+```bash
+bash scripts/setup-secrets.sh YOUR_PROJECT_ID
+```
+
+The script prompts for each of the 17 secret values (blank = skip). It creates the secret with automatic replication and adds the first version. Re-running the script adds a new version to any existing secret.
+
+Secrets managed:
+
+| Secret name | Env var |
+|---|---|
+| `jwt-secret` | `JWT_SECRET` |
+| `master-api-key` | `MASTER_API_KEY` |
+| `stripe-secret-key` | `STRIPE_SECRET_KEY` |
+| `stripe-webhook-secret` | `STRIPE_WEBHOOK_SECRET` |
+| `stripe-starter-price-id` | `STRIPE_STARTER_PRICE_ID` |
+| `stripe-pro-price-id` | `STRIPE_PRO_PRICE_ID` |
+| `stripe-agency-price-id` | `STRIPE_AGENCY_PRICE_ID` |
+| `sendgrid-api-key` | `SENDGRID_API_KEY` |
+| `postmark-api-key` | `POSTMARK_API_KEY` |
+| `cloudflare-api-token` | `CLOUDFLARE_API_TOKEN` |
+| `cloudflare-account-id` | `CLOUDFLARE_ACCOUNT_ID` |
+| `cloudflare-zone-id` | `CLOUDFLARE_ZONE_ID` |
+| `r2-access-key-id` | `R2_ACCESS_KEY_ID` |
+| `r2-secret-access-key` | `R2_SECRET_ACCESS_KEY` |
+| `anthropic-api-key` | `ANTHROPIC_API_KEY` |
+| `google-client-id` | `GOOGLE_CLIENT_ID` |
+| `google-client-secret` | `GOOGLE_CLIENT_SECRET` |
+
+### 3. Grant Cloud Run access
+
+```bash
+PROJECT_NUMBER=$(gcloud projects describe YOUR_PROJECT_ID --format='value(projectNumber)')
+SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="serviceAccount:${SA}" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+### 4. Deploy
+
+Cloud Build (`cloudbuild.yaml`) passes secrets to Cloud Run via `--set-secrets` automatically. Just push to trigger the build:
+
+```bash
+git push origin main
+```
+
+### Updating a secret
+
+```bash
+echo -n "new-value" | gcloud secrets versions add SECRET_NAME \
+  --project=YOUR_PROJECT_ID --data-file=-
+```
+
+The next deploy picks up the new `latest` version.
+
+### Local development
+
+`src/secrets.js` is a no-op when `NODE_ENV != production` or `GOOGLE_CLOUD_PROJECT` is unset. Use a local `.env` file (copy `.env.example`) for all credentials in development.

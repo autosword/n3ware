@@ -4,6 +4,15 @@ const express      = require('express');
 const cors         = require('cors');
 const morgan       = require('morgan');
 const path         = require('path');
+
+// ── App construction (synchronous) ───────────────────────────────────────────
+// All requires and route wiring happen here so that module.exports = app is
+// available synchronously when tests do require('../server').
+//
+// In production, secrets land in process.env via Cloud Run --set-secrets before
+// the process starts.  src/secrets.js is a belt-and-suspenders fallback for
+// cases where --set-secrets is not used; it runs before app.listen() below.
+
 const config       = require('./src/config');
 const serveSites   = require('./src/serving/sites');
 const sitesApi     = require('./src/api/sites');
@@ -125,12 +134,23 @@ app.use((err, req, res, _next) => {
   res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
-// ── Start ─────────────────────────────────────────────────────────────────────
-app.listen(config.port, () => {
-  console.log(`n3ware server  →  http://localhost:${config.port}`);
-  console.log(`  Storage: ${config.storageBackend}`);
-  console.log(`  CDN:     ${config.cdnProvider}`);
-  console.log(`  Env:     ${config.nodeEnv}`);
-});
+// ── Start (async to allow loadSecrets() before listen) ───────────────────────
+// Only start the listener when this file is the entry point, not when required
+// by tests (which call app.listen themselves on a random port).
+if (require.main === module) {
+  const { loadSecrets } = require('./src/secrets');
+  (async () => {
+    // In production this fetches any missing secrets from Google Secret Manager.
+    // In local dev / test this is an instant no-op.
+    await loadSecrets();
+
+    app.listen(config.port, () => {
+      console.log(`n3ware server  →  http://localhost:${config.port}`);
+      console.log(`  Storage: ${config.storageBackend}`);
+      console.log(`  CDN:     ${config.cdnProvider}`);
+      console.log(`  Env:     ${config.nodeEnv}`);
+    });
+  })();
+}
 
 module.exports = app;

@@ -9,6 +9,9 @@
 #   roles/run.admin
 #   roles/iam.serviceAccountUser
 #   roles/artifactregistry.writer
+#   roles/secretmanager.secretAccessor  (to read secrets at deploy time)
+#
+# Secrets must be pre-created with scripts/setup-secrets.sh before first deploy.
 
 substitutions:
   _SERVICE:  n3ware
@@ -61,7 +64,9 @@ steps:
       - --max-instances=10
       - --concurrency=80
       - --timeout=60
-      - --set-env-vars=NODE_ENV=production,STORAGE_BACKEND=firestore
+      - --set-env-vars=NODE_ENV=production,STORAGE_BACKEND=firestore,GOOGLE_CLOUD_PROJECT=$PROJECT_ID
+      - >-
+        --set-secrets=JWT_SECRET=jwt-secret:latest,MASTER_API_KEY=master-api-key:latest,STRIPE_SECRET_KEY=stripe-secret-key:latest,STRIPE_WEBHOOK_SECRET=stripe-webhook-secret:latest,STRIPE_STARTER_PRICE_ID=stripe-starter-price-id:latest,STRIPE_PRO_PRICE_ID=stripe-pro-price-id:latest,STRIPE_AGENCY_PRICE_ID=stripe-agency-price-id:latest,SENDGRID_API_KEY=sendgrid-api-key:latest,CLOUDFLARE_API_TOKEN=cloudflare-api-token:latest,CLOUDFLARE_ACCOUNT_ID=cloudflare-account-id:latest,ANTHROPIC_API_KEY=anthropic-api-key:latest,GOOGLE_CLIENT_ID=google-client-id:latest,GOOGLE_CLIENT_SECRET=google-client-secret:latest
       - --quiet
     waitFor: [push]
 
