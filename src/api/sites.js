@@ -4,10 +4,10 @@
  * Sites API routes.
  *
  * POST   /api/sites              — create a new site
- * GET    /api/sites              — list all sites
+ * GET    /api/sites              — list sites (filtered by owner if JWT auth)
  * GET    /api/sites/:id          — get site metadata
  * DELETE /api/sites/:id          — delete a site
- * POST   /api/sites/:id/save     — save HTML (+ optional css/message)
+ * POST   /api/sites/:id/save     — save HTML (+ optional name/message)
  * GET    /api/sites/:id/html     — get raw site HTML
  */
 
@@ -16,18 +16,20 @@ const { v4: uuid } = require('uuid');
 const sanitizeHtml = require('sanitize-html');
 const storage      = require('../storage');
 const cache        = require('../cache');
-const { requireApiKey } = require('./auth');
+const { authOrApiKey } = require('./auth');
 
 const router = express.Router();
 
-// ── All sites routes require auth ──────────────────────────────────────────
-router.use(requireApiKey);
+router.use(authOrApiKey);
 
 // ── List sites ─────────────────────────────────────────────────────────────
-
 router.get('/', async (req, res) => {
   try {
-    const sites = await cache.listSites(storage);
+    // JWT users only see their own sites; API key sees all
+    const filter = req.authType === 'jwt' && req.user
+      ? { ownerId: req.user.id }
+      : {};
+    const sites = await cache.listSites(storage, filter);
     res.json({ sites });
   } catch (err) {
     _error(res, 500, err);
@@ -35,15 +37,17 @@ router.get('/', async (req, res) => {
 });
 
 // ── Create site ────────────────────────────────────────────────────────────
-
 router.post('/', async (req, res) => {
   try {
-    const { html = '', css = '', message = '' } = req.body || {};
-    const id = uuid();
-    const site = await storage.saveSite(id, {
-      html: _sanitize(html),
+    const { html = '', css = '', message = '', name } = req.body || {};
+    const id      = uuid();
+    const ownerId = req.authType === 'jwt' && req.user ? req.user.id : null;
+    const site    = await storage.saveSite(id, {
+      html:    _sanitize(html),
       css,
       message: String(message).slice(0, 500),
+      name:    name ? String(name).slice(0, 200) : 'Untitled Site',
+      ownerId,
     });
     await cache.onSave(id);
     res.status(201).json({ site });
@@ -53,11 +57,11 @@ router.post('/', async (req, res) => {
 });
 
 // ── Get site ───────────────────────────────────────────────────────────────
-
 router.get('/:id', async (req, res) => {
   try {
     const site = await cache.getSite(storage, req.params.id);
     if (!site) return res.status(404).json({ error: 'Site not found' });
+    if (!_canRead(req, site)) return res.status(403).json({ error: 'Forbidden' });
     const { html: _html, ...meta } = site; // eslint-disable-line no-unused-vars
     res.json({ site: meta });
   } catch (err) {
@@ -66,11 +70,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // ── Get raw HTML ───────────────────────────────────────────────────────────
-
 router.get('/:id/html', async (req, res) => {
   try {
     const site = await cache.getSite(storage, req.params.id);
     if (!site) return res.status(404).json({ error: 'Site not found' });
+    if (!_canRead(req, site)) return res.status(403).json({ error: 'Forbidden' });
     res.set('Content-Type', 'text/html; charset=utf-8');
     res.set('Cache-Control', 'public, max-age=60');
     res.send(site.html);
@@ -80,21 +84,24 @@ router.get('/:id/html', async (req, res) => {
 });
 
 // ── Save site HTML ─────────────────────────────────────────────────────────
-
 router.post('/:id/save', async (req, res) => {
   try {
-    const { html, css = '', message = '' } = req.body || {};
+    const { html, css = '', message = '', name } = req.body || {};
     if (html === undefined) {
       return res.status(400).json({ error: '`html` field is required' });
     }
     const existing = await storage.getSite(req.params.id);
     if (!existing) return res.status(404).json({ error: 'Site not found' });
+    if (!_canWrite(req, existing)) return res.status(403).json({ error: 'Forbidden' });
 
-    const site = await storage.saveSite(req.params.id, {
+    const updates = {
       html:    _sanitize(html),
       css,
       message: String(message).slice(0, 500),
-    });
+    };
+    if (name !== undefined) updates.name = String(name).slice(0, 200);
+
+    const site = await storage.saveSite(req.params.id, updates);
     await cache.onSave(req.params.id, _baseUrl(req));
     res.json({ site: _meta(site) });
   } catch (err) {
@@ -103,11 +110,11 @@ router.post('/:id/save', async (req, res) => {
 });
 
 // ── Delete site ────────────────────────────────────────────────────────────
-
 router.delete('/:id', async (req, res) => {
   try {
     const existing = await storage.getSite(req.params.id);
     if (!existing) return res.status(404).json({ error: 'Site not found' });
+    if (!_canWrite(req, existing)) return res.status(403).json({ error: 'Forbidden' });
     await storage.deleteSite(req.params.id);
     cache.onDelete(req.params.id);
     res.json({ deleted: true, id: req.params.id });
@@ -118,9 +125,21 @@ router.delete('/:id', async (req, res) => {
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
+/** API key auth can read/write all. JWT users can only access their own sites. */
+function _canRead(req, site) {
+  if (req.authType === 'apikey') return true;
+  if (!site.ownerId) return true; // legacy site (no owner)
+  return req.user && req.user.id === site.ownerId;
+}
+
+function _canWrite(req, site) {
+  return _canRead(req, site);
+}
+
 function _sanitize(html) {
   return sanitizeHtml(html, {
-    allowedTags:       sanitizeHtml.defaults.allowedTags.concat([
+    allowVulnerableTags: true,
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
       'html','head','body','title','meta','link','style',
       'header','footer','nav','main','section','article','aside',
       'figure','figcaption','picture','source','video','audio',
@@ -133,7 +152,7 @@ function _sanitize(html) {
       'meta':['name','content','charset','http-equiv','property'],
       'link':['rel','href','type','media'],
     },
-    allowedSchemes:    ['http','https','mailto','tel','data'],
+    allowedSchemes: ['http','https','mailto','tel','data'],
     allowProtocolRelative: true,
   });
 }

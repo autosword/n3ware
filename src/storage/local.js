@@ -55,7 +55,7 @@ class LocalStorage {
    * @param {{html:string, css?:string, message?:string}} data
    * @returns {object} saved site record
    */
-  saveSite(id, { html, css = '', message = '' }) {
+  saveSite(id, { html, css = '', message = '', name, ownerId } = {}) {
     const now = new Date().toISOString();
     const existing = this.getSite(id);
     const site = {
@@ -63,6 +63,8 @@ class LocalStorage {
       html,
       css,
       message,
+      name:      name !== undefined ? name : (existing ? existing.name : 'Untitled Site'),
+      ownerId:   ownerId !== undefined ? ownerId : (existing ? existing.ownerId : null),
       createdAt: existing ? existing.createdAt : now,
       updatedAt: now,
     };
@@ -84,14 +86,20 @@ class LocalStorage {
    * List all site records (metadata only, no HTML body).
    * @returns {object[]}
    */
-  listSites() {
+  listSites({ ownerId } = {}) {
     if (!fs.existsSync(this._root)) return [];
     return fs.readdirSync(this._root)
       .filter(d => fs.existsSync(this._sitePath(d)))
       .map(d => {
         const site = this._readJSON(this._sitePath(d));
         if (!site) return null;
+        if (ownerId && site.ownerId !== ownerId) return null;
         const { html: _html, ...meta } = site; // eslint-disable-line no-unused-vars
+        // Count revisions
+        const revDir = this._revDir(d);
+        meta.revisionCount = fs.existsSync(revDir)
+          ? fs.readdirSync(revDir).filter(f => f.endsWith('.json')).length
+          : 0;
         return meta;
       })
       .filter(Boolean);

@@ -57,10 +57,16 @@ async function listRevisions(storage, siteId) {
 
 /**
  * Get site list with memory-cache read-through.
+ * Filtered requests (by ownerId) bypass the cache to ensure correctness.
  * @param {object} storage
+ * @param {{ ownerId?: string }} [filter]
  * @returns {Promise<object[]>}
  */
-async function listSites(storage) {
+async function listSites(storage, filter = {}) {
+  if (filter.ownerId) {
+    // User-scoped list — skip shared cache to avoid cross-user leakage
+    return storage.listSites(filter);
+  }
   const k = KEY.siteList();
   const cached = mem.get(k);
   if (cached !== null) return cached;

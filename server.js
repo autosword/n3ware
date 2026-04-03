@@ -8,6 +8,8 @@ const config     = require('./src/config');
 const serveSites = require('./src/serving/sites');
 const sitesApi   = require('./src/api/sites');
 const revisionsApi = require('./src/api/revisions');
+const authRoutes = require('./src/api/authRoutes');
+const templates  = require('./src/api/templates');
 
 const app = express();
 
@@ -18,7 +20,7 @@ app.use(morgan(config.nodeEnv === 'production' ? 'combined' : 'dev'));
 app.use(cors({
   origin:  config.nodeEnv === 'production' ? false : '*',
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'X-API-Key'],
+  allowedHeaders: ['Content-Type', 'X-API-Key', 'Authorization'],
 }));
 
 // ── Body parsing ─────────────────────────────────────────────────────────────
@@ -28,12 +30,14 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 // ── Static public files ──────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/tests', express.static(path.join(__dirname, 'tests')));
+app.use('/templates', express.static(path.join(__dirname, 'public', 'templates')));
 
 // ── API routes ───────────────────────────────────────────────────────────────
-app.use('/api/sites', sitesApi);
-// Revisions are nested under sites; mergeParams handled in router
+app.use('/api/auth',      authRoutes);
+app.use('/api/templates', templates);
+app.use('/api/sites',     sitesApi);
+// Revisions nested under sites
 app.use('/api/sites/:id/revisions', (req, res, next) => {
-  // Propagate :id into revisionsApi via req.params
   req.params = { ...req.params, id: req.params.id };
   next();
 }, revisionsApi);
@@ -50,9 +54,10 @@ app.get('/api/cache/stats', (req, res) => {
 app.use('/sites', serveSites());
 
 // ── Page routes ──────────────────────────────────────────────────────────────
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/demo', (req, res) => res.sendFile(path.join(__dirname, 'public', 'demo.html')));
-app.get('/tests', (req, res) => res.sendFile(path.join(__dirname, 'tests', 'n3ware.test.html')));
+app.get('/',          (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/demo',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'demo.html')));
+app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+app.get('/tests',     (req, res) => res.sendFile(path.join(__dirname, 'tests', 'n3ware.test.html')));
 
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
@@ -75,4 +80,4 @@ app.listen(config.port, () => {
   console.log(`  Env:     ${config.nodeEnv}`);
 });
 
-module.exports = app; // export for testing
+module.exports = app;

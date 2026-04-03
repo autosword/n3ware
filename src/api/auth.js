@@ -1,14 +1,15 @@
 'use strict';
 
 /**
- * API key authentication middleware.
+ * Authentication middleware.
  *
- * Reads key from X-API-Key header (or ?apiKey query param as fallback).
- * Compares against MASTER_API_KEY env var via constant-time comparison
- * to resist timing attacks.
+ * requireApiKey  — validates X-API-Key / ?apiKey against MASTER_API_KEY
+ * verifyToken    — validates Authorization: Bearer <jwt>, attaches req.user
+ * authOrApiKey   — accepts either JWT or API key; rejects if neither valid
  */
 
 const crypto = require('crypto');
+const jwt    = require('jsonwebtoken');
 const config = require('../config');
 
 /**
@@ -54,4 +55,58 @@ function _timingSafeEqual(a, b) {
   }
 }
 
-module.exports = { requireApiKey };
+/**
+ * JWT verification middleware.
+ * Reads Authorization: Bearer <token>, verifies signature, attaches req.user.
+ * Returns 401 if missing/invalid.
+ * @param {import('express').Request}  req
+ * @param {import('express').Response} res
+ * @param {Function}                   next
+ */
+function verifyToken(req, res, next) {
+  const header = req.headers['authorization'] || '';
+  const token  = header.startsWith('Bearer ') ? header.slice(7) : '';
+  if (!token) {
+    return res.status(401).json({ error: 'Authorization token required' });
+  }
+  try {
+    req.user = jwt.verify(token, config.jwtSecret);
+    next();
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+}
+
+/**
+ * Middleware that accepts either a valid JWT or a valid API key.
+ * - JWT: attaches req.user, sets req.authType = 'jwt'
+ * - API key: sets req.authType = 'apikey', req.user = null
+ * - Neither: 401
+ */
+function authOrApiKey(req, res, next) {
+  const header = req.headers['authorization'] || '';
+  const bearer = header.startsWith('Bearer ') ? header.slice(7) : '';
+
+  if (bearer) {
+    try {
+      req.user     = jwt.verify(bearer, config.jwtSecret);
+      req.authType = 'jwt';
+      return next();
+    } catch {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+  }
+
+  const provided = req.headers['x-api-key'] || req.query.apiKey || '';
+  if (!provided) {
+    return res.status(401).json({ error: 'Authentication required (Bearer token or X-API-Key)' });
+  }
+  if (!_timingSafeEqual(provided, config.masterApiKey)) {
+    return res.status(403).json({ error: 'Invalid API key' });
+  }
+  req.user     = null;
+  req.authType = 'apikey';
+  next();
+}
+
+module.exports = { requireApiKey, verifyToken, authOrApiKey };

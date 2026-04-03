@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n3ware — Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #0F172A; color: #F1F5F9; font-family: system-ui, -apple-system, sans-serif; }
+    .slide-panel { transform: translateX(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1); }
+    .slide-panel.open { transform: translateX(0); }
+    .modal-bg { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .modal-bg.open { opacity: 1; pointer-events: auto; }
+    .modal-card { transform: scale(0.95) translateY(8px); transition: transform 0.2s; }
+    .modal-bg.open .modal-card { transform: scale(1) translateY(0); }
+    .site-preview { background: linear-gradient(135deg, var(--c1), var(--c2)); }
+    .toast { transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(.4,0,.2,1); }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    input, select, textarea { background: #1E293B; border: 1px solid #334155; color: #F1F5F9; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #3B82F6; }
+    .template-card { border: 2px solid #334155; cursor: pointer; transition: all 0.15s; }
+    .template-card:hover { border-color: #3B82F6; background: #1E293B; }
+    .template-card.selected { border-color: #3B82F6; background: #1E3A5F; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ── AUTH SCREEN ──────────────────────────────────────────────────────────── -->
+<div id="auth-screen" class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-md">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 mb-3">
+        <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white text-lg">n</div>
+        <span class="text-2xl font-extrabold">n3ware</span>
+      </div>
+      <p class="text-slate-400 text-sm">Visual editing, powered by the cloud</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex bg-slate-800 rounded-xl p-1 mb-6">
+      <button id="tab-login" onclick="switchTab('login')"
+        class="flex-1 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 text-white">
+        Sign In
+      </button>
+      <button id="tab-register" onclick="switchTab('register')"
+        class="flex-1 py-2 rounded-lg text-sm font-semibold transition text-slate-400">
+        Create Account
+      </button>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-8">
+      <form id="auth-form" onsubmit="submitAuth(event)">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+          <input type="email" id="auth-email" required placeholder="you@company.com"
+            class="w-full rounded-xl px-4 py-3 text-sm">
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+          <input type="password" id="auth-password" required placeholder="••••••••" minlength="8"
+            class="w-full rounded-xl px-4 py-3 text-sm">
+        </div>
+        <button type="submit" id="auth-btn"
+          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">
+          Sign In
+        </button>
+        <p id="auth-error" class="text-red-400 text-sm text-center mt-3 hidden"></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ────────────────────────────────────────────────────────────── -->
+<div id="dashboard" class="hidden min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 px-6 py-4 sticky top-0 z-30 bg-slate-900/95 backdrop-blur">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">n</div>
+        <span class="text-lg font-extrabold">n3ware</span>
+        <span class="ml-2 text-xs text-slate-500 font-medium">Cloud</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span id="user-email" class="text-sm text-slate-400 hidden sm:block"></span>
+        <button onclick="logout()"
+          class="text-sm text-slate-400 hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-slate-800">
+          Sign out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 px-6 py-8 max-w-7xl mx-auto w-full">
+    <!-- Top bar -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold">My Sites</h1>
+        <p id="site-count" class="text-slate-400 text-sm mt-0.5"></p>
+      </div>
+      <button onclick="openCreateModal()"
+        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-xl transition text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        New Site
+      </button>
+    </div>
+
+    <!-- Site grid -->
+    <div id="sites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="hidden text-center py-24">
+      <div class="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+        <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <h2 class="text-xl font-bold mb-2">No sites yet</h2>
+      <p class="text-slate-400 text-sm mb-6">Create your first site to get started.</p>
+      <button onclick="openCreateModal()"
+        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        Create Your First Site
+      </button>
+    </div>
+  </main>
+</div>
+
+<!-- ── CREATE MODAL ─────────────────────────────────────────────────────────── -->
+<div id="create-modal" class="modal-bg fixed inset-0 z-50 flex items-center justify-center p-4"
+     style="background:rgba(0,0,0,0.7)" onclick="closeCreateModal(event)">
+  <div class="modal-card bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl"
+       onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-700">
+      <h2 class="text-lg font-bold">Create New Site</h2>
+      <button onclick="closeCreateModal()" class="text-slate-400 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="p-6">
+      <!-- Site name -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-slate-300 mb-1.5">Site Name</label>
+        <input type="text" id="new-site-name" placeholder="My Awesome Site"
+          class="w-full rounded-xl px-4 py-3 text-sm">
+      </div>
+      <!-- Templates -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-slate-300 mb-3">Choose a Template</label>
+        <div id="template-grid" class="grid grid-cols-2 gap-3"></div>
+      </div>
+      <button onclick="createSite()"
+        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm" id="create-btn">
+        Create Site
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── REVISIONS PANEL ──────────────────────────────────────────────────────── -->
+<div id="revisions-backdrop" class="hidden fixed inset-0 z-40 bg-black/50" onclick="closeRevisions()"></div>
+<div id="revisions-panel" class="slide-panel fixed right-0 top-0 h-full w-full max-w-sm z-50 bg-slate-900 border-l border-slate-700 flex flex-col">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+    <div>
+      <h2 class="font-bold">Revision History</h2>
+      <p id="rev-site-name" class="text-xs text-slate-400 mt-0.5"></p>
+    </div>
+    <button onclick="closeRevisions()" class="text-slate-400 hover:text-white transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div id="revisions-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+</div>
+
+<!-- ── SETTINGS MODAL ───────────────────────────────────────────────────────── -->
+<div id="settings-modal" class="modal-bg fixed inset-0 z-50 flex items-center justify-center p-4"
+     style="background:rgba(0,0,0,0.7)" onclick="closeSettings(event)">
+  <div class="modal-card bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+       onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-700 sticky top-0 bg-slate-800">
+      <h2 class="text-lg font-bold">Site Settings</h2>
+      <button onclick="closeSettings()" class="text-slate-400 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="p-6 space-y-6">
+      <!-- Site name -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Site Name</label>
+        <input type="text" id="settings-name" class="w-full rounded-xl px-4 py-3 text-sm">
+        <button onclick="saveSiteName()"
+          class="mt-2 text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition">
+          Save Name
+        </button>
+      </div>
+
+      <!-- Site URL -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Live Site URL</label>
+        <div class="flex gap-2">
+          <input type="text" id="settings-url" readonly class="flex-1 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-default">
+          <button onclick="copySettingsUrl()"
+            class="text-sm bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-xl transition" title="Copy URL">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Embed code -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Embed on Your Own Page</label>
+        <div class="relative">
+          <textarea id="settings-embed" readonly rows="4"
+            class="w-full rounded-xl px-4 py-3 text-xs font-mono resize-none text-slate-300 leading-relaxed"></textarea>
+          <button onclick="copyEmbed()"
+            class="absolute top-2 right-2 text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded transition">
+            Copy
+          </button>
+        </div>
+        <p class="text-xs text-slate-500 mt-1.5">Add this to any page. Include <code class="text-slate-300">data-n3-key</code> with your API key to enable publishing from that page.</p>
+      </div>
+
+      <!-- Custom domain -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Custom Domain</label>
+        <input type="text" id="settings-domain" placeholder="mysite.example.com" class="w-full rounded-xl px-4 py-3 text-sm">
+        <p class="text-xs text-slate-500 mt-1.5">Point a CNAME record at your n3ware server hostname, then enter the domain here.</p>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="border border-red-900/50 rounded-xl p-5">
+        <h3 class="text-sm font-bold text-red-400 mb-1">Danger Zone</h3>
+        <p class="text-xs text-slate-400 mb-4">Deleting this site is permanent and cannot be undone. All revisions will be lost.</p>
+        <button onclick="confirmDeleteSite()"
+          class="text-sm bg-red-900/40 hover:bg-red-900/70 text-red-400 border border-red-900/50 px-5 py-2 rounded-lg transition">
+          Delete This Site
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ─────────────────────────────────────────────────────────────────── -->
+<div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+<script>
+'use strict';
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const S = {
+  token:      localStorage.getItem('n3_token') || '',
+  user:       null,
+  sites:      [],
+  templates:  [],
+  activeSite: null,
+  authMode:   'login',
+};
+
+// ── API ───────────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (S.token) headers['Authorization'] = `Bearer ${S.token}`;
+  const res = await fetch(path, {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  if (res.status === 204) return {};
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+async function apiHtml(path) {
+  const headers = {};
+  if (S.token) headers['Authorization'] = `Bearer ${S.token}`;
+  const res = await fetch(path, { headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.text();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const colours = { info: 'bg-slate-700', success: 'bg-emerald-700', error: 'bg-red-800' };
+  const el = document.createElement('div');
+  el.className = `toast ${colours[type]} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-xl pointer-events-auto max-w-xs`;
+  el.textContent = msg;
+  document.getElementById('toast-container').prepend(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 350);
+  }, 3000);
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function switchTab(mode) {
+  S.authMode = mode;
+  const isLogin = mode === 'login';
+  document.getElementById('tab-login').className =
+    `flex-1 py-2 rounded-lg text-sm font-semibold transition ${isLogin ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
+  document.getElementById('tab-register').className =
+    `flex-1 py-2 rounded-lg text-sm font-semibold transition ${!isLogin ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
+  document.getElementById('auth-btn').textContent = isLogin ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-error').classList.add('hidden');
+}
+
+async function submitAuth(e) {
+  e.preventDefault();
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const btn      = document.getElementById('auth-btn');
+  const errEl    = document.getElementById('auth-error');
+  errEl.classList.add('hidden');
+  btn.disabled = true;
+  btn.textContent = S.authMode === 'login' ? 'Signing in…' : 'Creating account…';
+  try {
+    const path = S.authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+    const data = await api('POST', path, { email, password });
+    S.token = data.token;
+    S.user  = data.user;
+    localStorage.setItem('n3_token', S.token);
+    showDashboard();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = S.authMode === 'login' ? 'Sign In' : 'Create Account';
+  }
+}
+
+function logout() {
+  S.token = '';
+  S.user  = null;
+  S.sites = [];
+  localStorage.removeItem('n3_token');
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('auth-screen').classList.remove('hidden');
+  switchTab('login');
+}
+
+async function checkAuth() {
+  if (!S.token) return showAuth();
+  try {
+    const data = await api('GET', '/api/auth/me');
+    S.user = data.user;
+    showDashboard();
+  } catch {
+    logout();
+  }
+}
+
+function showAuth() {
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('dashboard').classList.add('hidden');
+}
+
+async function showDashboard() {
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('dashboard').classList.remove('hidden');
+  if (S.user) {
+    document.getElementById('user-email').textContent = S.user.email;
+  }
+  await Promise.all([loadSites(), loadTemplates()]);
+}
+
+// ── Sites ─────────────────────────────────────────────────────────────────────
+async function loadSites() {
+  try {
+    const data = await api('GET', '/api/sites');
+    S.sites = data.sites || [];
+    renderSites();
+  } catch (err) {
+    toast('Failed to load sites: ' + err.message, 'error');
+  }
+}
+
+function renderSites() {
+  const grid  = document.getElementById('sites-grid');
+  const empty = document.getElementById('empty-state');
+  const count = document.getElementById('site-count');
+  count.textContent = S.sites.length
+    ? `${S.sites.length} site${S.sites.length !== 1 ? 's' : ''}`
+    : '';
+
+  if (!S.sites.length) {
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  grid.innerHTML = S.sites.map(renderSiteCard).join('');
+}
+
+function renderSiteCard(site) {
+  const [c1, c2] = siteColours(site.id);
+  const updated  = site.updatedAt
+    ? new Date(site.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '—';
+  const revCount = site.revisionCount || 0;
+  const name     = esc(site.name || 'Untitled Site');
+
+  return `
+  <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden hover:border-slate-600 transition group" data-id="${esc(site.id)}">
+    <!-- Preview -->
+    <div class="site-preview h-40 relative flex items-center justify-center cursor-pointer"
+         style="--c1:${c1};--c2:${c2}"
+         onclick="editSite('${esc(site.id)}')">
+      <span class="text-5xl font-black text-white/30">${esc((site.name || 'U')[0].toUpperCase())}</span>
+      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center">
+        <span class="opacity-0 group-hover:opacity-100 transition bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-full">
+          Open Editor ↗
+        </span>
+      </div>
+      <!-- Status badge -->
+      <div class="absolute top-3 right-3 flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-semibold px-2.5 py-1 rounded-full">
+        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>Live
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="p-4">
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <h3 class="font-semibold text-sm leading-tight truncate flex-1"
+            title="${name}">${name}</h3>
+        <span class="shrink-0 bg-slate-700 text-slate-400 text-xs px-2 py-0.5 rounded-full">
+          ${revCount} rev${revCount !== 1 ? 's' : ''}
+        </span>
+      </div>
+      <p class="text-slate-500 text-xs mb-4">Edited ${updated}</p>
+
+      <!-- Actions -->
+      <div class="flex gap-2">
+        <button onclick="editSite('${esc(site.id)}')"
+          class="flex-1 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg transition">
+          Edit
+        </button>
+        <button onclick="openRevisions('${esc(site.id)}')"
+          class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Revisions">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </button>
+        <button onclick="openSettings('${esc(site.id)}')"
+          class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Settings">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function editSite(id) {
+  window.open(`/sites/${id}`, '_blank');
+}
+
+// ── Create modal ──────────────────────────────────────────────────────────────
+function openCreateModal() {
+  renderTemplateGrid();
+  document.getElementById('new-site-name').value = '';
+  document.getElementById('create-modal').classList.add('open');
+  document.getElementById('new-site-name').focus();
+}
+
+function closeCreateModal(e) {
+  if (e && e.target !== document.getElementById('create-modal')) return;
+  document.getElementById('create-modal').classList.remove('open');
+}
+
+function renderTemplateGrid() {
+  const grid = document.getElementById('template-grid');
+  if (!S.templates.length) {
+    grid.innerHTML = '<p class="col-span-2 text-slate-400 text-sm">Loading templates…</p>';
+    return;
+  }
+  const icons = { blank: '⬜', restaurant: '🍽️', portfolio: '🎨', business: '💼' };
+  grid.innerHTML = S.templates.map(t => `
+    <div class="template-card rounded-xl p-4 text-center" data-name="${esc(t.name)}" onclick="selectTemplate('${esc(t.name)}')">
+      <div class="text-3xl mb-2">${icons[t.name] || '📄'}</div>
+      <p class="text-sm font-semibold text-white">${esc(t.label)}</p>
+      <p class="text-xs text-slate-400 mt-0.5 leading-snug">${esc(t.description)}</p>
+    </div>`).join('');
+  // Pre-select first template
+  selectTemplate(S.templates[0].name);
+}
+
+let selectedTemplate = 'blank';
+function selectTemplate(name) {
+  selectedTemplate = name;
+  document.querySelectorAll('.template-card').forEach(el => {
+    el.classList.toggle('selected', el.dataset.name === name);
+  });
+}
+
+async function loadTemplates() {
+  try {
+    const data = await api('GET', '/api/templates');
+    S.templates = data.templates || [];
+  } catch {
+    S.templates = [];
+  }
+}
+
+async function createSite() {
+  const name    = document.getElementById('new-site-name').value.trim() || 'Untitled Site';
+  const btn     = document.getElementById('create-btn');
+  btn.disabled  = true;
+  btn.textContent = 'Creating…';
+  try {
+    // Fetch template HTML
+    const html = await apiHtml(`/api/templates/${selectedTemplate}`);
+    const data = await api('POST', '/api/sites', { html, name, message: 'Created from template' });
+    const site = data.site;
+    S.sites.unshift(site);
+    renderSites();
+    document.getElementById('create-modal').classList.remove('open');
+    toast(`"${site.name}" created!`, 'success');
+    // Open editor in new tab
+    window.open(`/sites/${site.id}`, '_blank');
+  } catch (err) {
+    toast('Create failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Site';
+  }
+}
+
+// ── Revisions panel ───────────────────────────────────────────────────────────
+async function openRevisions(siteId) {
+  const site = S.sites.find(s => s.id === siteId);
+  S.activeSite = siteId;
+  document.getElementById('rev-site-name').textContent = site ? site.name : siteId;
+  document.getElementById('revisions-list').innerHTML =
+    '<p class="text-slate-400 text-sm text-center py-8">Loading…</p>';
+
+  document.getElementById('revisions-backdrop').classList.remove('hidden');
+  document.getElementById('revisions-panel').classList.add('open');
+
+  try {
+    const data = await api('GET', `/api/sites/${siteId}/revisions`);
+    renderRevisions(data.revisions || []);
+  } catch (err) {
+    document.getElementById('revisions-list').innerHTML =
+      `<p class="text-red-400 text-sm text-center py-8">${esc(err.message)}</p>`;
+  }
+}
+
+function closeRevisions() {
+  document.getElementById('revisions-backdrop').classList.add('hidden');
+  document.getElementById('revisions-panel').classList.remove('open');
+}
+
+function renderRevisions(revisions) {
+  const list = document.getElementById('revisions-list');
+  if (!revisions.length) {
+    list.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">No revisions yet.</p>';
+    return;
+  }
+  const revHtml = revisions.map((rev, i) => {
+    const date = new Date(rev.createdAt).toLocaleString('en-US', {
+      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+    });
+    const isCurrent = i === 0;
+    return `
+    <div class="bg-slate-800 rounded-xl p-4 border ${isCurrent ? 'border-blue-500/50' : 'border-slate-700'}">
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold truncate">${esc(rev.message || 'Saved')}</p>
+          <p class="text-xs text-slate-400 mt-0.5">${esc(date)}</p>
+        </div>
+        ${isCurrent
+          ? '<span class="shrink-0 text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full font-semibold">Current</span>'
+          : `<button onclick="rollbackTo('${esc(rev.id)}')"
+               class="shrink-0 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition font-semibold">
+               ↺ Restore
+             </button>`
+        }
+      </div>
+      <p class="text-xs text-slate-500 font-mono">${esc(rev.id)}</p>
+    </div>`;
+  }).join('');
+  list.innerHTML = revHtml;
+}
+
+async function rollbackTo(revId) {
+  if (!confirm('Restore this revision? The current version will be saved as a new revision first.')) return;
+  try {
+    await api('POST', `/api/sites/${S.activeSite}/revisions/${revId}/rollback`);
+    toast('Revision restored!', 'success');
+    await loadSites();
+    openRevisions(S.activeSite);
+  } catch (err) {
+    toast('Rollback failed: ' + err.message, 'error');
+  }
+}
+
+// ── Settings modal ────────────────────────────────────────────────────────────
+function openSettings(siteId) {
+  const site = S.sites.find(s => s.id === siteId);
+  if (!site) return;
+  S.activeSite = siteId;
+
+  document.getElementById('settings-name').value = site.name || '';
+  const origin = window.location.origin;
+  const siteUrl = `${origin}/sites/${siteId}`;
+  document.getElementById('settings-url').value = siteUrl;
+  document.getElementById('settings-embed').value =
+    `<script src="${origin}/n3ware.js"\n  data-n3-site="${siteId}"\n  data-n3-api="${origin}/api"\n  data-n3-key="YOUR_API_KEY"><\/script>`;
+  document.getElementById('settings-domain').value = '';
+  document.getElementById('settings-modal').classList.add('open');
+}
+
+function closeSettings(e) {
+  if (e && e.target !== document.getElementById('settings-modal')) return;
+  document.getElementById('settings-modal').classList.remove('open');
+}
+
+async function saveSiteName() {
+  const name = document.getElementById('settings-name').value.trim();
+  if (!name) return;
+  try {
+    // Save name via a no-op save (fetch current HTML, re-save with new name)
+    const htmlData = await api('GET', `/api/sites/${S.activeSite}`);
+    // The GET /:id doesn't return html — use /html endpoint
+    const html = await apiHtml(`/api/sites/${S.activeSite}/html`);
+    await api('POST', `/api/sites/${S.activeSite}/save`, { html, name, message: `Renamed to "${name}"` });
+    const siteIdx = S.sites.findIndex(s => s.id === S.activeSite);
+    if (siteIdx !== -1) S.sites[siteIdx].name = name;
+    renderSites();
+    toast('Name saved', 'success');
+  } catch (err) {
+    toast('Save failed: ' + err.message, 'error');
+  }
+}
+
+function copySettingsUrl() {
+  const url = document.getElementById('settings-url').value;
+  navigator.clipboard.writeText(url).then(() => toast('URL copied!', 'success'));
+}
+
+function copyEmbed() {
+  const code = document.getElementById('settings-embed').value;
+  navigator.clipboard.writeText(code).then(() => toast('Embed code copied!', 'success'));
+}
+
+async function confirmDeleteSite() {
+  const site = S.sites.find(s => s.id === S.activeSite);
+  const name = site ? site.name : 'this site';
+  if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  try {
+    await api('DELETE', `/api/sites/${S.activeSite}`);
+    S.sites = S.sites.filter(s => s.id !== S.activeSite);
+    renderSites();
+    document.getElementById('settings-modal').classList.remove('open');
+    toast(`"${name}" deleted`, 'info');
+  } catch (err) {
+    toast('Delete failed: ' + err.message, 'error');
+  }
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/** Deterministic gradient colours from a site ID string */
+function siteColours(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  const palettes = [
+    ['#1e3a5f','#0f2b4a'],['#1a1a2e','#16213e'],['#0d2137','#0a3d62'],
+    ['#1b1f3b','#2c2f6b'],['#0f3460','#533483'],['#1a472a','#145a32'],
+    ['#4a0e2e','#6b1b3f'],['#1a0533','#2d1b69'],
+  ];
+  return palettes[h % palettes.length];
+}
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('create-modal').classList.remove('open');
+    closeRevisions();
+    document.getElementById('settings-modal').classList.remove('open');
+  }
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+checkAuth();
+</script>
+</body>
+</html>

@@ -16,6 +16,8 @@ module.exports = {
 
   // Auth
   masterApiKey:    process.env.MASTER_API_KEY  || 'dev-master-key',
+  jwtSecret:       process.env.JWT_SECRET      || 'dev-jwt-secret-change-in-prod',
+  usersFile:       process.env.USERS_FILE      || './data/users.json',
 
   // CDN
   cdnProvider:     process.env.CDN_PROVIDER    || 'none',            // 'none' | 'cloudflare' | 'gcp'

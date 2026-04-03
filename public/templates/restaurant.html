@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ember & Oak — Modern American Kitchen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-950 text-stone-100 font-sans">
+
+  <!-- Nav -->
+  <nav class="fixed top-0 w-full z-50 bg-stone-950/90 backdrop-blur border-b border-stone-800 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <span class="text-2xl font-bold tracking-tight text-amber-400">Ember &amp; Oak</span>
+      <div class="hidden md:flex gap-8 text-sm text-stone-300">
+        <a href="#menu" class="hover:text-amber-400 transition">Menu</a>
+        <a href="#about" class="hover:text-amber-400 transition">About</a>
+        <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
+      </div>
+      <a href="#contact" class="bg-amber-500 text-stone-950 text-sm font-bold px-5 py-2 rounded-full hover:bg-amber-400 transition">Reserve a Table</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600&q=80"
+         alt="Food" class="absolute inset-0 w-full h-full object-cover opacity-30">
+    <div class="relative z-10 max-w-3xl px-6">
+      <p class="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-4">Modern American Kitchen</p>
+      <h1 class="text-6xl font-extrabold text-white leading-tight mb-6">
+        Where Every Meal<br>Becomes a Memory
+      </h1>
+      <p class="text-stone-300 text-xl mb-10">Locally sourced, wood-fired, and crafted with love. Join us for dinner Tuesday through Sunday.</p>
+      <a href="#menu" class="inline-block bg-amber-500 text-stone-950 font-bold px-10 py-4 rounded-full text-lg hover:bg-amber-400 transition">
+        View Our Menu
+      </a>
+    </div>
+  </section>
+
+  <!-- Menu -->
+  <section id="menu" class="py-24 px-6">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-amber-400 text-sm font-semibold uppercase tracking-widest text-center mb-2">Curated Dishes</p>
+      <h2 class="text-4xl font-bold text-center mb-16">Tonight's Menu</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Starters -->
+        <div class="bg-stone-900 rounded-2xl p-8">
+          <h3 class="text-amber-400 font-semibold uppercase text-xs tracking-widest mb-6">Starters</h3>
+          <div class="space-y-5">
+            <div class="flex justify-between">
+              <div>
+                <p class="font-semibold">Burrata &amp; Heirloom Tomato</p>
+                <p class="text-stone-400 text-sm">Fresh burrata, basil oil, flaky sea salt</p>
+              </div>
+              <span class="text-amber-400 font-semibold">$16</span>
+            </div>
+            <div class="flex justify-between">
+              <div>
+                <p class="font-semibold">Wood-fired Mushroom Toast</p>
+                <p class="text-stone-400 text-sm">Sourdough, truffle, aged parmesan</p>
+              </div>
+              <span class="text-amber-400 font-semibold">$14</span>
+            </div>
+            <div class="flex justify-between">
+              <div>
+                <p class="font-semibold">Ember Roasted Beet Salad</p>
+                <p class="text-stone-400 text-sm">Whipped goat cheese, walnuts, micro herbs</p>
+              </div>
+              <span class="text-amber-400 font-semibold">$13</span>
+            </div>
+          </div>
+        </div>
+        <!-- Mains -->
+        <div class="bg-stone-900 rounded-2xl p-8">
+          <h3 class="text-amber-400 font-semibold uppercase text-xs tracking-widest mb-6">Mains</h3>
+          <div class="space-y-5">
+            <div class="flex justify-between">
+              <div>
+                <p class="font-semibold">12oz Dry-Aged Ribeye</p>
+                <p class="text-stone-400 text-sm">Bone marrow butter, chimichurri, frites</p>
+              </div>
+              <span class="text-amber-400 font-semibold">$54</span>
+            </div>
+            <div class="flex justify-between">
+              <div>
+                <p class="font-semibold">Pan-Seared Halibut</p>
+                <p class="text-stone-400 text-sm">Lemon caper beurre blanc, asparagus</p>
+              </div>
+              <span class="text-amber-400 font-semibold">$42</span>
+            </div>
+            <div class="flex justify-between">
+              <div>
+                <p class="font-semibold">Wild Mushroom Risotto</p>
+                <p class="text-stone-400 text-sm">Arborio, porcini, truffle, aged pecorino</p>
+              </div>
+              <span class="text-amber-400 font-semibold">$32</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="bg-stone-900 py-24 px-6">
+    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+      <div>
+        <p class="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Our Story</p>
+        <h2 class="text-4xl font-bold mb-6">Rooted in the Season,<br>Fired by Passion</h2>
+        <p class="text-stone-300 leading-relaxed mb-4">
+          Ember &amp; Oak was born from a single belief: the best meals come from the best ingredients. We partner with local farms, foragers, and fishmongers to bring you a menu that changes with the seasons.
+        </p>
+        <p class="text-stone-300 leading-relaxed">
+          Our wood-fired kitchen is the heart of everything we do. Every dish passes through the flame, picking up a depth of flavour you simply can't replicate any other way.
+        </p>
+      </div>
+      <div class="rounded-2xl overflow-hidden h-80">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80"
+             alt="Restaurant interior" class="w-full h-full object-cover">
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-24 px-6 text-center">
+    <div class="max-w-xl mx-auto">
+      <h2 class="text-4xl font-bold mb-4">Make a Reservation</h2>
+      <p class="text-stone-400 mb-10">We're open Tuesday – Sunday, 5pm – 10pm. Walk-ins welcome based on availability.</p>
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <input type="text" placeholder="Your name" class="bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
+          <input type="email" placeholder="Email address" class="bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <input type="date" class="bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
+          <select class="bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
+            <option>2 guests</option>
+            <option>3–4 guests</option>
+            <option>5–6 guests</option>
+            <option>Large party</option>
+          </select>
+        </div>
+        <button class="w-full bg-amber-500 text-stone-950 font-bold py-4 rounded-xl hover:bg-amber-400 transition text-lg">
+          Request Reservation
+        </button>
+      </div>
+      <p class="text-stone-500 text-sm mt-6">📍 42 Oak Street, Downtown · 📞 (555) 800-1200</p>
+    </div>
+  </section>
+
+  <footer class="border-t border-stone-800 py-8 text-center text-stone-500 text-sm">
+    <p>&copy; 2025 Ember &amp; Oak. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

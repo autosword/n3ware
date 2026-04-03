@@ -11,11 +11,11 @@
 const express = require('express');
 const storage = require('../storage');
 const cache   = require('../cache');
-const { requireApiKey } = require('./auth');
+const { authOrApiKey } = require('./auth');
 
 const router = express.Router({ mergeParams: true });
 
-router.use(requireApiKey);
+router.use(authOrApiKey);
 
 // ── List revisions ─────────────────────────────────────────────────────────
 
