@@ -1,16 +1,15 @@
 {
   "name": "n3ware",
   "version": "1.0.0",
-  "description": "",
+  "description": "Drop-in JavaScript library for visual webpage editing",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "keywords": ["visual-editor", "drag-drop", "contenteditable", "wysiwyg"],
+  "author": "autosword",
+  "license": "MIT",
   "dependencies": {
     "express": "^5.2.1"
   }

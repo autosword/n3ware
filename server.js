@@ -1,8 +1,6 @@
 const express = require('express');
 const path = require('path');
-
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -10,10 +8,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/demo', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'demo.html'));
-});
-
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`n3ware server running on port ${PORT}`);
+  console.log(`n3ware demo server running at http://localhost:${PORT}`);
 });
