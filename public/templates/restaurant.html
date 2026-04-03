@@ -1,155 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ember & Oak — Modern American Kitchen</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Waypoint — Wakefield, RI</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .hero-bg { background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80'); background-size: cover; background-position: center; }
+    .card-hover { transition: transform 0.2s ease; }
+    .card-hover:hover { transform: translateY(-3px); }
+    .masonry-grid { columns: 2; column-gap: 1rem; }
+    @media (min-width: 768px) { .masonry-grid { columns: 3; } }
+    .masonry-grid img { break-inside: avoid; margin-bottom: 1rem; }
+  </style>
 </head>
-<body class="bg-stone-950 text-stone-100 font-sans">
+<body class="font-sans antialiased bg-yellow-50 text-stone-800">
 
   <!-- Nav -->
-  <nav class="fixed top-0 w-full z-50 bg-stone-950/90 backdrop-blur border-b border-stone-800 px-6 py-4">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <span class="text-2xl font-bold tracking-tight text-amber-400">Ember &amp; Oak</span>
-      <div class="hidden md:flex gap-8 text-sm text-stone-300">
-        <a href="#menu" class="hover:text-amber-400 transition">Menu</a>
-        <a href="#about" class="hover:text-amber-400 transition">About</a>
-        <a href="#contact" class="hover:text-amber-400 transition">Contact</a>
+  <nav class="sticky top-0 z-50 bg-yellow-50 border-b border-stone-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-red-900 font-serif font-extrabold text-2xl tracking-tight">The Waypoint</span>
       </div>
-      <a href="#contact" class="bg-amber-500 text-stone-950 text-sm font-bold px-5 py-2 rounded-full hover:bg-amber-400 transition">Reserve a Table</a>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="#menu" class="text-stone-600 hover:text-red-900 transition-colors">Menu</a>
+        <a href="#story" class="text-stone-600 hover:text-red-900 transition-colors">Our Story</a>
+        <a href="#reserve" class="text-stone-600 hover:text-red-900 transition-colors">Reserve</a>
+        <a href="#hours" class="text-stone-600 hover:text-red-900 transition-colors">Contact</a>
+      </div>
+      <a href="#reserve" class="bg-red-900 hover:bg-red-800 text-yellow-50 px-5 py-2 rounded-lg font-semibold text-sm transition-colors">Reserve a Table</a>
     </div>
   </nav>
 
   <!-- Hero -->
-  <section class="relative h-screen flex items-center justify-center text-center overflow-hidden">
-    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600&q=80"
-         alt="Food" class="absolute inset-0 w-full h-full object-cover opacity-30">
-    <div class="relative z-10 max-w-3xl px-6">
-      <p class="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-4">Modern American Kitchen</p>
-      <h1 class="text-6xl font-extrabold text-white leading-tight mb-6">
-        Where Every Meal<br>Becomes a Memory
-      </h1>
-      <p class="text-stone-300 text-xl mb-10">Locally sourced, wood-fired, and crafted with love. Join us for dinner Tuesday through Sunday.</p>
-      <a href="#menu" class="inline-block bg-amber-500 text-stone-950 font-bold px-10 py-4 rounded-full text-lg hover:bg-amber-400 transition">
-        View Our Menu
-      </a>
+  <section class="hero-bg relative min-h-screen flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="relative z-10 text-center px-6 max-w-3xl mx-auto">
+      <span class="inline-block bg-amber-700/60 text-amber-200 text-xs font-semibold uppercase tracking-widest px-4 py-1 rounded-full mb-5">Wakefield, Rhode Island</span>
+      <h1 class="text-6xl font-serif font-bold text-white leading-tight mb-5">Where Craft<br /><span class="text-amber-400">Meets Comfort.</span></h1>
+      <p class="text-gray-200 text-xl mb-8 leading-relaxed">Locally sourced New England cuisine in the heart of South County. Farm-to-table ingredients, thoughtfully prepared. Open Tuesday through Sunday.</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="#reserve" class="bg-red-800 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-bold text-lg transition-colors">Reserve a Table</a>
+        <a href="#menu" class="border-2 border-white text-white hover:bg-white hover:text-red-900 px-8 py-3 rounded-lg font-bold text-lg transition-colors">View Menu</a>
+      </div>
     </div>
   </section>
 
   <!-- Menu -->
-  <section id="menu" class="py-24 px-6">
-    <div class="max-w-5xl mx-auto">
-      <p class="text-amber-400 text-sm font-semibold uppercase tracking-widest text-center mb-2">Curated Dishes</p>
-      <h2 class="text-4xl font-bold text-center mb-16">Tonight's Menu</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Starters -->
-        <div class="bg-stone-900 rounded-2xl p-8">
-          <h3 class="text-amber-400 font-semibold uppercase text-xs tracking-widest mb-6">Starters</h3>
-          <div class="space-y-5">
-            <div class="flex justify-between">
-              <div>
-                <p class="font-semibold">Burrata &amp; Heirloom Tomato</p>
-                <p class="text-stone-400 text-sm">Fresh burrata, basil oil, flaky sea salt</p>
-              </div>
-              <span class="text-amber-400 font-semibold">$16</span>
-            </div>
-            <div class="flex justify-between">
-              <div>
-                <p class="font-semibold">Wood-fired Mushroom Toast</p>
-                <p class="text-stone-400 text-sm">Sourdough, truffle, aged parmesan</p>
-              </div>
-              <span class="text-amber-400 font-semibold">$14</span>
-            </div>
-            <div class="flex justify-between">
-              <div>
-                <p class="font-semibold">Ember Roasted Beet Salad</p>
-                <p class="text-stone-400 text-sm">Whipped goat cheese, walnuts, micro herbs</p>
-              </div>
-              <span class="text-amber-400 font-semibold">$13</span>
-            </div>
+  <section id="menu" class="py-20 bg-stone-900 text-yellow-50">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-4xl font-serif font-bold text-center mb-3">Our Menu</h2>
+      <p class="text-stone-400 text-center mb-14">Sourced from local farms and New England waters. Menu changes seasonally.</p>
+
+      <!-- Starters -->
+      <h3 class="text-2xl font-serif font-semibold text-amber-400 mb-6 border-b border-stone-700 pb-3">Starters</h3>
+      <div class="grid md:grid-cols-2 gap-6 mb-12">
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Narragansett Bay Oysters</div>
+            <div class="text-stone-400 text-sm mt-1">Half dozen local oysters with house mignonette, cocktail sauce &amp; lemon</div>
           </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$16</div>
         </div>
-        <!-- Mains -->
-        <div class="bg-stone-900 rounded-2xl p-8">
-          <h3 class="text-amber-400 font-semibold uppercase text-xs tracking-widest mb-6">Mains</h3>
-          <div class="space-y-5">
-            <div class="flex justify-between">
-              <div>
-                <p class="font-semibold">12oz Dry-Aged Ribeye</p>
-                <p class="text-stone-400 text-sm">Bone marrow butter, chimichurri, frites</p>
-              </div>
-              <span class="text-amber-400 font-semibold">$54</span>
-            </div>
-            <div class="flex justify-between">
-              <div>
-                <p class="font-semibold">Pan-Seared Halibut</p>
-                <p class="text-stone-400 text-sm">Lemon caper beurre blanc, asparagus</p>
-              </div>
-              <span class="text-amber-400 font-semibold">$42</span>
-            </div>
-            <div class="flex justify-between">
-              <div>
-                <p class="font-semibold">Wild Mushroom Risotto</p>
-                <p class="text-stone-400 text-sm">Arborio, porcini, truffle, aged pecorino</p>
-              </div>
-              <span class="text-amber-400 font-semibold">$32</span>
-            </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">New England Clam Chowder</div>
+            <div class="text-stone-400 text-sm mt-1">House-made creamy chowder with littleneck clams, applewood bacon &amp; chives</div>
           </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$13</div>
+        </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Burrata &amp; Heirloom Tomato</div>
+            <div class="text-stone-400 text-sm mt-1">Local burrata, Shady Lea Farm tomatoes, basil oil, aged balsamic &amp; sea salt</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$15</div>
+        </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Crispy Calamari</div>
+            <div class="text-stone-400 text-sm mt-1">Lightly battered Rhode Island squid, banana peppers, house marinara &amp; aioli</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$14</div>
+        </div>
+      </div>
+
+      <!-- Mains -->
+      <h3 class="text-2xl font-serif font-semibold text-amber-400 mb-6 border-b border-stone-700 pb-3">Mains</h3>
+      <div class="grid md:grid-cols-2 gap-6 mb-12">
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Pan-Seared Striped Bass</div>
+            <div class="text-stone-400 text-sm mt-1">RI-caught striped bass, roasted fingerling potatoes, grilled asparagus &amp; lemon beurre blanc</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$36</div>
+        </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Wood-Grilled Ribeye</div>
+            <div class="text-stone-400 text-sm mt-1">12oz Black Angus ribeye, truffle compound butter, crispy shallots &amp; roasted garlic mash</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$42</div>
+        </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Free-Range Half Chicken</div>
+            <div class="text-stone-400 text-sm mt-1">Johnston Farm chicken, herb jus, wilted greens, roasted root vegetables</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$28</div>
+        </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Wild Mushroom Risotto</div>
+            <div class="text-stone-400 text-sm mt-1">Arborio rice, mixed local mushrooms, parmesan reggiano, truffle oil &amp; micro herbs</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$26</div>
+        </div>
+      </div>
+
+      <!-- Desserts -->
+      <h3 class="text-2xl font-serif font-semibold text-amber-400 mb-6 border-b border-stone-700 pb-3">Desserts</h3>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Warm Chocolate Lava Cake</div>
+            <div class="text-stone-400 text-sm mt-1">Valrhona chocolate, vanilla bean ice cream, fresh berries</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$11</div>
+        </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Crème Brûlée</div>
+            <div class="text-stone-400 text-sm mt-1">Classic vanilla custard, torched sugar crust, seasonal fruit compote</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$10</div>
+        </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Apple Tarte Tatin</div>
+            <div class="text-stone-400 text-sm mt-1">Caramelized New England apples, puff pastry, house caramel, whipped cream</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$10</div>
+        </div>
+        <div class="flex justify-between gap-4">
+          <div>
+            <div class="font-semibold text-yellow-50">Local Ice Cream &amp; Sorbet</div>
+            <div class="text-stone-400 text-sm mt-1">Three scoops from Gray's Ice Cream, Tiverton RI — seasonal flavors</div>
+          </div>
+          <div class="text-amber-400 font-bold whitespace-nowrap">$9</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- About -->
-  <section id="about" class="bg-stone-900 py-24 px-6">
-    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+  <!-- Hours & Location -->
+  <section id="hours" class="py-20 bg-yellow-50">
+    <div class="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-start">
       <div>
-        <p class="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Our Story</p>
-        <h2 class="text-4xl font-bold mb-6">Rooted in the Season,<br>Fired by Passion</h2>
-        <p class="text-stone-300 leading-relaxed mb-4">
-          Ember &amp; Oak was born from a single belief: the best meals come from the best ingredients. We partner with local farms, foragers, and fishmongers to bring you a menu that changes with the seasons.
-        </p>
-        <p class="text-stone-300 leading-relaxed">
-          Our wood-fired kitchen is the heart of everything we do. Every dish passes through the flame, picking up a depth of flavour you simply can't replicate any other way.
-        </p>
+        <h2 class="text-3xl font-serif font-bold text-red-900 mb-6">Hours &amp; Location</h2>
+        <div class="space-y-3 text-stone-700 mb-6">
+          <div class="flex justify-between border-b border-stone-200 pb-2"><span class="font-medium">Monday</span><span class="text-stone-400">Closed</span></div>
+          <div class="flex justify-between border-b border-stone-200 pb-2"><span class="font-medium">Tuesday – Thursday</span><span>5:00 pm – 9:00 pm</span></div>
+          <div class="flex justify-between border-b border-stone-200 pb-2"><span class="font-medium">Friday – Saturday</span><span>5:00 pm – 10:00 pm</span></div>
+          <div class="flex justify-between"><span class="font-medium">Sunday</span><span>11:00 am – 8:00 pm</span></div>
+        </div>
+        <div class="text-stone-700">
+          <p class="font-bold text-red-900 text-lg">The Waypoint</p>
+          <p>14 Main St, Wakefield RI 02879</p>
+          <p class="mt-1"><a href="tel:4015550384" class="text-red-800 font-semibold hover:underline">(401) 555-0384</a></p>
+        </div>
       </div>
-      <div class="rounded-2xl overflow-hidden h-80">
-        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80"
-             alt="Restaurant interior" class="w-full h-full object-cover">
+      <div>
+        <div class="w-full h-64 bg-stone-200 rounded-2xl flex flex-col items-center justify-center text-stone-500">
+          <div class="text-4xl mb-3">📍</div>
+          <p class="font-medium">14 Main St, Wakefield RI 02879</p>
+          <a href="https://maps.google.com" target="_blank" class="mt-3 bg-red-900 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-red-800 transition-colors">View on Google Maps</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Contact -->
-  <section id="contact" class="py-24 px-6 text-center">
-    <div class="max-w-xl mx-auto">
-      <h2 class="text-4xl font-bold mb-4">Make a Reservation</h2>
-      <p class="text-stone-400 mb-10">We're open Tuesday – Sunday, 5pm – 10pm. Walk-ins welcome based on availability.</p>
-      <div class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <input type="text" placeholder="Your name" class="bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
-          <input type="email" placeholder="Email address" class="bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
+  <!-- Photo Gallery -->
+  <section class="py-20 bg-stone-100">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-4xl font-serif font-bold text-red-900 text-center mb-12">A Taste of The Waypoint</h2>
+      <div class="masonry-grid">
+        <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80" alt="Dish" class="rounded-xl w-full object-cover" />
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80" alt="Dish" class="rounded-xl w-full object-cover" />
+        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80" alt="Dish" class="rounded-xl w-full object-cover" />
+        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&q=80" alt="Dish" class="rounded-xl w-full object-cover" />
+        <img src="https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&q=80" alt="Dish" class="rounded-xl w-full object-cover" />
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80" alt="Dish" class="rounded-xl w-full object-cover" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Chef Story -->
+  <section id="story" class="py-20 bg-yellow-50">
+    <div class="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400&q=80" alt="Chef Marcus" class="rounded-2xl w-full object-cover shadow-lg" />
+      </div>
+      <div>
+        <span class="text-amber-600 font-semibold text-sm uppercase tracking-widest">Meet the Chef</span>
+        <h2 class="text-4xl font-serif font-bold text-red-900 mt-2 mb-5">Chef Marcus Deluca</h2>
+        <p class="text-stone-600 leading-relaxed mb-4">Chef Marcus grew up just down the road in Peace Dale before heading north to earn his culinary degree at the Cambridge School of Culinary Arts. He spent twelve years honing his craft in Boston's restaurant scene — including seven years as sous chef at the nationally recognized Harborview — before returning to South County to open The Waypoint in 2018.</p>
+        <p class="text-stone-600 leading-relaxed">His approach is simple: use what's local, trust the seasons, and don't get in the way of great ingredients. Every menu changes monthly to reflect what's fresh from Johnston Farm in Hope Valley, Shady Lea Farm in North Kingstown, and the day boats out of Point Judith. "South County raised me," he says. "This restaurant is my way of giving it back."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reservations -->
+  <section id="reserve" class="py-20 bg-red-900 text-yellow-50">
+    <div class="max-w-2xl mx-auto px-6">
+      <h2 class="text-4xl font-serif font-bold text-center mb-3">Reserve a Table</h2>
+      <p class="text-center text-red-200 mb-8">Reservations are strongly recommended on weekends. Walk-ins welcome when available.</p>
+      <form class="bg-stone-900 rounded-2xl p-8 space-y-5">
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-medium text-stone-300 mb-1">Date</label>
+            <input type="date" class="w-full border border-stone-600 bg-stone-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-stone-300 mb-1">Time</label>
+            <select class="w-full border border-stone-600 bg-stone-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option>5:00 PM</option>
+              <option>5:30 PM</option>
+              <option>6:00 PM</option>
+              <option>6:30 PM</option>
+              <option>7:00 PM</option>
+              <option>7:30 PM</option>
+              <option>8:00 PM</option>
+              <option>8:30 PM</option>
+            </select>
+          </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <input type="date" class="bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
-          <select class="bg-stone-800 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
+        <div>
+          <label class="block text-sm font-medium text-stone-300 mb-1">Party Size</label>
+          <select class="w-full border border-stone-600 bg-stone-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option>1 guest</option>
             <option>2 guests</option>
-            <option>3–4 guests</option>
-            <option>5–6 guests</option>
-            <option>Large party</option>
+            <option>3 guests</option>
+            <option>4 guests</option>
+            <option>5 guests</option>
+            <option>6 guests</option>
+            <option>7+ guests — please call</option>
           </select>
         </div>
-        <button class="w-full bg-amber-500 text-stone-950 font-bold py-4 rounded-xl hover:bg-amber-400 transition text-lg">
-          Request Reservation
-        </button>
-      </div>
-      <p class="text-stone-500 text-sm mt-6">📍 42 Oak Street, Downtown · 📞 (555) 800-1200</p>
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-medium text-stone-300 mb-1">Name</label>
+            <input type="text" placeholder="Full name" class="w-full border border-stone-600 bg-stone-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-stone-300 mb-1">Phone</label>
+            <input type="tel" placeholder="(401) 555-0000" class="w-full border border-stone-600 bg-stone-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-3 rounded-lg font-bold transition-colors">Confirm Reservation</button>
+      </form>
     </div>
   </section>
 
-  <footer class="border-t border-stone-800 py-8 text-center text-stone-500 text-sm">
-    <p>&copy; 2025 Ember &amp; Oak. All rights reserved.</p>
+  <!-- Footer -->
+  <footer class="bg-red-950 text-red-200 py-10 text-center">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-yellow-100 font-serif font-bold text-xl mb-2">The Waypoint</div>
+      <p class="text-sm">14 Main St, Wakefield RI 02879</p>
+      <p class="text-sm mt-1">(401) 555-0384 · Tue–Sun · Dinner &amp; Sunday Brunch</p>
+      <p class="text-xs text-red-500 mt-4">&copy; 2026 The Waypoint Restaurant. All rights reserved.</p>
+    </div>
   </footer>
 
 </body>

@@ -79,6 +79,22 @@ class UserStore {
     if (!user) return null;
     return { id: user.id, email: user.email, createdAt: user.createdAt };
   }
+
+  /**
+   * Update arbitrary fields on a user record.
+   * @param {string} id
+   * @param {object} fields  Fields to merge (passwordHash excluded from return value)
+   * @returns {{ id, email, createdAt }|null}
+   */
+  updateUser(id, fields) {
+    const data = this._read();
+    const idx  = data.users.findIndex(u => u.id === id);
+    if (idx === -1) return null;
+    data.users[idx] = { ...data.users[idx], ...fields };
+    this._write(data);
+    const u = data.users[idx];
+    return { id: u.id, email: u.email, createdAt: u.createdAt };
+  }
 }
 
 let _instance = null;

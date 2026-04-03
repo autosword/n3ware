@@ -22,6 +22,10 @@
     .template-card { border: 2px solid #334155; cursor: pointer; transition: all 0.15s; }
     .template-card:hover { border-color: #3B82F6; background: #1E293B; }
     .template-card.selected { border-color: #3B82F6; background: #1E3A5F; }
+    .tab-btn { transition: all 0.15s; }
+    .tab-btn.active { background: #1E293B; color: #F1F5F9; }
+    .settings-tab { display: none; }
+    .settings-tab.active { display: block; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
@@ -32,7 +36,6 @@
 <!-- ── AUTH SCREEN ──────────────────────────────────────────────────────────── -->
 <div id="auth-screen" class="min-h-screen flex items-center justify-center px-4">
   <div class="w-full max-w-md">
-    <!-- Logo -->
     <div class="text-center mb-8">
       <div class="inline-flex items-center gap-2 mb-3">
         <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white text-lg">n</div>
@@ -40,36 +43,24 @@
       </div>
       <p class="text-slate-400 text-sm">Visual editing, powered by the cloud</p>
     </div>
-
-    <!-- Tabs -->
     <div class="flex bg-slate-800 rounded-xl p-1 mb-6">
       <button id="tab-login" onclick="switchTab('login')"
-        class="flex-1 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 text-white">
-        Sign In
-      </button>
+        class="flex-1 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 text-white">Sign In</button>
       <button id="tab-register" onclick="switchTab('register')"
-        class="flex-1 py-2 rounded-lg text-sm font-semibold transition text-slate-400">
-        Create Account
-      </button>
+        class="flex-1 py-2 rounded-lg text-sm font-semibold transition text-slate-400">Create Account</button>
     </div>
-
-    <!-- Form -->
     <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-8">
       <form id="auth-form" onsubmit="submitAuth(event)">
         <div class="mb-4">
           <label class="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
-          <input type="email" id="auth-email" required placeholder="you@company.com"
-            class="w-full rounded-xl px-4 py-3 text-sm">
+          <input type="email" id="auth-email" required placeholder="you@company.com" class="w-full rounded-xl px-4 py-3 text-sm">
         </div>
         <div class="mb-6">
           <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-          <input type="password" id="auth-password" required placeholder="••••••••" minlength="8"
-            class="w-full rounded-xl px-4 py-3 text-sm">
+          <input type="password" id="auth-password" required placeholder="••••••••" minlength="8" class="w-full rounded-xl px-4 py-3 text-sm">
         </div>
         <button type="submit" id="auth-btn"
-          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">
-          Sign In
-        </button>
+          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">Sign In</button>
         <p id="auth-error" class="text-red-400 text-sm text-center mt-3 hidden"></p>
       </form>
     </div>
@@ -82,80 +73,96 @@
   <!-- Header -->
   <header class="border-b border-slate-800 px-6 py-4 sticky top-0 z-30 bg-slate-900/95 backdrop-blur">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">n</div>
-        <span class="text-lg font-extrabold">n3ware</span>
-        <span class="ml-2 text-xs text-slate-500 font-medium">Cloud</span>
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">n</div>
+          <span class="text-lg font-extrabold">n3ware</span>
+          <span class="text-xs text-slate-500 font-medium">Cloud</span>
+        </div>
+        <!-- Main nav tabs -->
+        <nav class="hidden sm:flex gap-1">
+          <button onclick="showView('sites')" id="nav-sites"
+            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-slate-800">Sites</button>
+          <button onclick="showView('billing')" id="nav-billing"
+            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800">Billing</button>
+        </nav>
       </div>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-3">
         <span id="user-email" class="text-sm text-slate-400 hidden sm:block"></span>
-        <button onclick="logout()"
-          class="text-sm text-slate-400 hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-slate-800">
-          Sign out
-        </button>
+        <button onclick="logout()" class="text-sm text-slate-400 hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-slate-800">Sign out</button>
       </div>
     </div>
   </header>
 
-  <!-- Main -->
   <main class="flex-1 px-6 py-8 max-w-7xl mx-auto w-full">
-    <!-- Top bar -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-2xl font-bold">My Sites</h1>
-        <p id="site-count" class="text-slate-400 text-sm mt-0.5"></p>
+
+    <!-- ── Sites view ── -->
+    <div id="view-sites">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold">My Sites</h1>
+          <p id="site-count" class="text-slate-400 text-sm mt-0.5"></p>
+        </div>
+        <button onclick="openCreateModal()"
+          class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-xl transition text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+          New Site
+        </button>
       </div>
-      <button onclick="openCreateModal()"
-        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-xl transition text-sm">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-        New Site
-      </button>
+      <div id="sites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+      <div id="empty-state" class="hidden text-center py-24">
+        <div class="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <h2 class="text-xl font-bold mb-2">No sites yet</h2>
+        <p class="text-slate-400 text-sm mb-6">Create your first site to get started.</p>
+        <button onclick="openCreateModal()"
+          class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+          Create Your First Site
+        </button>
+      </div>
     </div>
 
-    <!-- Site grid -->
-    <div id="sites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
-
-    <!-- Empty state -->
-    <div id="empty-state" class="hidden text-center py-24">
-      <div class="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
-        <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    <!-- ── Billing view ── -->
+    <div id="view-billing" class="hidden">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold">Billing & Plans</h1>
+        <p class="text-slate-400 text-sm mt-0.5">Manage your subscription and see what's included.</p>
       </div>
-      <h2 class="text-xl font-bold mb-2">No sites yet</h2>
-      <p class="text-slate-400 text-sm mb-6">Create your first site to get started.</p>
-      <button onclick="openCreateModal()"
-        class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-        Create Your First Site
-      </button>
+      <div id="billing-current" class="bg-slate-800 border border-slate-700 rounded-2xl p-5 mb-8 hidden">
+        <p class="text-xs text-slate-400 uppercase tracking-widest mb-1">Current Plan</p>
+        <p id="billing-plan-name" class="text-lg font-bold"></p>
+        <p id="billing-plan-status" class="text-sm text-slate-400 mt-0.5"></p>
+      </div>
+      <div id="billing-plans" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
     </div>
+
   </main>
 </div>
 
-<!-- ── CREATE MODAL ─────────────────────────────────────────────────────────── -->
+<!-- ── CREATE SITE MODAL ────────────────────────────────────────────────────── -->
 <div id="create-modal" class="modal-bg fixed inset-0 z-50 flex items-center justify-center p-4"
      style="background:rgba(0,0,0,0.7)" onclick="closeCreateModal(event)">
-  <div class="modal-card bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl"
+  <div class="modal-card bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
        onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-700">
+    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-700 sticky top-0 bg-slate-800">
       <h2 class="text-lg font-bold">Create New Site</h2>
       <button onclick="closeCreateModal()" class="text-slate-400 hover:text-white transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
     <div class="p-6">
-      <!-- Site name -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-slate-300 mb-1.5">Site Name</label>
-        <input type="text" id="new-site-name" placeholder="My Awesome Site"
-          class="w-full rounded-xl px-4 py-3 text-sm">
+        <input type="text" id="new-site-name" placeholder="My Awesome Site" class="w-full rounded-xl px-4 py-3 text-sm">
       </div>
-      <!-- Templates -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-slate-300 mb-3">Choose a Template</label>
-        <div id="template-grid" class="grid grid-cols-2 gap-3"></div>
+        <div id="template-grid"></div>
       </div>
-      <button onclick="createSite()"
-        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm" id="create-btn">
+      <button onclick="createSite()" id="create-btn"
+        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">
         Create Site
       </button>
     </div>
@@ -170,11 +177,26 @@
       <h2 class="font-bold">Revision History</h2>
       <p id="rev-site-name" class="text-xs text-slate-400 mt-0.5"></p>
     </div>
-    <button onclick="closeRevisions()" class="text-slate-400 hover:text-white transition">
+    <button onclick="closeRevisions()" class="text-slate-400 hover:text-white">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
   </div>
   <div id="revisions-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+</div>
+
+<!-- ── ANALYTICS PANEL ─────────────────────────────────────────────────────── -->
+<div id="analytics-backdrop" class="hidden fixed inset-0 z-40 bg-black/50" onclick="closeAnalytics()"></div>
+<div id="analytics-panel" class="slide-panel fixed right-0 top-0 h-full w-full max-w-md z-50 bg-slate-900 border-l border-slate-700 flex flex-col">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+    <div>
+      <h2 class="font-bold">Analytics</h2>
+      <p id="analytics-site-name" class="text-xs text-slate-400 mt-0.5"></p>
+    </div>
+    <button onclick="closeAnalytics()" class="text-slate-400 hover:text-white">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div id="analytics-content" class="flex-1 overflow-y-auto p-5 space-y-5"></div>
 </div>
 
 <!-- ── SETTINGS MODAL ───────────────────────────────────────────────────────── -->
@@ -184,62 +206,90 @@
        onclick="event.stopPropagation()">
     <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-700 sticky top-0 bg-slate-800">
       <h2 class="text-lg font-bold">Site Settings</h2>
-      <button onclick="closeSettings()" class="text-slate-400 hover:text-white transition">
+      <button onclick="closeSettings()" class="text-slate-400 hover:text-white">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <div class="p-6 space-y-6">
-      <!-- Site name -->
+    <!-- Settings tabs -->
+    <div class="flex gap-1 px-6 pt-4 border-b border-slate-700 pb-0">
+      <button onclick="switchSettingsTab('general')" id="stab-general"
+        class="tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-slate-700">General</button>
+      <button onclick="switchSettingsTab('files')" id="stab-files"
+        class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-slate-400 hover:text-white">Files</button>
+    </div>
+
+    <!-- General tab -->
+    <div id="settings-general" class="settings-tab active p-6 space-y-6">
       <div>
         <label class="block text-sm font-semibold text-slate-300 mb-1.5">Site Name</label>
         <input type="text" id="settings-name" class="w-full rounded-xl px-4 py-3 text-sm">
-        <button onclick="saveSiteName()"
-          class="mt-2 text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition">
-          Save Name
-        </button>
+        <button onclick="saveSiteName()" class="mt-2 text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition">Save Name</button>
       </div>
-
-      <!-- Site URL -->
       <div>
         <label class="block text-sm font-semibold text-slate-300 mb-1.5">Live Site URL</label>
         <div class="flex gap-2">
           <input type="text" id="settings-url" readonly class="flex-1 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-default">
-          <button onclick="copySettingsUrl()"
-            class="text-sm bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-xl transition" title="Copy URL">
+          <button onclick="copySettingsUrl()" class="bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-xl transition" title="Copy URL">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           </button>
         </div>
       </div>
-
-      <!-- Embed code -->
       <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Embed on Your Own Page</label>
+        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Embed Code</label>
         <div class="relative">
           <textarea id="settings-embed" readonly rows="4"
             class="w-full rounded-xl px-4 py-3 text-xs font-mono resize-none text-slate-300 leading-relaxed"></textarea>
-          <button onclick="copyEmbed()"
-            class="absolute top-2 right-2 text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded transition">
-            Copy
-          </button>
+          <button onclick="copyEmbed()" class="absolute top-2 right-2 text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded transition">Copy</button>
         </div>
-        <p class="text-xs text-slate-500 mt-1.5">Add this to any page. Include <code class="text-slate-300">data-n3-key</code> with your API key to enable publishing from that page.</p>
       </div>
-
-      <!-- Custom domain -->
       <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Custom Domain</label>
-        <input type="text" id="settings-domain" placeholder="mysite.example.com" class="w-full rounded-xl px-4 py-3 text-sm">
-        <p class="text-xs text-slate-500 mt-1.5">Point a CNAME record at your n3ware server hostname, then enter the domain here.</p>
+        <label class="block text-sm font-semibold text-slate-300 mb-2">Custom Domain</label>
+        <div id="domain-connected" class="hidden mb-3">
+          <div class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
+            <div>
+              <p id="domain-name-display" class="text-sm font-semibold text-emerald-400"></p>
+              <p class="text-xs text-slate-400">Domain connected</p>
+            </div>
+            <button onclick="disconnectDomain()" class="text-xs text-red-400 hover:text-red-300 transition">Disconnect</button>
+          </div>
+        </div>
+        <div id="domain-form">
+          <input type="text" id="settings-domain" placeholder="mysite.example.com"
+            class="w-full rounded-xl px-4 py-3 text-sm mb-2">
+          <button onclick="connectDomain()" class="text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition">Connect Domain</button>
+          <p class="text-xs text-slate-500 mt-2">Point a CNAME record at your n3ware server, then enter the domain here.</p>
+        </div>
+        <div id="domain-cname-instructions" class="hidden mt-3 bg-slate-700/50 rounded-xl p-4">
+          <p class="text-xs font-semibold text-slate-300 mb-2">Add this DNS record:</p>
+          <code class="text-xs text-blue-400">CNAME  @  →  <span id="cname-target"></span></code>
+          <button onclick="verifyDomain()" class="mt-3 text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition">Verify DNS</button>
+        </div>
       </div>
-
-      <!-- Danger zone -->
       <div class="border border-red-900/50 rounded-xl p-5">
         <h3 class="text-sm font-bold text-red-400 mb-1">Danger Zone</h3>
-        <p class="text-xs text-slate-400 mb-4">Deleting this site is permanent and cannot be undone. All revisions will be lost.</p>
-        <button onclick="confirmDeleteSite()"
-          class="text-sm bg-red-900/40 hover:bg-red-900/70 text-red-400 border border-red-900/50 px-5 py-2 rounded-lg transition">
-          Delete This Site
-        </button>
+        <p class="text-xs text-slate-400 mb-4">Deleting this site is permanent. All revisions will be lost.</p>
+        <button onclick="confirmDeleteSite()" class="text-sm bg-red-900/40 hover:bg-red-900/70 text-red-400 border border-red-900/50 px-5 py-2 rounded-lg transition">Delete This Site</button>
+      </div>
+    </div>
+
+    <!-- Files tab -->
+    <div id="settings-files" class="settings-tab p-6">
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-slate-300 mb-3">Upload Image</label>
+        <div id="upload-drop-zone"
+          class="border-2 border-dashed border-slate-600 hover:border-blue-500 rounded-xl p-8 text-center cursor-pointer transition"
+          onclick="document.getElementById('file-input').click()"
+          ondragover="event.preventDefault()"
+          ondrop="handleFileDrop(event)">
+          <svg class="w-8 h-8 text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <p class="text-sm text-slate-400">Click to upload or drag & drop</p>
+          <p class="text-xs text-slate-500 mt-1">PNG, JPG, GIF, WebP up to 5MB</p>
+        </div>
+        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="uploadFile(this.files[0])">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-300 mb-3">Uploaded Files</label>
+        <div id="files-list" class="space-y-2"></div>
       </div>
     </div>
   </div>
@@ -259,6 +309,7 @@ const S = {
   templates:  [],
   activeSite: null,
   authMode:   'login',
+  currentView: 'sites',
 };
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -275,7 +326,6 @@ async function api(method, path, body) {
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
 }
-
 async function apiHtml(path) {
   const headers = {};
   if (S.token) headers['Authorization'] = `Bearer ${S.token}`;
@@ -286,88 +336,81 @@ async function apiHtml(path) {
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function toast(msg, type = 'info') {
-  const colours = { info: 'bg-slate-700', success: 'bg-emerald-700', error: 'bg-red-800' };
+  const c = { info: 'bg-slate-700', success: 'bg-emerald-700', error: 'bg-red-800' };
   const el = document.createElement('div');
-  el.className = `toast ${colours[type]} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-xl pointer-events-auto max-w-xs`;
+  el.className = `toast ${c[type]} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-xl pointer-events-auto max-w-xs`;
   el.textContent = msg;
   document.getElementById('toast-container').prepend(el);
   requestAnimationFrame(() => el.classList.add('show'));
-  setTimeout(() => {
-    el.classList.remove('show');
-    setTimeout(() => el.remove(), 350);
-  }, 3000);
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 350); }, 3000);
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 function switchTab(mode) {
   S.authMode = mode;
   const isLogin = mode === 'login';
-  document.getElementById('tab-login').className =
-    `flex-1 py-2 rounded-lg text-sm font-semibold transition ${isLogin ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
-  document.getElementById('tab-register').className =
-    `flex-1 py-2 rounded-lg text-sm font-semibold transition ${!isLogin ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
+  document.getElementById('tab-login').className = `flex-1 py-2 rounded-lg text-sm font-semibold transition ${isLogin ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
+  document.getElementById('tab-register').className = `flex-1 py-2 rounded-lg text-sm font-semibold transition ${!isLogin ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
   document.getElementById('auth-btn').textContent = isLogin ? 'Sign In' : 'Create Account';
   document.getElementById('auth-error').classList.add('hidden');
 }
-
 async function submitAuth(e) {
   e.preventDefault();
-  const email    = document.getElementById('auth-email').value.trim();
+  const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
-  const btn      = document.getElementById('auth-btn');
-  const errEl    = document.getElementById('auth-error');
+  const btn = document.getElementById('auth-btn');
+  const errEl = document.getElementById('auth-error');
   errEl.classList.add('hidden');
   btn.disabled = true;
   btn.textContent = S.authMode === 'login' ? 'Signing in…' : 'Creating account…';
   try {
-    const path = S.authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
-    const data = await api('POST', path, { email, password });
-    S.token = data.token;
-    S.user  = data.user;
+    const data = await api('POST', `/api/auth/${S.authMode === 'login' ? 'login' : 'register'}`, { email, password });
+    S.token = data.token; S.user = data.user;
     localStorage.setItem('n3_token', S.token);
     showDashboard();
   } catch (err) {
-    errEl.textContent = err.message;
-    errEl.classList.remove('hidden');
+    errEl.textContent = err.message; errEl.classList.remove('hidden');
   } finally {
     btn.disabled = false;
     btn.textContent = S.authMode === 'login' ? 'Sign In' : 'Create Account';
   }
 }
-
 function logout() {
-  S.token = '';
-  S.user  = null;
-  S.sites = [];
+  S.token = ''; S.user = null; S.sites = [];
   localStorage.removeItem('n3_token');
   document.getElementById('dashboard').classList.add('hidden');
   document.getElementById('auth-screen').classList.remove('hidden');
   switchTab('login');
 }
-
 async function checkAuth() {
   if (!S.token) return showAuth();
   try {
     const data = await api('GET', '/api/auth/me');
     S.user = data.user;
     showDashboard();
-  } catch {
-    logout();
-  }
+  } catch { logout(); }
 }
-
 function showAuth() {
   document.getElementById('auth-screen').classList.remove('hidden');
   document.getElementById('dashboard').classList.add('hidden');
 }
-
 async function showDashboard() {
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
-  if (S.user) {
-    document.getElementById('user-email').textContent = S.user.email;
-  }
+  if (S.user) document.getElementById('user-email').textContent = S.user.email;
   await Promise.all([loadSites(), loadTemplates()]);
+}
+
+// ── View switching ────────────────────────────────────────────────────────────
+function showView(view) {
+  S.currentView = view;
+  ['sites', 'billing'].forEach(v => {
+    document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
+    const nb = document.getElementById(`nav-${v}`);
+    if (v === view) { nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-slate-800'; }
+    else { nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800'; }
+  });
+  if (view === 'billing') loadBilling();
 }
 
 // ── Sites ─────────────────────────────────────────────────────────────────────
@@ -376,86 +419,69 @@ async function loadSites() {
     const data = await api('GET', '/api/sites');
     S.sites = data.sites || [];
     renderSites();
-  } catch (err) {
-    toast('Failed to load sites: ' + err.message, 'error');
-  }
+    loadAnalyticsBadges();
+  } catch (err) { toast('Failed to load sites: ' + err.message, 'error'); }
 }
-
 function renderSites() {
-  const grid  = document.getElementById('sites-grid');
+  const grid = document.getElementById('sites-grid');
   const empty = document.getElementById('empty-state');
   const count = document.getElementById('site-count');
-  count.textContent = S.sites.length
-    ? `${S.sites.length} site${S.sites.length !== 1 ? 's' : ''}`
-    : '';
-
-  if (!S.sites.length) {
-    grid.innerHTML = '';
-    empty.classList.remove('hidden');
-    return;
-  }
+  count.textContent = S.sites.length ? `${S.sites.length} site${S.sites.length !== 1 ? 's' : ''}` : '';
+  if (!S.sites.length) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
   grid.innerHTML = S.sites.map(renderSiteCard).join('');
 }
-
 function renderSiteCard(site) {
   const [c1, c2] = siteColours(site.id);
-  const updated  = site.updatedAt
+  const updated = site.updatedAt
     ? new Date(site.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : '—';
   const revCount = site.revisionCount || 0;
-  const name     = esc(site.name || 'Untitled Site');
-
+  const name = esc(site.name || 'Untitled Site');
   return `
   <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden hover:border-slate-600 transition group" data-id="${esc(site.id)}">
-    <!-- Preview -->
-    <div class="site-preview h-40 relative flex items-center justify-center cursor-pointer"
-         style="--c1:${c1};--c2:${c2}"
-         onclick="editSite('${esc(site.id)}')">
+    <div class="site-preview h-40 relative flex items-center justify-center cursor-pointer" style="--c1:${c1};--c2:${c2}" onclick="editSite('${esc(site.id)}')">
       <span class="text-5xl font-black text-white/30">${esc((site.name || 'U')[0].toUpperCase())}</span>
       <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center">
-        <span class="opacity-0 group-hover:opacity-100 transition bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-full">
-          Open Editor ↗
-        </span>
+        <span class="opacity-0 group-hover:opacity-100 transition bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-full">Open Editor ↗</span>
       </div>
-      <!-- Status badge -->
-      <div class="absolute top-3 right-3 flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-semibold px-2.5 py-1 rounded-full">
+      <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-semibold px-2.5 py-1 rounded-full">
         <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>Live
       </div>
+      <div class="absolute top-3 right-3 bg-black/40 text-slate-300 text-xs px-2 py-0.5 rounded-full" id="views-${esc(site.id)}">…</div>
     </div>
-
-    <!-- Info -->
     <div class="p-4">
       <div class="flex items-start justify-between gap-2 mb-2">
-        <h3 class="font-semibold text-sm leading-tight truncate flex-1"
-            title="${name}">${name}</h3>
-        <span class="shrink-0 bg-slate-700 text-slate-400 text-xs px-2 py-0.5 rounded-full">
-          ${revCount} rev${revCount !== 1 ? 's' : ''}
-        </span>
+        <h3 class="font-semibold text-sm leading-tight truncate flex-1" title="${name}">${name}</h3>
+        <span class="shrink-0 bg-slate-700 text-slate-400 text-xs px-2 py-0.5 rounded-full">${revCount} rev${revCount !== 1 ? 's' : ''}</span>
       </div>
       <p class="text-slate-500 text-xs mb-4">Edited ${updated}</p>
-
-      <!-- Actions -->
       <div class="flex gap-2">
-        <button onclick="editSite('${esc(site.id)}')"
-          class="flex-1 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg transition">
-          Edit
+        <button onclick="editSite('${esc(site.id)}')" class="flex-1 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg transition">Edit</button>
+        <button onclick="openAnalytics('${esc(site.id)}')" class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Analytics">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         </button>
-        <button onclick="openRevisions('${esc(site.id)}')"
-          class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Revisions">
+        <button onclick="openRevisions('${esc(site.id)}')" class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Revisions">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </button>
-        <button onclick="openSettings('${esc(site.id)}')"
-          class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Settings">
+        <button onclick="openSettings('${esc(site.id)}')" class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Settings">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>
     </div>
   </div>`;
 }
+function editSite(id) { window.open(`/sites/${id}`, '_blank'); }
 
-function editSite(id) {
-  window.open(`/sites/${id}`, '_blank');
+// Fetch analytics for each site and update view badges
+async function loadAnalyticsBadges() {
+  for (const site of S.sites) {
+    try {
+      const data = await api('GET', `/api/analytics/${site.id}?period=7d`);
+      const el = document.getElementById(`views-${site.id}`);
+      if (el) el.textContent = `${fmtNum(data.views || 0)} views`;
+    } catch { /* silent */ }
+  }
 }
 
 // ── Create modal ──────────────────────────────────────────────────────────────
@@ -465,108 +491,83 @@ function openCreateModal() {
   document.getElementById('create-modal').classList.add('open');
   document.getElementById('new-site-name').focus();
 }
-
 function closeCreateModal(e) {
   if (e && e.target !== document.getElementById('create-modal')) return;
   document.getElementById('create-modal').classList.remove('open');
 }
-
 function renderTemplateGrid() {
-  const grid = document.getElementById('template-grid');
-  if (!S.templates.length) {
-    grid.innerHTML = '<p class="col-span-2 text-slate-400 text-sm">Loading templates…</p>';
-    return;
-  }
-  const icons = { blank: '⬜', restaurant: '🍽️', portfolio: '🎨', business: '💼' };
-  grid.innerHTML = S.templates.map(t => `
-    <div class="template-card rounded-xl p-4 text-center" data-name="${esc(t.name)}" onclick="selectTemplate('${esc(t.name)}')">
-      <div class="text-3xl mb-2">${icons[t.name] || '📄'}</div>
-      <p class="text-sm font-semibold text-white">${esc(t.label)}</p>
-      <p class="text-xs text-slate-400 mt-0.5 leading-snug">${esc(t.description)}</p>
-    </div>`).join('');
-  // Pre-select first template
-  selectTemplate(S.templates[0].name);
+  const container = document.getElementById('template-grid');
+  if (!S.templates.length) { container.innerHTML = '<p class="text-slate-400 text-sm">Loading…</p>'; return; }
+  const cats = [...new Set(S.templates.map(t => t.category))];
+  const icons = { blank:'⬜', portfolio:'🎨', business:'💼', restaurant:'🍽️', realtor:'🏠', lawncare:'🌿', handyman:'🔧', salon:'✂️', petcare:'🐾' };
+  const catHtml = cats.map(cat => {
+    const items = S.templates.filter(t => t.category === cat);
+    const cards = items.map(t => `
+      <div class="template-card rounded-xl p-3 text-center" data-name="${esc(t.name)}" onclick="selectTemplate('${esc(t.name)}')">
+        <div class="text-2xl mb-1">${icons[t.name] || '📄'}</div>
+        <p class="text-xs font-semibold text-white">${esc(t.label)}</p>
+      </div>`).join('');
+    return `<div class="mb-4">
+      <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">${esc(cat)}</p>
+      <div class="grid grid-cols-4 gap-2">${cards}</div>
+    </div>`;
+  }).join('');
+  container.innerHTML = catHtml;
+  if (S.templates.length) selectTemplate(S.templates[0].name);
 }
-
 let selectedTemplate = 'blank';
 function selectTemplate(name) {
   selectedTemplate = name;
-  document.querySelectorAll('.template-card').forEach(el => {
-    el.classList.toggle('selected', el.dataset.name === name);
-  });
+  document.querySelectorAll('.template-card').forEach(el => el.classList.toggle('selected', el.dataset.name === name));
 }
-
 async function loadTemplates() {
   try {
     const data = await api('GET', '/api/templates');
     S.templates = data.templates || [];
-  } catch {
-    S.templates = [];
-  }
+  } catch { S.templates = []; }
 }
-
 async function createSite() {
-  const name    = document.getElementById('new-site-name').value.trim() || 'Untitled Site';
-  const btn     = document.getElementById('create-btn');
-  btn.disabled  = true;
-  btn.textContent = 'Creating…';
+  const name = document.getElementById('new-site-name').value.trim() || 'Untitled Site';
+  const btn = document.getElementById('create-btn');
+  btn.disabled = true; btn.textContent = 'Creating…';
   try {
-    // Fetch template HTML
     const html = await apiHtml(`/api/templates/${selectedTemplate}`);
     const data = await api('POST', '/api/sites', { html, name, message: 'Created from template' });
-    const site = data.site;
-    S.sites.unshift(site);
+    S.sites.unshift(data.site);
     renderSites();
     document.getElementById('create-modal').classList.remove('open');
-    toast(`"${site.name}" created!`, 'success');
-    // Open editor in new tab
-    window.open(`/sites/${site.id}`, '_blank');
-  } catch (err) {
-    toast('Create failed: ' + err.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Create Site';
-  }
+    toast(`"${data.site.name}" created!`, 'success');
+    window.open(`/sites/${data.site.id}`, '_blank');
+  } catch (err) { toast('Create failed: ' + err.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Create Site'; }
 }
 
-// ── Revisions panel ───────────────────────────────────────────────────────────
+// ── Revisions ─────────────────────────────────────────────────────────────────
 async function openRevisions(siteId) {
   const site = S.sites.find(s => s.id === siteId);
   S.activeSite = siteId;
   document.getElementById('rev-site-name').textContent = site ? site.name : siteId;
-  document.getElementById('revisions-list').innerHTML =
-    '<p class="text-slate-400 text-sm text-center py-8">Loading…</p>';
-
+  document.getElementById('revisions-list').innerHTML = '<p class="text-slate-400 text-sm text-center py-8">Loading…</p>';
   document.getElementById('revisions-backdrop').classList.remove('hidden');
   document.getElementById('revisions-panel').classList.add('open');
-
   try {
     const data = await api('GET', `/api/sites/${siteId}/revisions`);
     renderRevisions(data.revisions || []);
   } catch (err) {
-    document.getElementById('revisions-list').innerHTML =
-      `<p class="text-red-400 text-sm text-center py-8">${esc(err.message)}</p>`;
+    document.getElementById('revisions-list').innerHTML = `<p class="text-red-400 text-sm text-center py-8">${esc(err.message)}</p>`;
   }
 }
-
 function closeRevisions() {
   document.getElementById('revisions-backdrop').classList.add('hidden');
   document.getElementById('revisions-panel').classList.remove('open');
 }
-
 function renderRevisions(revisions) {
   const list = document.getElementById('revisions-list');
-  if (!revisions.length) {
-    list.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">No revisions yet.</p>';
-    return;
-  }
+  if (!revisions.length) { list.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">No revisions yet.</p>'; return; }
   const revHtml = revisions.map((rev, i) => {
-    const date = new Date(rev.createdAt).toLocaleString('en-US', {
-      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
-    });
+    const date = new Date(rev.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     const isCurrent = i === 0;
-    return `
-    <div class="bg-slate-800 rounded-xl p-4 border ${isCurrent ? 'border-blue-500/50' : 'border-slate-700'}">
+    return `<div class="bg-slate-800 rounded-xl p-4 border ${isCurrent ? 'border-blue-500/50' : 'border-slate-700'}">
       <div class="flex items-start justify-between gap-2 mb-2">
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold truncate">${esc(rev.message || 'Saved')}</p>
@@ -574,79 +575,161 @@ function renderRevisions(revisions) {
         </div>
         ${isCurrent
           ? '<span class="shrink-0 text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full font-semibold">Current</span>'
-          : `<button onclick="rollbackTo('${esc(rev.id)}')"
-               class="shrink-0 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition font-semibold">
-               ↺ Restore
-             </button>`
-        }
+          : `<button onclick="rollbackTo('${esc(rev.id)}')" class="shrink-0 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition font-semibold">↺ Restore</button>`}
       </div>
       <p class="text-xs text-slate-500 font-mono">${esc(rev.id)}</p>
     </div>`;
   }).join('');
   list.innerHTML = revHtml;
 }
-
 async function rollbackTo(revId) {
-  if (!confirm('Restore this revision? The current version will be saved as a new revision first.')) return;
+  if (!confirm('Restore this revision? Current version will be saved first.')) return;
   try {
     await api('POST', `/api/sites/${S.activeSite}/revisions/${revId}/rollback`);
     toast('Revision restored!', 'success');
     await loadSites();
     openRevisions(S.activeSite);
+  } catch (err) { toast('Rollback failed: ' + err.message, 'error'); }
+}
+
+// ── Analytics panel ───────────────────────────────────────────────────────────
+async function openAnalytics(siteId) {
+  const site = S.sites.find(s => s.id === siteId);
+  S.activeSite = siteId;
+  document.getElementById('analytics-site-name').textContent = site ? site.name : siteId;
+  document.getElementById('analytics-content').innerHTML = '<p class="text-slate-400 text-sm text-center py-8">Loading…</p>';
+  document.getElementById('analytics-backdrop').classList.remove('hidden');
+  document.getElementById('analytics-panel').classList.add('open');
+  try {
+    const [stats, daily] = await Promise.all([
+      api('GET', `/api/analytics/${siteId}?period=30d`),
+      api('GET', `/api/analytics/${siteId}/daily?days=30`),
+    ]);
+    renderAnalytics(stats, daily.daily || []);
   } catch (err) {
-    toast('Rollback failed: ' + err.message, 'error');
+    document.getElementById('analytics-content').innerHTML = `<p class="text-red-400 text-sm text-center py-8">${esc(err.message)}</p>`;
   }
+}
+function closeAnalytics() {
+  document.getElementById('analytics-backdrop').classList.add('hidden');
+  document.getElementById('analytics-panel').classList.remove('open');
+}
+function renderAnalytics(stats, daily) {
+  const topPagesHtml = (stats.topPages || []).slice(0, 5).map(p =>
+    `<div class="flex justify-between text-sm"><span class="text-slate-300 truncate">${esc(p.path)}</span><span class="text-slate-400 ml-2 shrink-0">${fmtNum(p.count)}</span></div>`
+  ).join('') || '<p class="text-slate-500 text-sm">No data</p>';
+
+  const chartMax = Math.max(...daily.map(d => d.views), 1);
+  const chartHtml = daily.slice(-14).map(d => {
+    const pct = Math.round((d.views / chartMax) * 100);
+    return `<div class="flex flex-col items-center gap-1" title="${d.date}: ${d.views} views">
+      <div class="w-full bg-blue-600 rounded-sm transition-all" style="height:${Math.max(pct * 0.6, 2)}px;min-height:2px;"></div>
+    </div>`;
+  }).join('');
+
+  const contentHtml = `
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-slate-800 rounded-xl p-4 text-center"><p class="text-3xl font-bold">${fmtNum(stats.views || 0)}</p><p class="text-xs text-slate-400 mt-1">Views (30d)</p></div>
+      <div class="bg-slate-800 rounded-xl p-4 text-center"><p class="text-3xl font-bold">${fmtNum(stats.uniqueVisitors || 0)}</p><p class="text-xs text-slate-400 mt-1">Visitors (30d)</p></div>
+    </div>
+    <div class="bg-slate-800 rounded-xl p-4">
+      <p class="text-xs font-semibold text-slate-400 mb-3">Daily Views (last 14 days)</p>
+      <div class="flex gap-1 items-end h-20">${chartHtml}</div>
+    </div>
+    <div class="bg-slate-800 rounded-xl p-4">
+      <p class="text-xs font-semibold text-slate-400 mb-3">Top Pages</p>
+      <div class="space-y-2">${topPagesHtml}</div>
+    </div>`;
+  document.getElementById('analytics-content').innerHTML = contentHtml;
 }
 
 // ── Settings modal ────────────────────────────────────────────────────────────
+function switchSettingsTab(tab) {
+  ['general','files'].forEach(t => {
+    document.getElementById(`settings-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`stab-${t}`).className = t === tab
+      ? 'tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-slate-700'
+      : 'tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-slate-400 hover:text-white';
+  });
+  if (tab === 'files') loadFiles();
+}
 function openSettings(siteId) {
   const site = S.sites.find(s => s.id === siteId);
   if (!site) return;
   S.activeSite = siteId;
-
   document.getElementById('settings-name').value = site.name || '';
   const origin = window.location.origin;
-  const siteUrl = `${origin}/sites/${siteId}`;
-  document.getElementById('settings-url').value = siteUrl;
-  document.getElementById('settings-embed').value =
-    `<script src="${origin}/n3ware.js"\n  data-n3-site="${siteId}"\n  data-n3-api="${origin}/api"\n  data-n3-key="YOUR_API_KEY"><\/script>`;
+  document.getElementById('settings-url').value = `${origin}/sites/${siteId}`;
+  document.getElementById('settings-embed').value = `<script src="${origin}/n3ware.js"\n  data-n3-site="${siteId}"\n  data-n3-api="${origin}/api"\n  data-n3-key="YOUR_API_KEY"><\/script>`;
+  // Domain
   document.getElementById('settings-domain').value = '';
+  document.getElementById('domain-connected').classList.add('hidden');
+  document.getElementById('domain-form').classList.remove('hidden');
+  document.getElementById('domain-cname-instructions').classList.add('hidden');
+  if (site.customDomain) {
+    document.getElementById('domain-connected').classList.remove('hidden');
+    document.getElementById('domain-form').classList.add('hidden');
+    document.getElementById('domain-name-display').textContent = site.customDomain;
+  }
+  switchSettingsTab('general');
   document.getElementById('settings-modal').classList.add('open');
 }
-
 function closeSettings(e) {
   if (e && e.target !== document.getElementById('settings-modal')) return;
   document.getElementById('settings-modal').classList.remove('open');
 }
-
 async function saveSiteName() {
   const name = document.getElementById('settings-name').value.trim();
   if (!name) return;
   try {
-    // Save name via a no-op save (fetch current HTML, re-save with new name)
-    const htmlData = await api('GET', `/api/sites/${S.activeSite}`);
-    // The GET /:id doesn't return html — use /html endpoint
     const html = await apiHtml(`/api/sites/${S.activeSite}/html`);
     await api('POST', `/api/sites/${S.activeSite}/save`, { html, name, message: `Renamed to "${name}"` });
-    const siteIdx = S.sites.findIndex(s => s.id === S.activeSite);
-    if (siteIdx !== -1) S.sites[siteIdx].name = name;
+    const idx = S.sites.findIndex(s => s.id === S.activeSite);
+    if (idx !== -1) S.sites[idx].name = name;
     renderSites();
     toast('Name saved', 'success');
-  } catch (err) {
-    toast('Save failed: ' + err.message, 'error');
-  }
+  } catch (err) { toast('Save failed: ' + err.message, 'error'); }
 }
-
 function copySettingsUrl() {
-  const url = document.getElementById('settings-url').value;
-  navigator.clipboard.writeText(url).then(() => toast('URL copied!', 'success'));
+  navigator.clipboard.writeText(document.getElementById('settings-url').value).then(() => toast('URL copied!', 'success'));
 }
-
 function copyEmbed() {
-  const code = document.getElementById('settings-embed').value;
-  navigator.clipboard.writeText(code).then(() => toast('Embed code copied!', 'success'));
+  navigator.clipboard.writeText(document.getElementById('settings-embed').value).then(() => toast('Embed code copied!', 'success'));
 }
-
+async function connectDomain() {
+  const domain = document.getElementById('settings-domain').value.trim();
+  if (!domain) return;
+  try {
+    await api('POST', `/api/domains/sites/${S.activeSite}/connect`, { domain });
+    const idx = S.sites.findIndex(s => s.id === S.activeSite);
+    if (idx !== -1) S.sites[idx].customDomain = domain;
+    document.getElementById('domain-name-display').textContent = domain;
+    document.getElementById('domain-connected').classList.remove('hidden');
+    document.getElementById('domain-form').classList.add('hidden');
+    document.getElementById('cname-target').textContent = window.location.hostname;
+    document.getElementById('domain-cname-instructions').classList.remove('hidden');
+    toast('Domain connected! Add the CNAME record shown below.', 'success');
+  } catch (err) { toast('Failed: ' + err.message, 'error'); }
+}
+async function disconnectDomain() {
+  if (!confirm('Disconnect this domain?')) return;
+  try {
+    await api('DELETE', `/api/domains/sites/${S.activeSite}/connect`);
+    const idx = S.sites.findIndex(s => s.id === S.activeSite);
+    if (idx !== -1) delete S.sites[idx].customDomain;
+    document.getElementById('domain-connected').classList.add('hidden');
+    document.getElementById('domain-form').classList.remove('hidden');
+    document.getElementById('domain-cname-instructions').classList.add('hidden');
+    toast('Domain disconnected', 'info');
+  } catch (err) { toast('Failed: ' + err.message, 'error'); }
+}
+async function verifyDomain() {
+  try {
+    const data = await api('GET', `/api/domains/sites/${S.activeSite}/verify`);
+    if (data.verified) toast('DNS verified! Domain is live.', 'success');
+    else toast(`Not yet propagated. Expected CNAME: ${data.expected}`, 'info');
+  } catch (err) { toast('Verify failed: ' + err.message, 'error'); }
+}
 async function confirmDeleteSite() {
   const site = S.sites.find(s => s.id === S.activeSite);
   const name = site ? site.name : 'this site';
@@ -657,42 +740,143 @@ async function confirmDeleteSite() {
     renderSites();
     document.getElementById('settings-modal').classList.remove('open');
     toast(`"${name}" deleted`, 'info');
-  } catch (err) {
-    toast('Delete failed: ' + err.message, 'error');
-  }
+  } catch (err) { toast('Delete failed: ' + err.message, 'error'); }
+}
+
+// ── File manager ──────────────────────────────────────────────────────────────
+async function loadFiles() {
+  const list = document.getElementById('files-list');
+  list.innerHTML = '<p class="text-slate-400 text-sm text-center py-4">Loading…</p>';
+  try {
+    const data = await api('GET', `/api/uploads/${S.activeSite}/files`);
+    const files = data.files || [];
+    if (!files.length) { list.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">No files uploaded yet.</p>'; return; }
+    const filesHtml = files.map(f => `
+      <div class="flex items-center justify-between bg-slate-700/50 rounded-xl px-4 py-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 bg-slate-600 rounded-lg overflow-hidden shrink-0">
+            <img src="${esc(f.url)}" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium truncate">${esc(f.name)}</p>
+            <p class="text-xs text-slate-400">${fmtBytes(f.size)}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 ml-2">
+          <button onclick="copyFileUrl('${esc(f.url)}')" class="text-xs text-slate-400 hover:text-white transition" title="Copy URL">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </button>
+          <button onclick="deleteFile('${esc(f.name)}')" class="text-xs text-red-400 hover:text-red-300 transition" title="Delete">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>`).join('');
+    list.innerHTML = filesHtml;
+  } catch (err) { list.innerHTML = `<p class="text-red-400 text-sm text-center py-4">${esc(err.message)}</p>`; }
+}
+function handleFileDrop(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file) uploadFile(file);
+}
+async function uploadFile(file) {
+  if (!file) return;
+  const zone = document.getElementById('upload-drop-zone');
+  zone.textContent = `Uploading ${file.name}…`;
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const headers = {};
+    if (S.token) headers['Authorization'] = `Bearer ${S.token}`;
+    const res = await fetch(`/api/uploads/${S.activeSite}/upload`, { method: 'POST', headers, body: formData });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error); }
+    toast('File uploaded!', 'success');
+    loadFiles();
+  } catch (err) { toast('Upload failed: ' + err.message, 'error'); }
+  finally { zone.innerHTML = '<svg class="w-8 h-8 text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><p class="text-sm text-slate-400">Click to upload or drag & drop</p><p class="text-xs text-slate-500 mt-1">PNG, JPG, GIF, WebP up to 5MB</p>'; }
+}
+function copyFileUrl(url) {
+  navigator.clipboard.writeText(window.location.origin + url).then(() => toast('URL copied!', 'success'));
+}
+async function deleteFile(name) {
+  if (!confirm(`Delete "${name}"?`)) return;
+  try {
+    await api('DELETE', `/api/uploads/${S.activeSite}/files/${encodeURIComponent(name)}`);
+    toast('File deleted', 'info');
+    loadFiles();
+  } catch (err) { toast('Delete failed: ' + err.message, 'error'); }
+}
+
+// ── Billing ───────────────────────────────────────────────────────────────────
+async function loadBilling() {
+  const plansEl = document.getElementById('billing-plans');
+  const currentEl = document.getElementById('billing-current');
+  plansEl.innerHTML = '<p class="text-slate-400 text-sm col-span-3 text-center py-8">Loading…</p>';
+  try {
+    const [plansData, subData] = await Promise.all([
+      api('GET', '/api/billing/plans'),
+      api('GET', '/api/billing/subscription').catch(() => ({ subscription: null })),
+    ]);
+    const plans = plansData.plans || [];
+    const sub = subData.subscription;
+    if (sub && sub.planId) {
+      currentEl.classList.remove('hidden');
+      document.getElementById('billing-plan-name').textContent = plans.find(p => p.id === sub.planId)?.name || sub.planId;
+      document.getElementById('billing-plan-status').textContent = sub.status === 'active'
+        ? `Active · renews ${new Date(sub.currentPeriodEnd).toLocaleDateString()}`
+        : `Status: ${sub.status}`;
+    }
+    const plansHtml = plans.map(plan => {
+      const isCurrent = sub && sub.planId === plan.id;
+      const priceStr = `$${(plan.price / 100).toFixed(0)}/${plan.interval}`;
+      const featuresHtml = (plan.features || []).map(f => `<li class="flex items-center gap-2 text-sm text-slate-300"><span class="text-emerald-400">✓</span> ${esc(f)}</li>`).join('');
+      const isPro = plan.id === 'n3ware_pro';
+      return `<div class="bg-slate-800 border ${isCurrent ? 'border-blue-500' : isPro ? 'border-slate-600' : 'border-slate-700'} rounded-2xl p-6 relative">
+        ${isPro ? '<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</div>' : ''}
+        <h3 class="text-xl font-bold mb-1">${esc(plan.name)}</h3>
+        <p class="text-3xl font-extrabold mb-4">${esc(priceStr)}</p>
+        <ul class="space-y-2 mb-6">${featuresHtml}</ul>
+        ${isCurrent
+          ? '<button class="w-full bg-slate-700 text-slate-400 py-2.5 rounded-xl text-sm font-semibold cursor-default">Current Plan</button>'
+          : `<button onclick="startCheckout('${esc(plan.id)}')" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-sm font-bold transition">${sub ? 'Switch Plan' : 'Subscribe'}</button>`}
+      </div>`;
+    }).join('');
+    plansEl.innerHTML = plansHtml;
+  } catch (err) { plansEl.innerHTML = `<p class="text-red-400 text-sm text-center py-8 col-span-3">${esc(err.message)}</p>`; }
+}
+async function startCheckout(planId) {
+  try {
+    const data = await api('POST', '/api/billing/checkout', {
+      planId,
+      successUrl: window.location.href + '?billing=success',
+      cancelUrl: window.location.href,
+    });
+    if (data.url) window.location.href = data.url;
+  } catch (err) { toast('Checkout failed: ' + err.message, 'error'); }
 }
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function esc(s) {
-  return String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
-/** Deterministic gradient colours from a site ID string */
 function siteColours(id) {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  const palettes = [
-    ['#1e3a5f','#0f2b4a'],['#1a1a2e','#16213e'],['#0d2137','#0a3d62'],
-    ['#1b1f3b','#2c2f6b'],['#0f3460','#533483'],['#1a472a','#145a32'],
-    ['#4a0e2e','#6b1b3f'],['#1a0533','#2d1b69'],
-  ];
-  return palettes[h % palettes.length];
+  const p = [['#1e3a5f','#0f2b4a'],['#1a1a2e','#16213e'],['#0d2137','#0a3d62'],['#1b1f3b','#2c2f6b'],['#0f3460','#533483'],['#1a472a','#145a32'],['#4a0e2e','#6b1b3f'],['#1a0533','#2d1b69']];
+  return p[h % p.length];
 }
+function fmtNum(n) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n); }
+function fmtBytes(b) { if (!b) return '—'; if (b < 1024) return b + 'B'; if (b < 1048576) return (b/1024).toFixed(1) + 'KB'; return (b/1048576).toFixed(1) + 'MB'; }
 
-// ── Keyboard shortcuts ────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     document.getElementById('create-modal').classList.remove('open');
     closeRevisions();
+    closeAnalytics();
     document.getElementById('settings-modal').classList.remove('open');
   }
 });
 
-// ── Init ─────────────────────────────────────────────────────────────────────
 checkAuth();
 </script>
 </body>

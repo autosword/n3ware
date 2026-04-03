@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumière Salon — Wakefield, Rhode Island</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .hero-bg { background-image: url('https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1600&q=80'); background-size: cover; background-position: center; }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body class="font-sans antialiased bg-pink-50 text-gray-800" style="background-color:#fdf2f8;">
+
+  <!-- Nav -->
+  <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-pink-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">✨</span>
+        <span class="text-gray-900 font-extrabold text-xl tracking-tight" style="font-family: Georgia, serif;">Lumière Salon</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="#services" class="text-gray-600 hover:text-gray-900 transition-colors">Services</a>
+        <a href="#stylists" class="text-gray-600 hover:text-gray-900 transition-colors">Our Stylists</a>
+        <a href="#gallery" class="text-gray-600 hover:text-gray-900 transition-colors">Gallery</a>
+        <a href="#book" class="text-gray-600 hover:text-gray-900 transition-colors">Book</a>
+      </div>
+      <a href="#book" class="border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white px-5 py-2 rounded-lg font-semibold text-sm transition-colors" style="border-color: #d97706; color: #d97706;" onmouseover="this.style.backgroundColor='#d97706';this.style.color='white';" onmouseout="this.style.backgroundColor='transparent';this.style.color='#d97706';">Book Now</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero-bg relative min-h-screen flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/45"></div>
+    <div class="relative z-10 text-center px-6 max-w-3xl mx-auto">
+      <span class="inline-block bg-white/20 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1 rounded-full mb-5 backdrop-blur-sm">Wakefield, Rhode Island</span>
+      <h1 class="text-6xl font-bold text-white leading-tight mb-5" style="font-family: Georgia, serif;">Beauty Without<br /><span style="color:#d97706;">Compromise.</span></h1>
+      <p class="text-gray-200 text-xl mb-8 leading-relaxed">South County's premier hair salon. Expert stylists, premium products, and a sanctuary where you leave looking and feeling your absolute best.</p>
+      <a href="#book" class="inline-block bg-white text-gray-900 hover:bg-gray-100 px-10 py-4 rounded-lg font-bold text-lg transition-colors shadow-lg">Book Your Appointment</a>
+    </div>
+  </section>
+
+  <!-- Services & Pricing -->
+  <section id="services" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-4xl font-bold text-gray-900 text-center mb-3" style="font-family: Georgia, serif;">Services &amp; Pricing</h2>
+      <p class="text-center text-gray-400 mb-12">All services include a complimentary scalp massage &amp; style consultation</p>
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Cuts -->
+        <div class="bg-pink-50 rounded-2xl p-7 border border-pink-100">
+          <h3 class="text-xl font-bold text-gray-900 mb-5 pb-3 border-b border-pink-200">✂️ Cuts</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Women's Cut &amp; Style</div>
+                <div class="text-gray-400 text-xs">Shampoo, cut, blowout &amp; style</div>
+              </div>
+              <span class="font-bold text-amber-600">$65</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Men's Cut</div>
+                <div class="text-gray-400 text-xs">Shampoo, cut &amp; style</div>
+              </div>
+              <span class="font-bold text-amber-600">$40</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Children's Cut</div>
+                <div class="text-gray-400 text-xs">Ages 12 &amp; under</div>
+              </div>
+              <span class="font-bold text-amber-600">$35</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Bang Trim</div>
+                <div class="text-gray-400 text-xs">Quick bang refresh, no appointment needed</div>
+              </div>
+              <span class="font-bold text-amber-600">$15</span>
+            </div>
+          </div>
+        </div>
+        <!-- Color -->
+        <div class="bg-pink-50 rounded-2xl p-7 border border-pink-100">
+          <h3 class="text-xl font-bold text-gray-900 mb-5 pb-3 border-b border-pink-200">🎨 Color</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Full Color</div>
+                <div class="text-gray-400 text-xs">Single process color, roots to ends</div>
+              </div>
+              <span class="font-bold text-amber-600">$85+</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Highlights</div>
+                <div class="text-gray-400 text-xs">Full or partial foil highlights</div>
+              </div>
+              <span class="font-bold text-amber-600">$120+</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Balayage</div>
+                <div class="text-gray-400 text-xs">Hand-painted natural sun-kissed color</div>
+              </div>
+              <span class="font-bold text-amber-600">$150+</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Color Correction</div>
+                <div class="text-gray-400 text-xs">Consultation required</div>
+              </div>
+              <span class="font-bold text-amber-600">$200+</span>
+            </div>
+          </div>
+        </div>
+        <!-- Treatments -->
+        <div class="bg-pink-50 rounded-2xl p-7 border border-pink-100">
+          <h3 class="text-xl font-bold text-gray-900 mb-5 pb-3 border-b border-pink-200">💆 Treatments</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Deep Conditioning</div>
+                <div class="text-gray-400 text-xs">Intensive moisture &amp; repair mask</div>
+              </div>
+              <span class="font-bold text-amber-600">$45</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Keratin Treatment</div>
+                <div class="text-gray-400 text-xs">Smooth &amp; frizz-free for up to 5 months</div>
+              </div>
+              <span class="font-bold text-amber-600">$200+</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Scalp Treatment</div>
+                <div class="text-gray-400 text-xs">Targeted scalp health &amp; hydration</div>
+              </div>
+              <span class="font-bold text-amber-600">$55</span>
+            </div>
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="font-semibold text-gray-800">Gloss &amp; Toner</div>
+                <div class="text-gray-400 text-xs">Refreshes and deepens color vibrancy</div>
+              </div>
+              <span class="font-bold text-amber-600">$60</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Meet Our Stylists -->
+  <section id="stylists" class="py-20" style="background-color:#fdf2f8;">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-4xl font-bold text-gray-900 text-center mb-3" style="font-family: Georgia, serif;">Meet Our Stylists</h2>
+      <p class="text-center text-gray-400 mb-12">Trained professionals who love what they do</p>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-sm border border-pink-100 text-center">
+          <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&q=80" alt="Sophie Reeves" class="w-full h-52 object-cover object-top" />
+          <div class="p-5">
+            <h3 class="font-bold text-lg text-gray-900">Sophie Reeves</h3>
+            <p class="text-amber-600 text-sm font-medium">Senior Stylist &amp; Color Specialist</p>
+            <p class="text-gray-400 text-xs mt-2">Specialty: Balayage &amp; lived-in color · 9 years experience</p>
+          </div>
+        </div>
+        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-sm border border-pink-100 text-center">
+          <img src="https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=300&q=80" alt="Maya Chen" class="w-full h-52 object-cover object-top" />
+          <div class="p-5">
+            <h3 class="font-bold text-lg text-gray-900">Maya Chen</h3>
+            <p class="text-amber-600 text-sm font-medium">Stylist &amp; Texture Expert</p>
+            <p class="text-gray-400 text-xs mt-2">Specialty: Curly hair &amp; keratin treatments · 6 years experience</p>
+          </div>
+        </div>
+        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-sm border border-pink-100 text-center">
+          <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&q=80" alt="Jess Moreau" class="w-full h-52 object-cover object-top" />
+          <div class="p-5">
+            <h3 class="font-bold text-lg text-gray-900">Jess Moreau</h3>
+            <p class="text-amber-600 text-sm font-medium">Junior Stylist</p>
+            <p class="text-gray-400 text-xs mt-2">Specialty: Precision cuts &amp; blowouts · 3 years experience</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-4xl font-bold text-gray-900 text-center mb-12" style="font-family: Georgia, serif;">Our Work</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" alt="Hair" class="rounded-xl w-full h-48 object-cover" />
+        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&q=80" alt="Hair" class="rounded-xl w-full h-48 object-cover" />
+        <img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=400&q=80" alt="Hair" class="rounded-xl w-full h-48 object-cover" />
+        <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=400&q=80" alt="Salon" class="rounded-xl w-full h-48 object-cover" />
+        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80" alt="Hair" class="rounded-xl w-full h-48 object-cover brightness-110" />
+        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=400&q=80" alt="Styling" class="rounded-xl w-full h-48 object-cover" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section class="py-20" style="background-color:#fdf2f8;">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-4xl font-bold text-gray-900 text-center mb-12" style="font-family: Georgia, serif;">What Our Clients Say</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-pink-100">
+          <div class="text-yellow-400 text-lg mb-3">★★★★★</div>
+          <p class="text-gray-500 text-sm italic mb-4">"Sophie gave me the best balayage I've ever had. I've been to salons in Providence and Boston and Lumière blows them all out of the water. The vibe is so relaxing, too."</p>
+          <div class="text-sm font-semibold text-gray-700">— Claire B., Wakefield RI</div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-pink-100">
+          <div class="text-yellow-400 text-lg mb-3">★★★★★</div>
+          <p class="text-gray-500 text-sm italic mb-4">"Maya is a curly hair wizard. First time in years someone actually understood my curl pattern. My hair has never looked this good. Already booked my next appointment."</p>
+          <div class="text-sm font-semibold text-gray-700">— Tanya R., Narragansett RI</div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-pink-100">
+          <div class="text-yellow-400 text-lg mb-3">★★★★★</div>
+          <p class="text-gray-500 text-sm italic mb-4">"I've been coming to Lumière for two years. The whole team is professional, warm, and talented. It's my favorite part of the month. Don't change a thing!"</p>
+          <div class="text-sm font-semibold text-gray-700">— Patricia M., South Kingstown RI</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Book Appointment -->
+  <section id="book" class="py-20 bg-gray-900 text-white">
+    <div class="max-w-2xl mx-auto px-6">
+      <h2 class="text-4xl font-bold text-center mb-3" style="font-family: Georgia, serif;">Book Your Appointment</h2>
+      <p class="text-center text-gray-400 mb-8">We'll confirm within 24 hours. For same-day bookings, please call.</p>
+      <form class="space-y-5">
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Name</label>
+            <input type="text" placeholder="Your name" class="w-full border border-gray-600 bg-gray-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Phone</label>
+            <input type="tel" placeholder="(401) 555-0000" class="w-full border border-gray-600 bg-gray-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Preferred Date</label>
+            <input type="date" class="w-full border border-gray-600 bg-gray-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Preferred Time</label>
+            <select class="w-full border border-gray-600 bg-gray-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option>Morning (9am–12pm)</option>
+              <option>Afternoon (12pm–4pm)</option>
+              <option>Evening (4pm–7pm)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Service</label>
+          <select class="w-full border border-gray-600 bg-gray-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option>Women's Cut &amp; Style</option>
+            <option>Men's Cut</option>
+            <option>Full Color</option>
+            <option>Highlights</option>
+            <option>Balayage</option>
+            <option>Keratin Treatment</option>
+            <option>Deep Conditioning</option>
+            <option>Other — please specify below</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Stylist Preference</label>
+          <select class="w-full border border-gray-600 bg-gray-800 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option>No preference</option>
+            <option>Sophie Reeves</option>
+            <option>Maya Chen</option>
+            <option>Jess Moreau</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full text-white py-3 rounded-lg font-bold transition-colors" style="background-color:#d97706;" onmouseover="this.style.backgroundColor='#b45309';" onmouseout="this.style.backgroundColor='#d97706';">Request Appointment</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Hours -->
+  <section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4" style="font-family: Georgia, serif;">Hours &amp; Location</h3>
+        <div class="space-y-2 text-sm text-gray-600">
+          <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-medium">Monday</span><span class="text-gray-400">Closed</span></div>
+          <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-medium">Tuesday – Friday</span><span>9:00 am – 7:00 pm</span></div>
+          <div class="flex justify-between border-b border-gray-100 pb-2"><span class="font-medium">Saturday</span><span>8:00 am – 6:00 pm</span></div>
+          <div class="flex justify-between"><span class="font-medium">Sunday</span><span>10:00 am – 4:00 pm</span></div>
+        </div>
+      </div>
+      <div class="text-gray-700">
+        <p class="font-bold text-gray-900 text-lg" style="font-family: Georgia, serif;">Lumière Salon</p>
+        <p>88 Tower Hill Rd, Wakefield RI 02879</p>
+        <p class="mt-1"><a href="tel:4015550628" class="font-semibold hover:underline" style="color:#d97706;">(401) 555-0628</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 text-center bg-gray-900 text-gray-400">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-white font-bold text-xl mb-2" style="font-family: Georgia, serif;">✨ Lumière Salon</div>
+      <p class="text-sm">88 Tower Hill Rd, Wakefield RI 02879 · (401) 555-0628</p>
+      <p class="text-xs text-gray-600 mt-4">&copy; 2026 Lumière Salon. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
