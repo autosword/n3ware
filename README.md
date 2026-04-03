@@ -1,176 +1,163 @@
-# n3ware
+# n3ware Cloud
 
-Drop-in JavaScript visual editor + cloud backend. Add one `<script>` tag and your users can edit any page in-browser and publish changes instantly.
+Visual webpage editor + hosted publishing platform.
 
----
+Embed `n3ware.js` on any page, edit visually, and click **Publish** to push updates live — with cache invalidation and revision history.
 
-## Features
-
-- **Visual editing** — click any element to edit text, drag to reorder, style via sidebar
-- **Undo / redo** — full snapshot-based history
-- **One-line integration** — single `<script>` tag, zero dependencies
-- **n3ware Cloud** — REST API to persist, version, and serve pages
-- **Revision history** — every save creates a revision; roll back any time
-- **CDN-aware** — Cloudflare or GCP cache purge on publish
-- **Deployable** — Docker + Cloud Run ready out of the box
-
----
-
-## Quick start
-
-### Local dev
+## Quick Start (local dev)
 
 ```bash
 npm install
-node server.js
+npm start          # http://localhost:8080
 ```
 
-Open `http://localhost:3000`. The demo page is at `/demo`.
-
-### Environment variables
+## Environment Variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `PORT` | `3000` | HTTP port |
 | `NODE_ENV` | `development` | `development` or `production` |
-| `STORAGE_BACKEND` | `local` | `local` or `firestore` |
-| `DATA_DIR` | `./data` | Local JSON storage root |
-| `MASTER_API_KEY` | *(required)* | API key for all `/api/*` routes |
-| `GCP_PROJECT` | — | GCP project ID (Firestore) |
-| `CDN_PROVIDER` | `none` | `cloudflare`, `gcp`, or `none` |
-| `CLOUDFLARE_ZONE_ID` | — | Cloudflare zone ID |
-| `CLOUDFLARE_API_TOKEN` | — | Cloudflare API token |
-| `GCP_BACKEND_NAME` | — | GCP backend service name (CDN purge) |
-| `CACHE_MAX_SIZE` | `500` | In-memory LRU cache size |
-| `CACHE_TTL_MS` | `300000` | Cache TTL (5 min) |
-| `N3WARE_SCRIPT_URL` | `/n3ware.js` | Injected script URL |
+| `PORT` | `8080` | HTTP port |
+| `STORAGE_BACKEND` | `local` | `local` (JSON files) or `firestore` |
+| `DATA_DIR` | `./data/sites` | Local storage root |
+| `MASTER_API_KEY` | `dev-master-key` | API key for all requests |
+| `CDN_PROVIDER` | `none` | `none`, `cloudflare`, or `gcp` |
+| `CF_ZONE_ID` | — | Cloudflare Zone ID |
+| `CF_API_TOKEN` | — | Cloudflare API token |
+| `GCP_PROJECT_ID` | — | Google Cloud project |
+| `GCP_BACKEND_NAME` | — | Cloud CDN URL map name |
 
----
+## API Reference
 
-## API
-
-All API routes require `X-API-Key` header (or `?apiKey` query param).
+All endpoints require `X-API-Key` header (or `?apiKey=` query param).
 
 ### Sites
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/api/sites` | List all sites (no HTML) |
-| `POST` | `/api/sites` | Create site `{ html, message? }` |
-| `GET` | `/api/sites/:id` | Get site with HTML |
-| `GET` | `/api/sites/:id/html` | Get raw HTML only |
-| `POST` | `/api/sites/:id/save` | Save new revision `{ html, message? }` |
-| `DELETE` | `/api/sites/:id` | Delete site + all revisions |
+```bash
+# Create site
+curl -X POST /api/sites \
+  -H "X-API-Key: $KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"html":"<html>...</html>","message":"Initial"}'
+
+# List sites
+curl /api/sites -H "X-API-Key: $KEY"
+
+# Get site metadata
+curl /api/sites/:id -H "X-API-Key: $KEY"
+
+# Get raw HTML
+curl /api/sites/:id/html -H "X-API-Key: $KEY"
+
+# Save (publish) new HTML — invalidates cache
+curl -X POST /api/sites/:id/save \
+  -H "X-API-Key: $KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"html":"<html>...</html>","message":"Updated hero"}'
+
+# Delete site
+curl -X DELETE /api/sites/:id -H "X-API-Key: $KEY"
+```
 
 ### Revisions
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/api/sites/:id/revisions` | List revisions (newest first) |
-| `GET` | `/api/sites/:id/revisions/:revId` | Get single revision |
-| `POST` | `/api/sites/:id/revisions/:revId/rollback` | Restore revision |
+```bash
+# List revision history
+curl /api/sites/:id/revisions -H "X-API-Key: $KEY"
 
-### Serving
+# Get a specific revision (includes full HTML)
+curl /api/sites/:id/revisions/:revId -H "X-API-Key: $KEY"
 
-Published sites are served at `/sites/:siteId` with the n3ware editor automatically injected before `</body>`.
+# Rollback to a revision
+curl -X POST /api/sites/:id/revisions/:revId/rollback -H "X-API-Key: $KEY"
+```
 
-### Other
+### Site Serving
 
-| Path | Description |
-|---|---|
-| `GET /health` | Health check |
-| `GET /api/cache/stats` | LRU cache stats (requires `MASTER_API_KEY`) |
+Published sites are served at `/sites/:siteId`. Each page has the n3ware editor auto-injected:
 
----
+```
+GET /sites/:siteId
+```
 
-## Embedding
+The injected script tag looks like:
+```html
+<script src="/n3ware.js"
+        data-n3-site="site_abc123"
+        data-n3-api="/api"></script>
+```
+
+The site owner can add a `data-n3-key` attribute manually to enable the **Publish** button.
+
+## Cloud Save Integration
+
+When `n3ware.js` detects cloud config on its script tag, it enables cloud saving:
 
 ```html
-<script
-  src="https://your-domain.com/n3ware.js"
-  data-n3-site="my-site-id"
-  data-n3-api="https://your-domain.com/api"
-  data-n3-key="YOUR_API_KEY"
-></script>
+<script src="https://your-app.example.com/n3ware.js"
+        data-n3-api="https://your-app.example.com/api"
+        data-n3-site="site_abc123"
+        data-n3-key="your-api-key"></script>
 ```
 
-| Attribute | Description |
+In edit mode:
+- **☁ Publish** — saves clean HTML to the API, invalidates cache
+- **↺ History** — opens revision panel with rollback support
+- **⬇ Download** — still available as local backup
+
+## Deploying to Google Cloud Run
+
+### Prerequisites
+
+```bash
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com
+```
+
+### Deploy with Cloud Build
+
+```bash
+gcloud builds submit --config cloudbuild.yaml
+```
+
+This builds the Docker image, pushes it to Artifact Registry, and deploys to Cloud Run in `us-east1`.
+
+### First-time Firestore setup
+
+```bash
+gcloud firestore databases create --region=us-east1
+```
+
+Set these environment variables on the Cloud Run service:
+
+```bash
+gcloud run services update n3ware \
+  --region=us-east1 \
+  --set-env-vars="STORAGE_BACKEND=firestore,GCP_PROJECT_ID=YOUR_PROJECT,MASTER_API_KEY=your-secure-key"
+```
+
+## Cache Invalidation Strategy
+
+| Asset | Cache-Control |
 |---|---|
-| `data-n3-site` | Site ID to save/load |
-| `data-n3-api` | API base URL |
-| `data-n3-key` | API key (omit if serving via `/sites/:id`) |
+| Site HTML (`/sites/:id`) | `public, s-maxage=300, stale-while-revalidate=60` |
+| API responses | `private, no-cache` |
+| Static files (`n3ware.js`) | `public, max-age=86400` |
 
-The editor toolbar appears in the bottom-right corner. Use **Publish** to push changes to the cloud.
+When a site is saved:
+1. Memory cache for that site is immediately invalidated
+2. CDN purge request is fired (Cloudflare or GCP CDN, if configured)
+3. Next request fetches fresh HTML from storage
 
----
-
-## Architecture
-
-```
-n3ware.js  (client)
-  N3Events          — pub/sub event bus
-  N3UI              — CSS injection + DOM factories
-  N3History         — snapshot undo/redo stack
-  N3Export          — HTML cleanup, diff, download
-  N3TextEditor      — contentEditable + formatting toolbar
-  N3DragManager     — drag-and-drop reorder
-  N3ElementControls — hover overlays + selection
-  N3StylePanel      — right-side style panel
-  N3Toolbar         — top toolbar (edit/preview/export/publish)
-  N3Cloud           — REST API integration (save/revisions/rollback)
-  N3RevisionsPanel  — slide-out revisions history panel
-  N3Editor          — orchestrator / public API
-
-server.js  (Node/Express)
-  src/config.js          — env config
-  src/api/auth.js        — API key middleware
-  src/api/sites.js       — sites CRUD router
-  src/api/revisions.js   — revisions router
-  src/serving/sites.js   — site serving + editor injection
-  src/storage/local.js   — JSON file storage
-  src/storage/firestore.js — Firestore storage
-  src/cache/memory.js    — LRU memory cache
-  src/cache/cdn.js       — CDN cache purge
-  src/cache/index.js     — cache coordinator
-```
-
----
-
-## Deployment
-
-### Docker
+## Running Tests
 
 ```bash
-docker build -t n3ware .
-docker run -e MASTER_API_KEY=secret -p 8080:8080 n3ware
-```
+# API integration tests (starts server internally)
+node tests/api.test.js
 
-### Google Cloud Run
-
-1. Set up a Cloud Build trigger pointing at this repo
-2. Grant the Cloud Build SA: `roles/run.admin`, `roles/iam.serviceAccountUser`, `roles/artifactregistry.writer`
-3. Add substitution variables or accept defaults (`_SERVICE=n3ware`, `_REGION=us-east1`)
-4. Push — Cloud Build handles build → push → deploy
-
-For Firestore storage, set `STORAGE_BACKEND=firestore` and ensure the Cloud Run SA has `roles/datastore.user`.
-
----
-
-## Tests
-
-```bash
-# Browser tests (open in browser)
-open http://localhost:3000/tests
-
-# Node smoke tests
+# n3ware.js smoke tests
 node tests/run-tests.js
 
-# API integration tests
-MASTER_API_KEY=test node tests/api.test.js
+# Both
+npm test
 ```
-
----
-
-## License
-
-MIT
