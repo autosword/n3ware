@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luminary Studio — n3ware Demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #3B82F6;
+      --dark: #0F172A;
+      --card: #1E293B;
+      --border: #334155;
+      --text: #F1F5F9;
+      --muted: #94A3B8;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    img { display: block; width: 100%; object-fit: cover; }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+    .nav-logo span { color: var(--blue); }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: var(--muted); font-size: 14px; font-weight: 500; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--blue); color: #fff;
+      padding: 8px 20px; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      transition: background 0.15s;
+    }
+    .nav-cta:hover { background: #2563EB; }
+
+    /* Hero */
+    .hero {
+      padding: 100px 32px;
+      text-align: center;
+      background: radial-gradient(ellipse at center top, rgba(59,130,246,0.12) 0%, transparent 70%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.3);
+      color: #93C5FD;
+      font-size: 12px; font-weight: 600;
+      padding: 5px 14px; border-radius: 100px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 20px; color: var(--muted);
+      max-width: 560px; margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--blue); color: #fff;
+      padding: 14px 32px; border-radius: 10px;
+      font-size: 16px; font-weight: 700;
+      transition: all 0.15s;
+      display: inline-block;
+    }
+    .btn-primary:hover { background: #2563EB; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+      padding: 14px 32px; border-radius: 10px;
+      font-size: 16px; font-weight: 600;
+      transition: all 0.15s;
+      display: inline-block;
+    }
+    .btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* Hero image */
+    .hero-img-wrap {
+      max-width: 900px;
+      margin: 60px auto 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    }
+    .hero-img-wrap img { border-radius: 16px; height: 400px; }
+
+    /* Section */
+    section { padding: 80px 32px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--blue); margin-bottom: 12px;
+    }
+    .section-title { font-size: clamp(28px, 4vw, 44px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 16px; }
+    .section-sub { color: var(--muted); font-size: 18px; max-width: 560px; line-height: 1.6; margin-bottom: 48px; }
+
+    /* Stats */
+    .stats-bar {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 32px;
+    }
+    .stats-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 24px; text-align: center;
+    }
+    .stat-val { font-size: 40px; font-weight: 900; color: var(--blue); letter-spacing: -1px; }
+    .stat-label { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+    /* Cards grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.25s;
+    }
+    .card:hover { transform: translateY(-4px); border-color: rgba(59,130,246,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+    .card-img { height: 200px; }
+    .card-img img { height: 200px; }
+    .card-body { padding: 20px; }
+    .card-tag {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--blue);
+      background: rgba(59,130,246,0.1);
+      padding: 3px 10px; border-radius: 100px;
+      display: inline-block; margin-bottom: 10px;
+    }
+    .card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .card p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .card-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px;
+    }
+    .card-price { font-weight: 800; font-size: 18px; color: var(--text); }
+    .card-link { color: var(--blue); font-weight: 600; }
+
+    /* Features list */
+    .features-two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .features-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+    .features-list li {
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .feat-icon {
+      width: 40px; height: 40px; flex-shrink: 0;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .feat-text h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .feat-text p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .testimonial {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .testi-stars { color: #FBBF24; font-size: 14px; margin-bottom: 12px; }
+    .testi-text { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 16px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 10px; }
+    .testi-avatar {
+      width: 36px; height: 36px; border-radius: 50%; overflow: hidden;
+      background: var(--border); flex-shrink: 0;
+    }
+    .testi-avatar img { width: 36px; height: 36px; }
+    .testi-name { font-size: 13px; font-weight: 700; }
+    .testi-role { font-size: 12px; color: var(--muted); }
+
+    /* Team */
+    .team-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    }
+    .team-card { text-align: center; }
+    .team-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      overflow: hidden; margin: 0 auto 12px;
+      border: 2px solid var(--border);
+    }
+    .team-avatar img { width: 80px; height: 80px; }
+    .team-name { font-weight: 700; font-size: 15px; }
+    .team-role { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .pricing-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+    }
+    .pricing-card.featured {
+      border-color: var(--blue);
+      box-shadow: 0 0 40px rgba(59,130,246,0.15);
+    }
+    .pricing-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--blue); color: #fff;
+      font-size: 11px; font-weight: 700;
+      padding: 4px 14px; border-radius: 100px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .pricing-name { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .pricing-price { font-size: 48px; font-weight: 900; letter-spacing: -2px; margin-bottom: 4px; }
+    .pricing-price span { font-size: 18px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+    .pricing-desc { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .pricing-features li { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .pricing-features li::before { content: "✓"; color: var(--blue); font-weight: 700; }
+    .pricing-btn {
+      display: block; text-align: center;
+      padding: 12px; border-radius: 10px;
+      font-weight: 700; font-size: 14px;
+      transition: all 0.15s;
+    }
+    .pricing-btn-outline {
+      border: 1px solid var(--border); color: var(--text);
+    }
+    .pricing-btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+    .pricing-btn-solid { background: var(--blue); color: #fff; }
+    .pricing-btn-solid:hover { background: #2563EB; }
+
+    /* Blog */
+    .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .blog-card { }
+    .blog-card-img { height: 180px; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+    .blog-card-img img { height: 180px; }
+    .blog-date { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .blog-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .blog-excerpt { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+    .blog-read { color: var(--blue); font-size: 13px; font-weight: 600; }
+
+    /* FAQ */
+    .faq-list { max-width: 680px; display: flex; flex-direction: column; gap: 4px; }
+    .faq-item {
+      border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 18px 20px; font-weight: 600; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 15px;
+    }
+    .faq-a { padding: 0 20px 16px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+    /* CTA section */
+    .cta-section {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(139,92,246,0.08) 100%);
+      border-top: 1px solid rgba(59,130,246,0.2);
+      border-bottom: 1px solid rgba(59,130,246,0.2);
+    }
+    .cta-section h2 { font-size: 48px; font-weight: 900; letter-spacing: -1px; margin-bottom: 16px; }
+    .cta-section p { color: var(--muted); font-size: 18px; margin-bottom: 36px; }
+
+    /* Footer */
+    footer {
+      background: rgba(15,23,42,0.95);
+      border-top: 1px solid var(--border);
+      padding: 48px 32px 32px;
+    }
+    .footer-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-brand p { color: var(--muted); font-size: 14px; line-height: 1.6; margin-top: 10px; max-width: 280px; }
+    .footer-col h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 14px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .footer-col ul li a { color: var(--muted); font-size: 14px; transition: color 0.15s; }
+    .footer-col ul li a:hover { color: var(--text); }
+    .footer-bottom {
+      max-width: 1100px; margin: 0 auto;
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; color: var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-two-col { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">Luminary<span>Studio</span></div>
+    <div class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#services">Services</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#blog">Blog</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="#contact" class="nav-cta">Get a Quote</a>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">Award-winning creative studio</div>
+    <h1>We Build<br><span>Remarkable</span><br>Digital Products</h1>
+    <p class="hero-sub">
+      Luminary Studio crafts world-class websites, apps, and brand identities
+      for ambitious teams who demand the extraordinary.
+    </p>
+    <div class="hero-btns">
+      <a href="#work" class="btn-primary">View Our Work</a>
+      <a href="#contact" class="btn-outline">Let's Talk →</a>
+    </div>
+    <div class="hero-img-wrap">
+      <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&h=500&fit=crop&crop=center&auto=format&q=80"
+           alt="Creative team at work" />
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stats-grid">
+      <div>
+        <div class="stat-val">240+</div>
+        <div class="stat-label">Projects Delivered</div>
+      </div>
+      <div>
+        <div class="stat-val">98%</div>
+        <div class="stat-label">Client Satisfaction</div>
+      </div>
+      <div>
+        <div class="stat-val">12yr</div>
+        <div class="stat-label">In Business</div>
+      </div>
+      <div>
+        <div class="stat-val">36</div>
+        <div class="stat-label">Team Members</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Work / Cards -->
+  <section id="work">
+    <div class="section-inner">
+      <div class="section-label">Our Work</div>
+      <h2 class="section-title">Featured Projects</h2>
+      <p class="section-sub">A selection of our recent work across web, mobile, and brand design.</p>
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-img">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=200&fit=crop&auto=format&q=80" alt="Dashboard project" />
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Web App</span>
+            <h3>Analytics Dashboard</h3>
+            <p>A real-time analytics platform for enterprise clients, featuring 40+ interactive charts and custom data pipelines.</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-price">Case Study</span>
+            <a href="#" class="card-link">View →</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img">
+            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=200&fit=crop&auto=format&q=80" alt="E-commerce project" />
+          </div>
+          <div class="card-body">
+            <span class="card-tag">E-Commerce</span>
+            <h3>Luxe Boutique Store</h3>
+            <p>High-end fashion e-commerce with 3D product viewer, AR try-on, and a fully headless commerce architecture.</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-price">Case Study</span>
+            <a href="#" class="card-link">View →</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img">
+            <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=200&fit=crop&auto=format&q=80" alt="Mobile app project" />
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Mobile App</span>
+            <h3>Wellness Companion</h3>
+            <p>iOS & Android fitness app with AI-powered coaching, wearable integration, and 500K+ downloads in the first year.</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-price">Case Study</span>
+            <a href="#" class="card-link">View →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services / Features -->
+  <section id="services" style="background: rgba(30,41,59,0.3);">
+    <div class="section-inner">
+      <div class="features-two-col">
+        <div>
+          <div class="section-label">Services</div>
+          <h2 class="section-title">What We Do Best</h2>
+          <p class="section-sub">From concept to launch, we handle every pixel and every line of code.</p>
+          <a href="#contact" class="btn-primary" style="display:inline-block">Work With Us</a>
+        </div>
+        <div>
+          <ul class="features-list">
+            <li>
+              <div class="feat-icon">🎨</div>
+              <div class="feat-text">
+                <h4>Brand Identity & Design Systems</h4>
+                <p>Logos, color systems, typography, and component libraries that scale with your company.</p>
+              </div>
+            </li>
+            <li>
+              <div class="feat-icon">💻</div>
+              <div class="feat-text">
+                <h4>Web Design & Development</h4>
+                <p>Performant, accessible websites built with modern frameworks. 100/100 Lighthouse scores.</p>
+              </div>
+            </li>
+            <li>
+              <div class="feat-icon">📱</div>
+              <div class="feat-text">
+                <h4>Mobile App Development</h4>
+                <p>Native iOS, Android, and cross-platform apps that delight users and drive retention.</p>
+              </div>
+            </li>
+            <li>
+              <div class="feat-icon">⚡</div>
+              <div class="feat-text">
+                <h4>Performance & Optimization</h4>
+                <p>Audits, Core Web Vitals fixes, and continuous optimization to keep your site blazing fast.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section>
+    <div class="section-inner">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">Loved by founders</h2>
+      <p class="section-sub">Don't take our word for it — hear from the teams we've worked with.</p>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Luminary transformed our outdated website into a conversion machine. Our signups tripled within 60 days of launch. Absolutely incredible work."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=72&h=72&fit=crop&crop=face&auto=format&q=80" alt="Sarah K." />
+            </div>
+            <div>
+              <div class="testi-name">Sarah Kimura</div>
+              <div class="testi-role">CEO, Vertix Health</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"The team's attention to detail is unreal. They caught UX issues we hadn't noticed in years and shipped solutions in the same sprint. Highly recommend."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=72&h=72&fit=crop&crop=face&auto=format&q=80" alt="Marcus D." />
+            </div>
+            <div>
+              <div class="testi-name">Marcus Delacroix</div>
+              <div class="testi-role">CTO, Arcane Labs</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"We went from zero brand presence to winning a design award in 8 months. Luminary isn't just a studio — they're a growth partner."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">
+              <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=72&h=72&fit=crop&crop=face&auto=format&q=80" alt="Priya N." />
+            </div>
+            <div>
+              <div class="testi-name">Priya Nair</div>
+              <div class="testi-role">Founder, Solace App</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section style="background: rgba(30,41,59,0.3);">
+    <div class="section-inner">
+      <div class="section-label">The Team</div>
+      <h2 class="section-title">Meet the Makers</h2>
+      <p class="section-sub">A small, senior team with big agency experience and startup speed.</p>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-avatar">
+            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=160&h=160&fit=crop&crop=face&auto=format&q=80" alt="Alex Chen" />
+          </div>
+          <div class="team-name">Alex Chen</div>
+          <div class="team-role">Creative Director</div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=160&h=160&fit=crop&crop=face&auto=format&q=80" alt="Maya Patel" />
+          </div>
+          <div class="team-name">Maya Patel</div>
+          <div class="team-role">Lead Designer</div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&h=160&fit=crop&crop=face&auto=format&q=80" alt="Jordan Lee" />
+          </div>
+          <div class="team-name">Jordan Lee</div>
+          <div class="team-role">Full-Stack Engineer</div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">
+            <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=160&h=160&fit=crop&crop=face&auto=format&q=80" alt="Zara Osei" />
+          </div>
+          <div class="team-name">Zara Osei</div>
+          <div class="team-role">Brand Strategist</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing">
+    <div class="section-inner">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <p class="section-sub">No hidden fees. Pay for what you need, scale when you grow.</p>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-name">Starter</div>
+          <div class="pricing-price">$4,500<span>/project</span></div>
+          <div class="pricing-desc">Perfect for early-stage startups and landing pages.</div>
+          <ul class="pricing-features">
+            <li>Up to 8 pages</li>
+            <li>Responsive design</li>
+            <li>CMS integration</li>
+            <li>2 rounds of revisions</li>
+            <li>30-day support</li>
+          </ul>
+          <a href="#contact" class="pricing-btn pricing-btn-outline">Get Started</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Most Popular</div>
+          <div class="pricing-name">Growth</div>
+          <div class="pricing-price">$12,000<span>/project</span></div>
+          <div class="pricing-desc">For growing companies with complex needs and custom features.</div>
+          <ul class="pricing-features">
+            <li>Unlimited pages</li>
+            <li>Custom animations</li>
+            <li>API & integrations</li>
+            <li>Unlimited revisions</li>
+            <li>90-day support</li>
+            <li>Performance audit</li>
+          </ul>
+          <a href="#contact" class="pricing-btn pricing-btn-solid">Get Started</a>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-name">Enterprise</div>
+          <div class="pricing-price">Custom</div>
+          <div class="pricing-desc">Full-scale digital transformation for established organizations.</div>
+          <ul class="pricing-features">
+            <li>Dedicated team</li>
+            <li>Design system</li>
+            <li>Ongoing retainer</li>
+            <li>SLA guarantee</li>
+            <li>Priority support</li>
+            <li>Quarterly reviews</li>
+          </ul>
+          <a href="#contact" class="pricing-btn pricing-btn-outline">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog -->
+  <section id="blog" style="background: rgba(30,41,59,0.3);">
+    <div class="section-inner">
+      <div class="section-label">Journal</div>
+      <h2 class="section-title">From the Blog</h2>
+      <p class="section-sub">Thoughts on design, development, and building great digital products.</p>
+      <div class="blog-grid">
+        <div class="blog-card">
+          <div class="blog-card-img">
+            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=180&fit=crop&auto=format&q=80" alt="Design systems post" />
+          </div>
+          <div class="blog-date">March 12, 2026</div>
+          <h3 class="blog-title">Why Every Product Team Needs a Design System in 2026</h3>
+          <p class="blog-excerpt">Design systems aren't just for big companies anymore. Here's how to build one that actually scales — and why it pays for itself in weeks.</p>
+          <a href="#" class="blog-read">Read article →</a>
+        </div>
+        <div class="blog-card">
+          <div class="blog-card-img">
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=180&fit=crop&auto=format&q=80" alt="Performance post" />
+          </div>
+          <div class="blog-date">February 28, 2026</div>
+          <h3 class="blog-title">The Hidden Cost of a Slow Website (And How to Fix It)</h3>
+          <p class="blog-excerpt">Every 100ms of latency costs real money. We break down exactly how performance affects revenue and the practical steps to fix it fast.</p>
+          <a href="#" class="blog-read">Read article →</a>
+        </div>
+        <div class="blog-card">
+          <div class="blog-card-img">
+            <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&h=180&fit=crop&auto=format&q=80" alt="Conversion post" />
+          </div>
+          <div class="blog-date">February 10, 2026</div>
+          <h3 class="blog-title">10 Conversion Rate Wins You Can Ship in an Afternoon</h3>
+          <p class="blog-excerpt">Quick wins that compound. From micro-copy tweaks to CTA placement, these evidence-backed changes move the needle fast.</p>
+          <a href="#" class="blog-read">Read article →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <div class="section-inner">
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Common Questions</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q">How long does a typical project take? <span>+</span></div>
+          <div class="faq-a">Most projects take 6–12 weeks depending on scope. We'll give you a detailed timeline in the proposal phase.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Do you work with early-stage startups? <span>+</span></div>
+          <div class="faq-a">Absolutely. Some of our favorite projects started as napkin sketches. We offer flexible payment plans for early-stage teams.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">What technologies do you use? <span>+</span></div>
+          <div class="faq-a">We're stack-agnostic — React, Next.js, Vue, Svelte, Webflow, whatever fits your needs and team. We'll recommend the right tool for the job.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Do you offer ongoing maintenance? <span>+</span></div>
+          <div class="faq-a">Yes. All projects include a support window, and we offer monthly retainer packages for ongoing work, updates, and performance monitoring.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="contact">
+    <div class="section-inner">
+      <h2>Ready to build something great?</h2>
+      <p>Tell us about your project and we'll get back within 24 hours.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <a href="mailto:hello@luminarystudio.com" class="btn-primary">hello@luminarystudio.com</a>
+        <a href="/" class="btn-outline">← Back to n3ware</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">Luminary<span style="color:var(--blue)">Studio</span></div>
+        <p>Award-winning digital studio crafting remarkable products for ambitious teams. Based in San Francisco, working worldwide.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Work</h4>
+        <ul>
+          <li><a href="#">Web Design</a></li>
+          <li><a href="#">Mobile Apps</a></li>
+          <li><a href="#">Branding</a></li>
+          <li><a href="#">Case Studies</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 LuminaryStudio. All rights reserved.</span>
+      <span style="color:var(--blue);font-size:12px;">Powered by <a href="/" style="color:var(--blue);font-weight:700;">n3ware</a></span>
+    </div>
+  </footer>
+
+  <!-- n3ware editor -->
+  <script src="/n3ware.js"></script>
+</body>
+</html>
