@@ -146,13 +146,25 @@
      style="background:rgba(0,0,0,0.7)" onclick="closeCreateModal(event)">
   <div class="modal-card bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
        onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-700 sticky top-0 bg-slate-800">
-      <h2 class="text-lg font-bold">Create New Site</h2>
-      <button onclick="closeCreateModal()" class="text-slate-400 hover:text-white transition">
+
+    <!-- Modal header -->
+    <div class="flex items-center justify-between px-6 pt-6 pb-0 sticky top-0 bg-slate-800 z-10">
+      <h2 class="text-lg font-bold pb-4">Create New Site</h2>
+      <button onclick="closeCreateModal()" class="text-slate-400 hover:text-white transition pb-4">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <div class="p-6">
+
+    <!-- Create mode tabs -->
+    <div class="flex gap-1 px-6 bg-slate-800 border-b border-slate-700">
+      <button onclick="switchCreateTab('template')" id="ctab-template"
+        class="tab-btn active text-sm font-semibold px-4 py-2.5 rounded-t-lg text-white bg-slate-700">From Template</button>
+      <button onclick="switchCreateTab('import')" id="ctab-import"
+        class="tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg text-slate-400 hover:text-white">Import Website</button>
+    </div>
+
+    <!-- ── Template tab ── -->
+    <div id="create-tab-template" class="settings-tab active p-6">
       <div class="mb-6">
         <label class="block text-sm font-medium text-slate-300 mb-1.5">Site Name</label>
         <input type="text" id="new-site-name" placeholder="My Awesome Site" class="w-full rounded-xl px-4 py-3 text-sm">
@@ -166,6 +178,76 @@
         Create Site
       </button>
     </div>
+
+    <!-- ── Import tab ── -->
+    <div id="create-tab-import" class="settings-tab p-6">
+
+      <!-- Step 1: URL input -->
+      <div id="import-step-url">
+        <p class="text-sm text-slate-400 mb-5">Paste your existing website URL. n3ware will scrape it, strip the CMS bloat, and convert it to clean HTML ready for visual editing.</p>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-300 mb-1.5">Website URL</label>
+          <input type="url" id="import-url" placeholder="https://yourbusiness.com"
+            class="w-full rounded-xl px-4 py-3 text-sm"
+            onkeydown="if(event.key==='Enter')scanWebsite()">
+        </div>
+        <button onclick="scanWebsite()" id="scan-btn"
+          class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition text-sm">
+          Scan Website
+        </button>
+        <p id="scan-error" class="text-red-400 text-sm mt-3 hidden"></p>
+      </div>
+
+      <!-- Step 2: Preview + confirm -->
+      <div id="import-step-preview" class="hidden">
+        <div id="import-preview-card" class="bg-slate-700/50 border border-slate-600 rounded-2xl p-5 mb-5"></div>
+        <div class="mb-5">
+          <label class="block text-sm font-medium text-slate-300 mb-1.5">Site Name</label>
+          <input type="text" id="import-site-name" placeholder="Imported Site"
+            class="w-full rounded-xl px-4 py-3 text-sm">
+        </div>
+        <div class="flex gap-3">
+          <button onclick="resetImport()"
+            class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold py-3 rounded-xl transition text-sm">← Back</button>
+          <button onclick="startImport()" id="import-btn"
+            class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">
+            Import &amp; Edit
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: In-progress -->
+      <div id="import-step-progress" class="hidden text-center py-6">
+        <div class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg class="w-8 h-8 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </div>
+        <p id="import-status-text" class="text-slate-300 font-semibold mb-3">Scanning website…</p>
+        <div class="w-full bg-slate-700 rounded-full h-2 mb-2 max-w-xs mx-auto">
+          <div id="import-progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-700" style="width:0%"></div>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">This may take up to 30 seconds</p>
+      </div>
+
+      <!-- Step 4: Complete -->
+      <div id="import-step-done" class="hidden text-center py-6">
+        <div class="w-16 h-16 bg-emerald-600/20 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <p class="text-xl font-bold text-white mb-1">Import Complete!</p>
+        <p id="import-done-text" class="text-slate-400 text-sm mb-5"></p>
+        <div id="import-report" class="bg-slate-700/50 rounded-xl p-4 text-left text-sm mb-5 space-y-1.5 max-w-sm mx-auto"></div>
+        <button onclick="openImportedSite()"
+          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">
+          Open in Editor →
+        </button>
+      </div>
+
+    </div><!-- /import tab -->
   </div>
 </div>
 
@@ -488,12 +570,27 @@ async function loadAnalyticsBadges() {
 function openCreateModal() {
   renderTemplateGrid();
   document.getElementById('new-site-name').value = '';
+  switchCreateTab('template');
+  resetImport();
   document.getElementById('create-modal').classList.add('open');
   document.getElementById('new-site-name').focus();
 }
 function closeCreateModal(e) {
   if (e && e.target !== document.getElementById('create-modal')) return;
   document.getElementById('create-modal').classList.remove('open');
+  resetImport();
+}
+
+// ── Create modal tab switching ────────────────────────────────────────────────
+function switchCreateTab(tab) {
+  ['template', 'import'].forEach(t => {
+    document.getElementById(`create-tab-${t}`).classList.toggle('active', t === tab);
+    const btn = document.getElementById(`ctab-${t}`);
+    btn.className = t === tab
+      ? 'tab-btn active text-sm font-semibold px-4 py-2.5 rounded-t-lg text-white bg-slate-700'
+      : 'tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg text-slate-400 hover:text-white';
+  });
+  if (tab === 'import') document.getElementById('import-url').focus();
 }
 function renderTemplateGrid() {
   const container = document.getElementById('template-grid');
@@ -540,6 +637,141 @@ async function createSite() {
     window.open(`/sites/${data.site.id}`, '_blank');
   } catch (err) { toast('Create failed: ' + err.message, 'error'); }
   finally { btn.disabled = false; btn.textContent = 'Create Site'; }
+}
+
+// ── Import flow ───────────────────────────────────────────────────────────────
+let _importJobId    = null;
+let _importSiteId   = null;
+let _importPollTimer = null;
+
+function resetImport() {
+  if (_importPollTimer) { clearInterval(_importPollTimer); _importPollTimer = null; }
+  _importJobId  = null;
+  _importSiteId = null;
+  const urlInput = document.getElementById('import-url');
+  if (urlInput) urlInput.value = '';
+  const nameInput = document.getElementById('import-site-name');
+  if (nameInput) nameInput.value = '';
+  const errEl = document.getElementById('scan-error');
+  if (errEl) errEl.classList.add('hidden');
+  _importStep('url');
+}
+
+function _importStep(step) {
+  ['url', 'preview', 'progress', 'done'].forEach(s => {
+    const el = document.getElementById(`import-step-${s}`);
+    if (el) el.classList.toggle('hidden', s !== step);
+  });
+}
+
+async function scanWebsite() {
+  const url = (document.getElementById('import-url').value || '').trim();
+  if (!url) return;
+  const btn  = document.getElementById('scan-btn');
+  const errEl = document.getElementById('scan-error');
+  errEl.classList.add('hidden');
+  btn.disabled = true; btn.textContent = 'Scanning…';
+  try {
+    const data = await api('POST', '/api/migrate/scrape', { url });
+    _importJobId = data.jobId;
+    _showScrapePreview(data.scraped, url);
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Scan Website';
+  }
+}
+
+function _showScrapePreview(scraped, url) {
+  const card = document.getElementById('import-preview-card');
+  const imgs = scraped.images || [];
+  const thumbs = imgs.slice(0, 3).map(i =>
+    `<img src="${esc(i.src)}" alt="${esc(i.alt)}" class="w-14 h-14 object-cover rounded-lg shrink-0" onerror="this.style.display='none'">`
+  ).join('');
+  card.innerHTML = `
+    <div class="flex items-start gap-4 mb-4">
+      ${thumbs ? `<div class="flex gap-1.5 shrink-0">${thumbs}</div>` : ''}
+      <div class="min-w-0">
+        <p class="font-semibold text-white truncate">${esc(scraped.title || url)}</p>
+        ${scraped.description ? `<p class="text-xs text-slate-400 mt-0.5 line-clamp-2">${esc(scraped.description)}</p>` : ''}
+        <p class="text-xs text-blue-400 mt-1 truncate">${esc(scraped.finalUrl || url)}</p>
+      </div>
+    </div>
+    <div class="flex gap-4 text-xs text-slate-400">
+      <span>🖼 ${scraped.imageCount || 0} image${scraped.imageCount !== 1 ? 's' : ''}</span>
+      <span>🎨 ${scraped.styleCount || 0} stylesheet${scraped.styleCount !== 1 ? 's' : ''}</span>
+      <span class="text-emerald-400">✓ Ready to import</span>
+    </div>`;
+  document.getElementById('import-site-name').value = scraped.title || '';
+  _importStep('preview');
+}
+
+async function startImport() {
+  const url      = (document.getElementById('import-url').value || '').trim();
+  const siteName = (document.getElementById('import-site-name').value || '').trim();
+  const btn      = document.getElementById('import-btn');
+  btn.disabled = true; btn.textContent = 'Starting…';
+  try {
+    const data = await api('POST', '/api/migrate/import', { url, jobId: _importJobId, siteName });
+    _importJobId = data.jobId;
+    _importStep('progress');
+    _pollImport();
+  } catch (err) {
+    toast('Import failed: ' + err.message, 'error');
+    btn.disabled = false; btn.textContent = 'Import & Edit';
+  }
+}
+
+function _pollImport() {
+  const STATUS_MAP = {
+    scraping:  { text: 'Scraping website…',         pct: 20 },
+    analyzing: { text: 'Analyzing with AI…',         pct: 55 },
+    importing: { text: 'Importing & re-hosting images…', pct: 80 },
+    complete:  { text: 'Done!',                       pct: 100 },
+    failed:    { text: 'Import failed',               pct: 0 },
+  };
+  _importPollTimer = setInterval(async () => {
+    try {
+      const data = await fetch(`/api/migrate/status/${_importJobId}`).then(r => r.json());
+      const info = STATUS_MAP[data.status] || { text: data.status, pct: data.progress || 0 };
+      document.getElementById('import-status-text').textContent = info.text;
+      document.getElementById('import-progress-bar').style.width = `${info.pct}%`;
+      if (data.status === 'complete') {
+        clearInterval(_importPollTimer); _importPollTimer = null;
+        _importSiteId = data.siteId;
+        _showImportDone(data.report);
+        loadSites();
+      } else if (data.status === 'failed') {
+        clearInterval(_importPollTimer); _importPollTimer = null;
+        _importStep('url');
+        toast('Import failed: ' + (data.error || 'Unknown error'), 'error');
+      }
+    } catch { /* keep polling */ }
+  }, 1500);
+}
+
+function _showImportDone(report) {
+  _importStep('done');
+  document.getElementById('import-done-text').textContent =
+    report && report.siteName ? `"${report.siteName}" is ready to edit.` : 'Your site is ready to edit.';
+  if (report) {
+    const warnings = (report.warnings || []).map(w =>
+      `<p class="text-yellow-400 text-xs">⚠ ${esc(w)}</p>`).join('');
+    document.getElementById('import-report').innerHTML =
+      `<p class="text-slate-300">✓ ${report.sectionsFound || 0} sections found</p>` +
+      `<p class="text-slate-300">✓ ${report.imagesProcessed || 0} images imported</p>` +
+      `<p class="text-slate-300">✓ ${report.linesRemoved || 0} bloat lines removed</p>` +
+      warnings;
+  }
+}
+
+function openImportedSite() {
+  if (_importSiteId) {
+    document.getElementById('create-modal').classList.remove('open');
+    resetImport();
+    window.open(`/sites/${_importSiteId}`, '_blank');
+  }
 }
 
 // ── Revisions ─────────────────────────────────────────────────────────────────

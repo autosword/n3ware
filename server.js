@@ -14,6 +14,7 @@ const billingApi   = require('./src/api/billing');
 const domainsApi   = require('./src/api/domains');
 const uploadsApi   = require('./src/api/uploads');
 const analyticsApi = require('./src/api/analytics-routes');
+const migrateApi   = require('./src/api/migrate');
 
 // Initialize integrations (logs mock-mode notices)
 require('./src/integrations');
@@ -72,6 +73,9 @@ app.use('/api/uploads', uploadsApi);
 
 // ── Analytics ─────────────────────────────────────────────────────────────────
 app.use('/api/analytics', analyticsApi);
+
+// ── Migration ─────────────────────────────────────────────────────────────────
+app.use('/api/migrate', migrateApi);
 
 // ── Cache stats (internal) ───────────────────────────────────────────────────
 app.get('/api/cache/stats', (req, res) => {

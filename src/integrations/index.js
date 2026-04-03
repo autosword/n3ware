@@ -6,11 +6,13 @@
  * Each logs a notice if running in mock mode.
  */
 
-const stripe      = require('./stripe');
-const email       = require('./email');
-const cloudflare  = require('./cloudflare');
+const stripe       = require('./stripe');
+const email        = require('./email');
+const cloudflare   = require('./cloudflare');
 const storageCloud = require('./storage-cloud');
-const analytics   = require('./analytics');
+const analytics    = require('./analytics');
+const scraper      = require('./scraper');
+const migrator     = require('./migrator');
 
 // Log which integrations are running in mock mode at startup.
 const mocks = [];
@@ -27,6 +29,9 @@ if (!process.env.CLOUDFLARE_API_TOKEN) {
 if (!process.env.R2_ACCESS_KEY_ID && !process.env.GCS_BUCKET) {
   mocks.push('storage-cloud');
 }
+if (!process.env.ANTHROPIC_API_KEY) {
+  mocks.push('migrator (cheerio)');
+}
 
 // Analytics is always local in this version.
 mocks.push('analytics (local)');
@@ -35,4 +40,4 @@ if (mocks.length > 0) {
   console.log(`[integrations] Mock mode active for: ${mocks.join(', ')}`);
 }
 
-module.exports = { stripe, email, cloudflare, storageCloud, analytics };
+module.exports = { stripe, email, cloudflare, storageCloud, analytics, scraper, migrator };

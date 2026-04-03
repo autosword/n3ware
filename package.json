@@ -18,9 +18,11 @@
   "author": "autosword",
   "license": "MIT",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
     "@google-cloud/firestore": "^7.11.6",
     "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^3.0.3",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
