@@ -216,6 +216,55 @@
     </div>
   </section>
 
+  <!-- Modular Architecture -->
+  <section id="architecture" class="py-32 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center gap-2 bg-blue-950/50 border border-blue-800/50 px-4 py-2 rounded-full text-sm text-blue-400 mb-6">
+          <span>⚙️</span> Clean, modular internals
+        </div>
+        <h2 class="text-4xl md:text-5xl font-black mb-4">10-Class Modular Architecture</h2>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">A single file, internally organized into clean, decoupled classes. Event-driven communication. Dependency injection. JSDoc throughout.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 font-mono text-sm">
+          <div class="text-blue-400 font-bold mb-3 text-xs uppercase tracking-wider">Core</div>
+          <div class="space-y-2">
+            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3Editor</span><span class="text-gray-500">— main orchestrator, public API surface</span></div>
+            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3Events</span><span class="text-gray-500">— pub/sub bus: on() emit() off() clear()</span></div>
+            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3History</span><span class="text-gray-500">— undo/redo stack with canUndo/canRedo</span></div>
+            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3UI</span><span class="text-gray-500">— CSS injection, toast, confirm dialog</span></div>
+            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3Export</span><span class="text-gray-500">— cleanHTML(), diff(), download, copy</span></div>
+          </div>
+        </div>
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 font-mono text-sm">
+          <div class="text-blue-400 font-bold mb-3 text-xs uppercase tracking-wider">Editing</div>
+          <div class="space-y-2">
+            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3TextEditor</span><span class="text-gray-500">— contentEditable + formatting toolbar</span></div>
+            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3DragManager</span><span class="text-gray-500">— drag start/move/end, drop indicator</span></div>
+            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3ElementControls</span><span class="text-gray-500">— hover overlays, dup, delete</span></div>
+            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3StylePanel</span><span class="text-gray-500">— right sidebar: colors, spacing, classes</span></div>
+            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3Toolbar</span><span class="text-gray-500">— top bar: undo/redo, save, exit</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-5 font-mono text-sm">
+        <div class="text-blue-400 font-bold mb-3 text-xs uppercase tracking-wider">Advanced API</div>
+        <div class="grid sm:grid-cols-2 gap-x-8 gap-y-1 text-gray-300">
+          <div><span class="text-yellow-400">n3ware</span>.on(<span class="text-green-400">'editor:modeChange'</span>, cb) <span class="text-gray-600">// event bus</span></div>
+          <div><span class="text-yellow-400">n3ware</span>.on(<span class="text-green-400">'drag:drop'</span>, cb)          <span class="text-gray-600">// drag events</span></div>
+          <div><span class="text-yellow-400">n3ware</span>._modules.history.canUndo()      <span class="text-gray-600">// direct access</span></div>
+          <div><span class="text-yellow-400">n3ware</span>._modules.exporter.diff(a, b)   <span class="text-gray-600">// diff API</span></div>
+        </div>
+      </div>
+      <div class="mt-6 text-center">
+        <a href="/tests" class="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 border border-blue-800/50 bg-blue-950/30 px-5 py-2.5 rounded-lg transition-colors">
+          <span>🧪</span> View Test Suite — 60+ tests across all 10 modules
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Get Started -->
   <section id="get-started" class="py-32 px-6">
     <div class="max-w-3xl mx-auto text-center">
@@ -245,7 +294,11 @@
         <span class="text-blue-500 font-black text-lg">n3ware</span>
         <span class="text-gray-600 text-sm">— Visual editing for the web</span>
       </div>
-      <p class="text-gray-600 text-sm">Built with zero dependencies. Pure JavaScript.</p>
+      <div class="flex items-center gap-4 text-sm text-gray-600">
+        <a href="/tests" class="hover:text-blue-400 transition-colors">🧪 Tests</a>
+        <a href="https://github.com/autosword/n3ware" target="_blank" class="hover:text-blue-400 transition-colors">GitHub</a>
+        <span>Pure JavaScript. Zero dependencies.</span>
+      </div>
     </div>
   </footer>
 

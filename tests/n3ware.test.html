@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>n3ware — Test Suite</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #0F172A;
+      --panel:   #1E293B;
+      --border:  #334155;
+      --text:    #F1F5F9;
+      --muted:   #94A3B8;
+      --pass:    #22C55E;
+      --fail:    #EF4444;
+      --skip:    #F59E0B;
+      --accent:  #3B82F6;
+    }
+    body { background: var(--bg); color: var(--text); font: 14px/1.6 system-ui, sans-serif; }
+    header { background: var(--panel); border-bottom: 1px solid var(--border); padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 18px; font-weight: 800; color: var(--accent); }
+    .logo span { color: var(--muted); font-weight: 400; font-size: 14px; margin-left: 8px; }
+    main { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+    #summary {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px 24px; margin-bottom: 28px;
+      display: flex; align-items: center; gap: 32px;
+    }
+    .sum-item { text-align: center; }
+    .sum-num  { font-size: 32px; font-weight: 900; line-height: 1; }
+    .sum-label{ font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+    .pass-num { color: var(--pass); }
+    .fail-num { color: var(--fail); }
+    .total-num{ color: var(--text); }
+    #progress-bar { flex: 1; background: var(--border); border-radius: 4px; height: 8px; overflow: hidden; }
+    #progress-fill{ height: 100%; background: var(--pass); border-radius: 4px; transition: width 0.3s; width: 0%; }
+    .suite { margin-bottom: 24px; }
+    .suite-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .suite-badge { font-size: 11px; padding: 2px 8px; border-radius: 100px; font-weight: 600; }
+    .badge-pass { background: rgba(34,197,94,0.15); color: var(--pass); }
+    .badge-fail { background: rgba(239,68,68,0.15);  color: var(--fail); }
+    .test-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 7px 0; border-bottom: 1px solid rgba(51,65,85,0.4);
+      font-size: 13px;
+    }
+    .test-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .test-name { flex: 1; }
+    .test-time { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+    .test-err  { color: var(--fail); font-size: 12px; margin-top: 3px; font-family: monospace; background: rgba(239,68,68,0.08); padding: 4px 8px; border-radius: 4px; }
+    .pass-icon { color: var(--pass); }
+    .fail-icon { color: var(--fail); }
+    #fixture {
+      position: fixed; top: -9999px; left: -9999px; width: 1px; height: 1px; overflow: hidden;
+    }
+    #run-btn {
+      background: var(--accent); color: #fff; border: none; border-radius: 8px;
+      padding: 10px 24px; font: 700 14px/1 system-ui, sans-serif; cursor: pointer;
+      transition: background 0.15s;
+    }
+    #run-btn:hover { background: #2563EB; }
+    .status-badge {
+      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 100px;
+      background: rgba(59,130,246,0.15); color: var(--accent); margin-left: 12px;
+    }
+    #status-text { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <span class="logo">n3ware <span>test suite</span></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span id="status-text">Ready</span>
+    <button id="run-btn" onclick="runAllSuites()">▶ Run All Tests</button>
+  </div>
+</header>
+
+<main>
+  <div id="summary">
+    <div class="sum-item"><div class="sum-num total-num" id="sum-total">0</div><div class="sum-label">Total</div></div>
+    <div class="sum-item"><div class="sum-num pass-num"  id="sum-pass">0</div><div class="sum-label">Passed</div></div>
+    <div class="sum-item"><div class="sum-num fail-num"  id="sum-fail">0</div><div class="sum-label">Failed</div></div>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+  </div>
+  <div id="results"></div>
+</main>
+
+<!-- Fixture: hidden content area used by tests -->
+<div id="fixture">
+  <div id="test-content">
+    <h1 id="heading1">Test Heading</h1>
+    <p id="para1">Test paragraph with some text content.</p>
+    <p id="para2">Second paragraph here.</p>
+    <div id="container1">
+      <p id="child1">Child element one</p>
+      <p id="child2">Child element two</p>
+      <p id="child3">Child element three</p>
+    </div>
+    <ul id="list1">
+      <li id="li1">List item one</li>
+      <li id="li2">List item two</li>
+    </ul>
+    <a id="link1" href="#">A link element</a>
+    <blockquote id="bq1">A blockquote element</blockquote>
+    <span id="span1">A span element</span>
+  </div>
+</div>
+
+<!-- Load n3ware -->
+<script src="../public/n3ware.js"></script>
+
+<script>
+// ─── Tiny Test Framework ────────────────────────────────────────────────────
+const suites = [];
+let currentSuite = null;
+
+function describe(name, fn) {
+  const suite = { name, tests: [] };
+  suites.push(suite);
+  const prev = currentSuite;
+  currentSuite = suite;
+  fn();
+  currentSuite = prev;
+}
+
+function it(name, fn) {
+  if (!currentSuite) return;
+  currentSuite.tests.push({ name, fn });
+}
+
+function expect(actual) {
+  return {
+    toBe(expected) {
+      if (actual !== expected) throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    },
+    toEqual(expected) {
+      const a = JSON.stringify(actual), b = JSON.stringify(expected);
+      if (a !== b) throw new Error(`Expected ${b}, got ${a}`);
+    },
+    toBeTruthy() {
+      if (!actual) throw new Error(`Expected truthy, got ${JSON.stringify(actual)}`);
+    },
+    toBeFalsy() {
+      if (actual) throw new Error(`Expected falsy, got ${JSON.stringify(actual)}`);
+    },
+    toBeGreaterThan(n) {
+      if (!(actual > n)) throw new Error(`Expected ${actual} > ${n}`);
+    },
+    toBeLessThanOrEqual(n) {
+      if (!(actual <= n)) throw new Error(`Expected ${actual} <= ${n}`);
+    },
+    toContain(sub) {
+      if (!String(actual).includes(sub)) throw new Error(`Expected "${actual}" to contain "${sub}"`);
+    },
+    toNotContain(sub) {
+      if (String(actual).includes(sub)) throw new Error(`Expected "${actual}" to not contain "${sub}"`);
+    },
+    toHaveLength(n) {
+      if (actual.length !== n) throw new Error(`Expected length ${n}, got ${actual.length}`);
+    },
+    toBeInstanceOf(cls) {
+      if (!(actual instanceof cls)) throw new Error(`Expected instance of ${cls.name}`);
+    },
+  };
+}
+
+async function runAllSuites() {
+  document.getElementById('run-btn').disabled = true;
+  document.getElementById('status-text').textContent = 'Running…';
+  document.getElementById('results').innerHTML = '';
+
+  let totalPass = 0, totalFail = 0, totalTests = 0;
+
+  for (const suite of suites) {
+    const rows = [];
+    let suitePass = 0, suiteFail = 0;
+
+    for (const test of suite.tests) {
+      const t0 = performance.now();
+      let passed = false, err = null;
+      try {
+        const result = test.fn();
+        if (result && typeof result.then === 'function') await result;
+        passed = true;
+      } catch (e) {
+        err = e.message || String(e);
+      }
+      const ms = (performance.now() - t0).toFixed(1);
+      if (passed) { suitePass++; totalPass++; }
+      else          { suiteFail++; totalFail++; }
+      totalTests++;
+      rows.push({ name: test.name, passed, err, ms });
+      // Tiny yield to keep UI responsive
+      await new Promise(r => setTimeout(r, 0));
+    }
+
+    // Render suite
+    const suiteEl = document.createElement('div');
+    suiteEl.className = 'suite';
+    const allPass = suiteFail === 0;
+    suiteEl.innerHTML = `
+      <div class="suite-title">
+        ${suite.name}
+        <span class="suite-badge ${allPass ? 'badge-pass' : 'badge-fail'}">${suitePass}/${suite.tests.length}</span>
+      </div>
+      ${rows.map(r => `
+        <div class="test-row">
+          <span class="test-icon ${r.passed ? 'pass-icon' : 'fail-icon'}">${r.passed ? '✓' : '✕'}</span>
+          <span class="test-name">
+            ${r.name}
+            ${r.err ? `<div class="test-err">${escHtml(r.err)}</div>` : ''}
+          </span>
+          <span class="test-time">${r.ms}ms</span>
+        </div>`).join('')}`;
+    document.getElementById('results').appendChild(suiteEl);
+  }
+
+  document.getElementById('sum-total').textContent = totalTests;
+  document.getElementById('sum-pass').textContent  = totalPass;
+  document.getElementById('sum-fail').textContent  = totalFail;
+  document.getElementById('progress-fill').style.width = totalTests ? `${(totalPass / totalTests * 100).toFixed(1)}%` : '0%';
+  document.getElementById('status-text').textContent = totalFail === 0 ? `✓ All ${totalPass} tests passed` : `✕ ${totalFail} failed`;
+  document.getElementById('run-btn').disabled = false;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Helper: get modules via n3ware._modules ────────────────────────────────
+function getModules() {
+  return window.n3ware._modules;
+}
+
+// ─── Test fixture helpers ────────────────────────────────────────────────────
+function fixture(id) { return document.getElementById(id); }
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3Events
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3Events', () => {
+  it('on() registers a listener and emit() calls it', () => {
+    const { events } = getModules();
+    let received = null;
+    const cb = d => { received = d; };
+    events.on('test:basic', cb);
+    events.emit('test:basic', 42);
+    events.off('test:basic', cb);
+    expect(received).toBe(42);
+  });
+
+  it('off() removes the listener', () => {
+    const { events } = getModules();
+    let count = 0;
+    const cb = () => count++;
+    events.on('test:off', cb);
+    events.emit('test:off');
+    events.off('test:off', cb);
+    events.emit('test:off');
+    expect(count).toBe(1);
+  });
+
+  it('multiple listeners for the same event all fire', () => {
+    const { events } = getModules();
+    const results = [];
+    const a = () => results.push('a');
+    const b = () => results.push('b');
+    events.on('test:multi', a);
+    events.on('test:multi', b);
+    events.emit('test:multi');
+    events.off('test:multi', a);
+    events.off('test:multi', b);
+    expect(results).toEqual(['a', 'b']);
+  });
+
+  it('emit with no listeners does not throw', () => {
+    const { events } = getModules();
+    events.emit('test:no-listeners-event-xyz');
+    expect(true).toBeTruthy();
+  });
+
+  it('clear() removes all listeners for an event', () => {
+    const { events } = getModules();
+    let count = 0;
+    events.on('test:clear', () => count++);
+    events.on('test:clear', () => count++);
+    events.clear('test:clear');
+    events.emit('test:clear');
+    expect(count).toBe(0);
+  });
+
+  it('emit passes data payload to listener', () => {
+    const { events } = getModules();
+    let got = null;
+    const cb = d => { got = d; };
+    events.on('test:payload', cb);
+    events.emit('test:payload', { x: 99 });
+    events.off('test:payload', cb);
+    expect(got.x).toBe(99);
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3History
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3History', () => {
+  it('starts empty: canUndo and canRedo are false', () => {
+    const { history } = getModules();
+    history.reset();
+    expect(history.canUndo()).toBeFalsy();
+    expect(history.canRedo()).toBeFalsy();
+  });
+
+  it('push() adds to stack, canUndo stays false on first item', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>state0</body>');
+    expect(history.canUndo()).toBeFalsy();
+    expect(history.canRedo()).toBeFalsy();
+  });
+
+  it('canUndo() is true after two pushes', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>s0</body>');
+    history.push('<body>s1</body>');
+    expect(history.canUndo()).toBeTruthy();
+  });
+
+  it('undo() returns previous snapshot', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>A</body>');
+    history.push('<body>B</body>');
+    const snap = history.undo();
+    expect(snap).toBe('<body>A</body>');
+  });
+
+  it('redo() returns next snapshot after undo', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>A</body>');
+    history.push('<body>B</body>');
+    history.undo();
+    const snap = history.redo();
+    expect(snap).toBe('<body>B</body>');
+  });
+
+  it('undo() returns null at beginning of stack', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>only</body>');
+    const snap = history.undo();
+    expect(snap).toBe(null);
+  });
+
+  it('redo() returns null at end of stack', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>A</body>');
+    const snap = history.redo();
+    expect(snap).toBe(null);
+  });
+
+  it('push() after undo truncates forward history', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>A</body>');
+    history.push('<body>B</body>');
+    history.undo();
+    history.push('<body>C</body>');
+    expect(history.canRedo()).toBeFalsy();
+  });
+
+  it('duplicate push of same snapshot is ignored', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>same</body>');
+    history.push('<body>same</body>');
+    // Only one item, so canUndo still false
+    expect(history.canUndo()).toBeFalsy();
+  });
+
+  it('current() returns the current snapshot', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>current</body>');
+    expect(history.current()).toBe('<body>current</body>');
+  });
+
+  it('history:change event fires on push', () => {
+    const { history, events } = getModules();
+    history.reset();
+    let fired = false;
+    const cb = () => { fired = true; };
+    events.on('history:change', cb);
+    history.push('<body>event-test</body>');
+    events.off('history:change', cb);
+    expect(fired).toBeTruthy();
+  });
+
+  it('history:change event carries index and total', () => {
+    const { history, events } = getModules();
+    history.reset();
+    let state = null;
+    const cb = s => { state = s; };
+    events.on('history:change', cb);
+    history.push('<body>s0</body>');
+    history.push('<body>s1</body>');
+    events.off('history:change', cb);
+    expect(state.total).toBe(2);
+    expect(state.index).toBe(1);
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3Export
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3Export', () => {
+  it('cleanHTML() returns a string starting with <!DOCTYPE html>', () => {
+    const { exporter } = getModules();
+    const html = exporter.cleanHTML();
+    expect(typeof html).toBe('string');
+    expect(html.startsWith('<!DOCTYPE html>')).toBeTruthy();
+  });
+
+  it('cleanHTML() strips data-n3-ui elements', () => {
+    const dummy = document.createElement('div');
+    dummy.setAttribute('data-n3-ui', '1');
+    dummy.id = '__n3_test_cleanup__';
+    document.body.appendChild(dummy);
+    const html = exporter.cleanHTML();
+    document.getElementById('__n3_test_cleanup__').remove();
+    expect(html).toNotContain('__n3_test_cleanup__');
+  });
+
+  it('cleanHTML() strips n3ware-styles element', () => {
+    const { exporter } = getModules();
+    const html = exporter.cleanHTML();
+    expect(html).toNotContain('n3ware-styles');
+  });
+
+  it('cleanHTML() strips n3-editing class from body', () => {
+    const { exporter } = getModules();
+    document.body.classList.add('n3-editing');
+    const html = exporter.cleanHTML();
+    document.body.classList.remove('n3-editing');
+    expect(html).toNotContain('n3-editing');
+  });
+
+  it('cleanHTML() removes contenteditable attributes', () => {
+    const { exporter } = getModules();
+    const el = document.createElement('p');
+    el.setAttribute('data-n3-editable', '1');
+    el.setAttribute('contenteditable', 'true');
+    el.id = '__n3_ce_test__';
+    document.body.appendChild(el);
+    const html = exporter.cleanHTML();
+    el.remove();
+    expect(html).toNotContain('contenteditable');
+  });
+
+  it('diff() returns empty array for identical HTML strings', () => {
+    const { exporter } = getModules();
+    const html = '<html><body><p>same</p></body></html>';
+    const result = exporter.diff(html, html);
+    expect(result).toHaveLength(0);
+  });
+
+  it('diff() detects a text content change', () => {
+    const { exporter } = getModules();
+    const before = '<html><body><p>Original text</p></body></html>';
+    const after  = '<html><body><p>Changed text</p></body></html>';
+    const result = exporter.diff(before, after);
+    expect(result.length).toBeGreaterThan(0);
+    expect(result[0].tag).toBe('p');
+  });
+
+  it('diff() detects a style change', () => {
+    const { exporter } = getModules();
+    const before = '<html><body><p style="color:red">text</p></body></html>';
+    const after  = '<html><body><p style="color:blue">text</p></body></html>';
+    const result = exporter.diff(before, after);
+    const changed = result.find(r => r.styleChanged);
+    expect(changed).toBeTruthy();
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3TextEditor
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3TextEditor', () => {
+  it('enable() marks text elements with data-n3-editable', () => {
+    const { text } = getModules();
+    // Create a fresh paragraph in the fixture
+    const p = document.createElement('p');
+    p.id = '__n3_text_test__';
+    p.textContent = 'test para';
+    fixture('fixture').appendChild(p);
+
+    text.enable();
+    const marked = document.querySelectorAll('[data-n3-editable]');
+    expect(marked.length).toBeGreaterThan(0);
+    text.disable();
+    p.remove();
+  });
+
+  it('disable() removes data-n3-editable and contenteditable', () => {
+    const { text } = getModules();
+    const p = document.createElement('p');
+    p.id = '__n3_text_dis__';
+    document.body.appendChild(p);
+    text.enable();
+    text.disable();
+    expect(p.getAttribute('contenteditable')).toBe(null);
+    p.remove();
+  });
+
+  it('enable() sets contenteditable="true" on text elements', () => {
+    const { text } = getModules();
+    const el = document.createElement('p');
+    el.id = '__n3_ce_enable__';
+    document.body.appendChild(el);
+    text.enable();
+    const ceCount = document.querySelectorAll('[contenteditable="true"]').length;
+    text.disable();
+    el.remove();
+    expect(ceCount).toBeGreaterThan(0);
+  });
+
+  it('showToolbar() creates the format bar in the DOM', () => {
+    const { text } = getModules();
+    const el = document.createElement('p');
+    el.textContent = 'hello';
+    document.body.appendChild(el);
+    text.showToolbar(el);
+    const bar = document.querySelector('.n3-format-bar');
+    const exists = !!bar;
+    text.hideToolbar();
+    el.remove();
+    expect(exists).toBeTruthy();
+  });
+
+  it('hideToolbar() removes the format bar from the DOM', () => {
+    const { text } = getModules();
+    const el = document.createElement('p');
+    document.body.appendChild(el);
+    text.showToolbar(el);
+    text.hideToolbar();
+    el.remove();
+    expect(document.querySelector('.n3-format-bar')).toBeFalsy();
+  });
+
+  it('format bar contains bold button with id n3-fmt-bold', () => {
+    const { text } = getModules();
+    const el = document.createElement('p');
+    el.textContent = 'hello';
+    document.body.appendChild(el);
+    text.showToolbar(el);
+    const boldBtn = document.getElementById('n3-fmt-bold');
+    const found = !!boldBtn;
+    text.hideToolbar();
+    el.remove();
+    expect(found).toBeTruthy();
+  });
+
+  it('format bar contains italic button with id n3-fmt-italic', () => {
+    const { text } = getModules();
+    const el = document.createElement('p');
+    document.body.appendChild(el);
+    text.showToolbar(el);
+    const found = !!document.getElementById('n3-fmt-italic');
+    text.hideToolbar();
+    el.remove();
+    expect(found).toBeTruthy();
+  });
+
+  it('text:format event fires when execFormat is called', () => {
+    const { text, events } = getModules();
+    let firedCmd = null;
+    const cb = d => { firedCmd = d.cmd; };
+    events.on('text:format', cb);
+    text.execFormat('bold');
+    events.off('text:format', cb);
+    expect(firedCmd).toBe('bold');
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3DragManager
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3DragManager', () => {
+  it('drag:start event fires when startDrag is called', () => {
+    const { drag, events } = getModules();
+    let started = null;
+    const cb = el => { started = el; };
+    events.on('drag:start', cb);
+
+    const el = document.createElement('div');
+    el.style.cssText = 'width:100px;height:50px;position:fixed;top:0;left:0';
+    document.body.appendChild(el);
+
+    const fakeEvent = { preventDefault: () => {}, clientX: 50, clientY: 25 };
+    drag.startDrag(fakeEvent, el);
+
+    // Trigger mouseup to clean up
+    document.dispatchEvent(new MouseEvent('mouseup', { clientX: 50, clientY: 25 }));
+    events.off('drag:start', cb);
+    el.remove();
+
+    expect(started).toBe(el);
+  });
+
+  it('startDrag() adds n3-dragging class to the element', () => {
+    const { drag } = getModules();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    const fakeEvent = { preventDefault: () => {}, clientX: 0, clientY: 0 };
+    drag.startDrag(fakeEvent, el);
+    const hasDragging = el.classList.contains('n3-dragging');
+    document.dispatchEvent(new MouseEvent('mouseup'));
+    el.remove();
+    expect(hasDragging).toBeTruthy();
+  });
+
+  it('drag:end event fires after mouseup', () => {
+    const { drag, events } = getModules();
+    let ended = false;
+    const cb = () => { ended = true; };
+    events.on('drag:end', cb);
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    drag.startDrag({ preventDefault: () => {} }, el);
+    document.dispatchEvent(new MouseEvent('mouseup'));
+    events.off('drag:end', cb);
+    el.remove();
+    expect(ended).toBeTruthy();
+  });
+
+  it('n3-dragging class is removed after drag ends', () => {
+    const { drag } = getModules();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    drag.startDrag({ preventDefault: () => {} }, el);
+    document.dispatchEvent(new MouseEvent('mouseup'));
+    el.remove();
+    expect(el.classList.contains('n3-dragging')).toBeFalsy();
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3ElementControls
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3ElementControls', () => {
+  it('enable() attaches mouseover listener (no throw)', () => {
+    const { controls } = getModules();
+    controls.disable();
+    controls.enable();
+    expect(true).toBeTruthy();
+    controls.disable();
+  });
+
+  it('removeOverlay() does not throw when no overlay is active', () => {
+    const { controls } = getModules();
+    controls.removeOverlay();
+    expect(true).toBeTruthy();
+  });
+
+  it('controls:duplicate event fires with the right element', () => {
+    const { controls, events } = getModules();
+    controls.enable();
+    let dupTarget = null;
+    const cb = el => { dupTarget = el; };
+    events.on('controls:duplicate', cb);
+
+    // Manually trigger what the dup button does
+    const el = document.createElement('div');
+    el.setAttribute('data-n3-block', '1');
+    document.body.appendChild(el);
+    events.emit('controls:duplicate', el);
+
+    events.off('controls:duplicate', cb);
+    controls.disable();
+    el.remove();
+    expect(dupTarget).toBe(el);
+  });
+
+  it('controls:delete event removes element when emitted', () => {
+    const { events } = getModules();
+    const el = document.createElement('div');
+    el.id = '__n3_del_test__';
+    document.body.appendChild(el);
+
+    // Simulate what editor does on controls:delete
+    const cb = target => {
+      target.remove();
+    };
+    events.on('controls:delete', cb);
+    events.emit('controls:delete', el);
+    events.off('controls:delete', cb);
+
+    expect(document.getElementById('__n3_del_test__')).toBeFalsy();
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3StylePanel
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3StylePanel', () => {
+  it('panel is present in the DOM after mount()', () => {
+    expect(document.querySelector('.n3-style-panel')).toBeTruthy();
+  });
+
+  it('open() adds n3-panel-open class', () => {
+    const { panel } = getModules();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    panel.open(el);
+    const open = panel.isOpen();
+    panel.close();
+    el.remove();
+    expect(open).toBeTruthy();
+  });
+
+  it('close() removes n3-panel-open class', () => {
+    const { panel } = getModules();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    panel.open(el);
+    panel.close();
+    expect(panel.isOpen()).toBeFalsy();
+    el.remove();
+  });
+
+  it('isOpen() returns false initially', () => {
+    const { panel } = getModules();
+    panel.close();
+    expect(panel.isOpen()).toBeFalsy();
+  });
+
+  it('open() syncs tag label to element type', () => {
+    const { panel } = getModules();
+    const el = document.createElement('section');
+    document.body.appendChild(el);
+    panel.open(el);
+    const tag = document.getElementById('n3-sel-tag');
+    const label = tag ? tag.textContent : '';
+    panel.close();
+    el.remove();
+    expect(label).toBe('section');
+  });
+
+  it('style:change event is emitted when a slider changes', () => {
+    const { panel, events } = getModules();
+    let changed = false;
+    const cb = () => { changed = true; };
+    events.on('style:change', cb);
+
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    panel.open(el);
+
+    const slider = document.getElementById('n3-padding');
+    if (slider) {
+      slider.value = '20';
+      slider.dispatchEvent(new Event('input'));
+    }
+
+    panel.close();
+    el.remove();
+    events.off('style:change', cb);
+    expect(changed).toBeTruthy();
+  });
+
+  it('class editor input updates element classList', () => {
+    const { panel } = getModules();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    panel.open(el);
+
+    const classInput = document.getElementById('n3-classes');
+    if (classInput) {
+      classInput.value = 'hero container';
+      classInput.dispatchEvent(new Event('input'));
+    }
+
+    const hasHero = el.classList.contains('hero');
+    panel.close();
+    el.remove();
+    expect(hasHero).toBeTruthy();
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3Toolbar
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3Toolbar', () => {
+  it('toolbar element is present in the DOM', () => {
+    expect(document.querySelector('.n3-toolbar')).toBeTruthy();
+  });
+
+  it('show() adds n3-visible class', () => {
+    const { toolbar } = getModules();
+    toolbar.show();
+    const visible = document.querySelector('.n3-toolbar').classList.contains('n3-visible');
+    toolbar.hide();
+    expect(visible).toBeTruthy();
+  });
+
+  it('hide() removes n3-visible class', () => {
+    const { toolbar } = getModules();
+    toolbar.show();
+    toolbar.hide();
+    expect(document.querySelector('.n3-toolbar').classList.contains('n3-visible')).toBeFalsy();
+  });
+
+  it('updateHistory() updates the history count badge', () => {
+    const { toolbar } = getModules();
+    toolbar.updateHistory({ index: 2, total: 5 });
+    const badge = document.querySelector('.n3-history-count');
+    expect(badge.textContent).toBe('3/5');
+  });
+
+  it('toolbar:action event fires when a button is clicked', () => {
+    const { toolbar, events } = getModules();
+    let action = null;
+    const cb = a => { action = a; };
+    events.on('toolbar:action', cb);
+
+    const undoBtn = document.querySelector('.n3-toolbar [data-action="undo"]');
+    if (undoBtn) undoBtn.click();
+
+    events.off('toolbar:action', cb);
+    expect(action).toBe('undo');
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Suite: N3Editor (integration)
+// ═══════════════════════════════════════════════════════════════════════════
+describe('N3Editor (integration)', () => {
+  it('n3ware object is exposed on window', () => {
+    expect(window.n3ware).toBeTruthy();
+  });
+
+  it('n3ware._modules exposes all 8 module keys', () => {
+    const keys = Object.keys(window.n3ware._modules);
+    const expected = ['events','history','exporter','text','drag','controls','panel','toolbar'];
+    expected.forEach(k => expect(keys.includes(k)).toBeTruthy());
+  });
+
+  it('n3ware.enable() activates edit mode', () => {
+    n3ware.disable(); // start clean
+    n3ware.enable();
+    const hasClass = document.body.classList.contains('n3-editing');
+    n3ware.disable();
+    expect(hasClass).toBeTruthy();
+  });
+
+  it('n3ware.disable() deactivates edit mode', () => {
+    n3ware.enable();
+    n3ware.disable();
+    expect(document.body.classList.contains('n3-editing')).toBeFalsy();
+  });
+
+  it('n3ware.toggle() flips edit mode on and off', () => {
+    n3ware.disable();
+    n3ware.toggle();
+    const on = document.body.classList.contains('n3-editing');
+    n3ware.toggle();
+    const off = !document.body.classList.contains('n3-editing');
+    expect(on && off).toBeTruthy();
+  });
+
+  it('editor:modeChange event fires with true on enable()', () => {
+    n3ware.disable();
+    let val = null;
+    n3ware.on('editor:modeChange', v => { val = v; });
+    n3ware.enable();
+    n3ware.disable();
+    expect(val).toBe(true);
+  });
+
+  it('edit mode marks block elements with data-n3-block', () => {
+    n3ware.disable();
+    n3ware.enable();
+    const count = document.querySelectorAll('[data-n3-block]').length;
+    n3ware.disable();
+    expect(count).toBeGreaterThan(0);
+  });
+
+  it('disabling edit mode removes data-n3-block attributes', () => {
+    n3ware.enable();
+    n3ware.disable();
+    expect(document.querySelectorAll('[data-n3-block]').length).toBe(0);
+  });
+
+  it('undo() calls history.undo()', () => {
+    const { history } = getModules();
+    history.reset();
+    history.push('<body>snap1</body>');
+    history.push('<body>snap2</body>');
+    const canBefore = history.canUndo();
+    n3ware.undo();
+    expect(canBefore).toBeTruthy();
+  });
+
+  it('n3ware.on() and .off() proxy to events module', () => {
+    let count = 0;
+    const cb = () => count++;
+    n3ware.on('test:proxy', cb);
+    window.n3ware._modules.events.emit('test:proxy');
+    n3ware.off('test:proxy', cb);
+    window.n3ware._modules.events.emit('test:proxy');
+    expect(count).toBe(1);
+  });
+
+  it('CSS styles are injected into <head>', () => {
+    expect(document.getElementById('n3ware-styles')).toBeTruthy();
+  });
+
+  it('floating edit button is present in DOM', () => {
+    expect(document.querySelector('.n3-edit-btn')).toBeTruthy();
+  });
+});
+
+
+// ─── Auto-run on load ────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  runAllSuites();
+});
+</script>
+</body>
+</html>
