@@ -134,6 +134,22 @@ app.use('/sites', (req, res, next) => {
   next();
 }, serveSites());
 
+// ── brand.n3ware.com — proxy to gs://n3ware-sites ────────────────────────────
+app.use((req, res, next) => {
+  const host = (req.headers['x-forwarded-host'] || req.headers.host || '').split(':')[0];
+  if (host !== 'brand.n3ware.com') return next();
+  const filePath = req.path === '/' ? '/index.html' : req.path;
+  const gcsUrl = `https://storage.googleapis.com/n3ware-sites${filePath}`;
+  fetch(gcsUrl)
+    .then(r => {
+      if (!r.ok) return res.status(r.status).send('Not found');
+      res.set('Content-Type', r.headers.get('content-type') || 'text/html');
+      res.set('Cache-Control', 'public, max-age=300');
+      return r.arrayBuffer().then(buf => res.send(Buffer.from(buf)));
+    })
+    .catch(() => res.status(502).send('Upstream error'));
+});
+
 // ── Page routes ───────────────────────────────────────────────────────────────
 app.get('/',          (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/demo',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'demo.html')));
