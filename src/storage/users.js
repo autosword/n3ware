@@ -97,9 +97,64 @@ class UserStore {
   }
 }
 
+// ── Firestore-backed user store (production) ──────────────────────────────────
+
+class FirestoreUserStore {
+  constructor() {
+    const { Firestore } = require('@google-cloud/firestore');
+    this._db = new Firestore({ projectId: process.env.GOOGLE_CLOUD_PROJECT || 'n3ware' });
+    this._col = this._db.collection('users');
+  }
+
+  async _findByEmail(email) {
+    const snap = await this._col.where('email', '==', email.toLowerCase()).limit(1).get();
+    if (snap.empty) return null;
+    const doc = snap.docs[0];
+    return { id: doc.id, ...doc.data() };
+  }
+
+  async getUserByEmail(email) {
+    return this._findByEmail(email);
+  }
+
+  async createUser(email, _passwordHash) {
+    // Check for existing first to stay idempotent
+    const existing = await this._findByEmail(email);
+    if (existing) return existing;
+    const { v4: uuid } = require('uuid');
+    const id  = uuid();
+    const now = new Date().toISOString();
+    const data = { email: email.toLowerCase(), createdAt: now };
+    await this._col.doc(id).set(data);
+    return { id, ...data };
+  }
+
+  async getUserById(id) {
+    const doc = await this._col.doc(id).get();
+    if (!doc.exists) return null;
+    const d = doc.data();
+    return { id: doc.id, email: d.email, createdAt: d.createdAt };
+  }
+
+  async updateUser(id, fields) {
+    const ref = this._col.doc(id);
+    await ref.update(fields);
+    const doc = await ref.get();
+    if (!doc.exists) return null;
+    const d = doc.data();
+    return { id: doc.id, email: d.email, createdAt: d.createdAt };
+  }
+}
+
+// ── Factory ────────────────────────────────────────────────────────────────────
+
 let _instance = null;
 function getUserStore() {
-  if (!_instance) _instance = new UserStore();
+  if (!_instance) {
+    _instance = process.env.STORAGE_BACKEND === 'firestore'
+      ? new FirestoreUserStore()
+      : new UserStore();
+  }
   return _instance;
 }
 function resetUserStore() { _instance = null; }

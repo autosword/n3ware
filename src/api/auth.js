@@ -84,9 +84,9 @@ function verifyToken(req, res, next) {
  * - Neither: 401
  */
 function authOrApiKey(req, res, next) {
+  // 1. Authorization: Bearer <JWT>
   const header = req.headers['authorization'] || '';
   const bearer = header.startsWith('Bearer ') ? header.slice(7) : '';
-
   if (bearer) {
     try {
       req.user     = jwt.verify(bearer, config.jwtSecret);
@@ -97,9 +97,22 @@ function authOrApiKey(req, res, next) {
     }
   }
 
+  // 2. n3_token cookie (set by magic-auth on .n3ware.com)
+  const cookieToken = req.cookies && req.cookies.n3_token;
+  if (cookieToken) {
+    try {
+      req.user     = jwt.verify(cookieToken, config.jwtSecret);
+      req.authType = 'jwt';
+      return next();
+    } catch {
+      // Invalid cookie — fall through to API key check
+    }
+  }
+
+  // 3. X-API-Key header
   const provided = req.headers['x-api-key'] || req.query.apiKey || '';
   if (!provided) {
-    return res.status(401).json({ error: 'Authentication required (Bearer token or X-API-Key)' });
+    return res.status(401).json({ error: 'Authentication required (Bearer token, cookie, or X-API-Key)' });
   }
   if (_timingSafeEqual(provided, config.masterApiKey)) {
     req.user     = null;

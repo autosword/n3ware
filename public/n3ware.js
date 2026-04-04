@@ -1020,8 +1020,19 @@
       const genBtn      = el.querySelector('#n3pc-generate-btn');
 
       const { api, site, key } = this._cloudCfg;
+
+      // Build auth headers: prefer JWT cookie, fall back to site API key
+      const cookieJwt = document.cookie.match(/n3_token=([^;]+)/)?.[1]
+                     || sessionStorage.getItem('n3_auth');
       const jsonHeaders = { 'Content-Type': 'application/json' };
-      if (key) jsonHeaders['X-API-Key'] = key;
+      const uploadHdrBase = {};
+      if (cookieJwt) {
+        jsonHeaders['Authorization']    = 'Bearer ' + cookieJwt;
+        uploadHdrBase['Authorization']  = 'Bearer ' + cookieJwt;
+      } else if (key) {
+        jsonHeaders['X-API-Key']   = key;
+        uploadHdrBase['X-API-Key'] = key;
+      }
 
       const setProgress = (pct, msg) => { barEl.style.width = pct + '%'; statusEl.textContent = msg; };
 
@@ -1039,9 +1050,7 @@
           for (let i = 0; i < images.length; i++) {
             const fd = new FormData();
             fd.append('file', images[i]);
-            const uploadHdr = {};
-            if (key) uploadHdr['X-API-Key'] = key;
-            const r = await fetch(`${api}/uploads/${site}/upload`, { method: 'POST', headers: uploadHdr, credentials: 'include', body: fd });
+            const r = await fetch(`${api}/uploads/${site}/upload`, { method: 'POST', headers: uploadHdrBase, credentials: 'include', body: fd });
             if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || `Upload failed: ${r.status}`); }
             const { file: uploaded } = await r.json();
             imageUrls.push(uploaded.url);
