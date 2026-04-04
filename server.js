@@ -42,10 +42,23 @@ app.use(cookieParser());
 
 // ── CORS ────────────────────────────────────────────────────────────────────
 app.use(cors({
-  origin:  config.nodeEnv === 'production' ? false : '*',
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'X-API-Key', 'Authorization'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (curl, Postman, same-origin)
+    if (!origin) return callback(null, true);
+    // Allow any *.n3ware.com subdomain and localhost for dev
+    if (origin.endsWith('.n3ware.com') || origin === 'https://n3ware.com' ||
+        /^http:\/\/localhost(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+    callback(null, false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'X-API-Key', 'Authorization', 'X-Requested-With'],
 }));
+
+// Handle OPTIONS preflight for all routes before auth middleware runs
+app.options('*', cors());
 
 // ── Raw body (Stripe webhook) — must come before express.json ────────────────
 app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
