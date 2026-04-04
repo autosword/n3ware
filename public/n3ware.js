@@ -875,9 +875,11 @@
       el.querySelector('#n3pc-slug-preview').textContent = '';
       el.querySelector('#n3pc-desc').value = '';
       el.querySelector('#n3pc-thumbs').innerHTML = '';
-      el.querySelector('#n3pc-progress').style.display = 'none';
+      el.querySelector('#n3pc-form-body').style.display = 'block';
+      el.querySelector('#n3pc-spinner').style.display = 'none';
       el.querySelector('#n3pc-success').style.display = 'none';
       el.querySelector('#n3pc-generate-btn').disabled = false;
+      el.querySelector('#n3pc-generate-btn').style.display = 'block';
       el.querySelector('#n3pc-generate-btn').textContent = '🤖 Generate Page with AI';
       this._pcImages = [];
       this._pcDone   = false;
@@ -908,29 +910,30 @@
         <button id="n3pc-close" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1" title="Close">✕</button>
         <h2 style="margin:0 0 24px;font-size:21px;font-weight:700;color:#fff">Create New Page</h2>
 
-        <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Name <span style="color:#E31137">*</span></label>
-        <input id="n3pc-name" type="text" placeholder="e.g. Our Menu" autocomplete="off"
-          style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:15px;outline:none;margin-bottom:4px">
-        <div id="n3pc-slug-preview" style="font-size:12px;color:#555;margin-bottom:18px;min-height:16px"></div>
+        <div id="n3pc-form-body">
+          <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Name <span style="color:#E31137">*</span></label>
+          <input id="n3pc-name" type="text" placeholder="e.g. Our Menu" autocomplete="off"
+            style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:15px;outline:none;margin-bottom:4px">
+          <div id="n3pc-slug-preview" style="font-size:12px;color:#555;margin-bottom:18px;min-height:16px"></div>
 
-        <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Description</label>
-        <textarea id="n3pc-desc" rows="5" placeholder="Describe what this page should contain — style, sections, key content, tone…"
-          style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;resize:vertical;margin-bottom:20px;font-family:inherit"></textarea>
+          <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Description</label>
+          <textarea id="n3pc-desc" rows="5" placeholder="Describe what this page should contain — style, sections, key content, tone…"
+            style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;resize:vertical;margin-bottom:20px;font-family:inherit"></textarea>
 
-        <label style="display:block;margin-bottom:8px;font-size:13px;color:#aaa;font-weight:500">Upload Images <span style="color:#555">(optional)</span></label>
-        <div id="n3pc-dropzone" style="background:#0A0A0A;border:2px dashed #333;border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color 0.2s">
-          <div style="font-size:26px;margin-bottom:6px">📷</div>
-          <div style="color:#666;font-size:14px">Drop images here or <span style="color:#E31137">click to browse</span></div>
-          <div style="color:#444;font-size:12px;margin-top:4px">JPG, PNG, WebP · max 5 MB each</div>
-          <input id="n3pc-file-input" type="file" accept="image/*" multiple style="display:none">
-        </div>
-        <div id="n3pc-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
-
-        <div id="n3pc-progress" style="display:none;margin-bottom:20px">
-          <div id="n3pc-status-text" style="font-size:13px;color:#aaa;margin-bottom:8px">Generating…</div>
-          <div style="background:#0A0A0A;border-radius:8px;height:8px;overflow:hidden">
-            <div id="n3pc-bar" style="background:#E31137;height:100%;width:0%;transition:width 0.4s ease;border-radius:8px"></div>
+          <label style="display:block;margin-bottom:8px;font-size:13px;color:#aaa;font-weight:500">Upload Images <span style="color:#555">(optional)</span></label>
+          <div id="n3pc-dropzone" style="background:#0A0A0A;border:2px dashed #333;border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color 0.2s">
+            <div style="font-size:26px;margin-bottom:6px">📷</div>
+            <div style="color:#666;font-size:14px">Drop images here or <span style="color:#E31137">click to browse</span></div>
+            <div style="color:#444;font-size:12px;margin-top:4px">JPG, PNG, WebP · max 5 MB each</div>
+            <input id="n3pc-file-input" type="file" accept="image/*" multiple style="display:none">
           </div>
+          <div id="n3pc-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+        </div>
+
+        <div id="n3pc-spinner" style="display:none;text-align:center;padding:48px 20px">
+          <div style="width:64px;height:64px;border:4px solid #2a2a2a;border-top-color:#E31137;border-radius:50%;animation:n3-spin 1s linear infinite;margin:0 auto 24px"></div>
+          <h3 style="color:#fff;font-size:20px;font-weight:700;margin:0 0 10px">Creating your page…</h3>
+          <p id="n3pc-spin-status" style="color:#888;font-size:14px;margin:0;min-height:20px">Picking the best components…</p>
         </div>
 
         <div id="n3pc-success" style="display:none;background:#0c2318;border:1px solid #1a5c38;border-radius:10px;padding:14px 16px;margin-bottom:18px">
@@ -1011,11 +1014,10 @@
     async _runPageGeneration(el) {
       const nameVal   = el.querySelector('#n3pc-name').value.trim();
       if (!nameVal) { N3UI.toast('Page name is required', 'error'); el.querySelector('#n3pc-name').focus(); return; }
-      const slug        = this._toSlug(nameVal);
       const description = el.querySelector('#n3pc-desc').value.trim() || `A page called ${nameVal}`;
-      const progressEl  = el.querySelector('#n3pc-progress');
-      const statusEl    = el.querySelector('#n3pc-status-text');
-      const barEl       = el.querySelector('#n3pc-bar');
+      const formBody    = el.querySelector('#n3pc-form-body');
+      const spinnerEl   = el.querySelector('#n3pc-spinner');
+      const spinStatus  = el.querySelector('#n3pc-spin-status');
       const successEl   = el.querySelector('#n3pc-success');
       const genBtn      = el.querySelector('#n3pc-generate-btn');
 
@@ -1027,26 +1029,52 @@
       const jsonHeaders = { 'Content-Type': 'application/json' };
       const uploadHdrBase = {};
       if (cookieJwt) {
-        jsonHeaders['Authorization']    = 'Bearer ' + cookieJwt;
-        uploadHdrBase['Authorization']  = 'Bearer ' + cookieJwt;
+        jsonHeaders['Authorization']   = 'Bearer ' + cookieJwt;
+        uploadHdrBase['Authorization'] = 'Bearer ' + cookieJwt;
       } else if (key) {
         jsonHeaders['X-API-Key']   = key;
         uploadHdrBase['X-API-Key'] = key;
       }
 
-      const setProgress = (pct, msg) => { barEl.style.width = pct + '%'; statusEl.textContent = msg; };
+      // Inject spin keyframes once
+      if (!document.getElementById('n3-spin-kf')) {
+        const s = document.createElement('style');
+        s.id = 'n3-spin-kf';
+        s.textContent = '@keyframes n3-spin{to{transform:rotate(360deg)}}';
+        document.head.appendChild(s);
+      }
 
-      genBtn.disabled = true;
-      genBtn.textContent = 'Working…';
-      progressEl.style.display = 'block';
-      successEl.style.display  = 'none';
+      // Switch to spinner view
+      formBody.style.display  = 'none';
+      genBtn.style.display    = 'none';
+      successEl.style.display = 'none';
+      spinnerEl.style.display = 'block';
+
+      const statuses = [
+        'Picking the best components…',
+        'Writing your content…',
+        'Adding photos…',
+        'Updating your navigation…',
+        'Almost done…',
+      ];
+      let statusIdx = 0;
+      spinStatus.textContent = statuses[0];
+      const statusInterval = setInterval(() => {
+        statusIdx = (statusIdx + 1) % statuses.length;
+        spinStatus.textContent = statuses[statusIdx];
+      }, 4000);
+
+      const _stopSpinner = () => {
+        clearInterval(statusInterval);
+        spinnerEl.style.display = 'none';
+      };
 
       try {
         // 1. Upload images
         const imageUrls = [];
         const images    = this._pcImages || [];
         if (images.length > 0) {
-          setProgress(5, `Uploading ${images.length} image(s)…`);
+          spinStatus.textContent = `Uploading ${images.length} image(s)…`;
           for (let i = 0; i < images.length; i++) {
             const fd = new FormData();
             fd.append('file', images[i]);
@@ -1054,12 +1082,10 @@
             if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || `Upload failed: ${r.status}`); }
             const { file: uploaded } = await r.json();
             imageUrls.push(uploaded.url);
-            setProgress(5 + Math.round((i + 1) / images.length * 30), `Uploaded ${i + 1}/${images.length} image(s)…`);
           }
         }
 
         // 2. Generate page with AI
-        setProgress(40, 'Generating page with AI… (this takes ~10s)');
         const genRes = await fetch(`${api}/sites/${site}/pages/generate`, {
           method: 'POST', headers: jsonHeaders, credentials: 'include',
           body: JSON.stringify({ name: nameVal, description, imageUrls }),
@@ -1069,24 +1095,25 @@
           throw new Error(e.error || `Generation failed: ${genRes.status}`);
         }
         const genData = await genRes.json();
-        setProgress(95, 'Updating navigation…');
 
-        await new Promise(r => setTimeout(r, 400));
-        setProgress(100, 'Done!');
+        _stopSpinner();
 
         // 3. Show success
         successEl.style.display = 'block';
         const pageUrl = `https://assembler.n3ware.com/sites/${site}/${genData.slug}`;
         el.querySelector('#n3pc-success-msg').innerHTML =
           `<strong>${nameVal}</strong> — <a href="${pageUrl}" target="_blank" style="color:#4ade80;text-decoration:underline">View page →</a>`;
-        genBtn.textContent = '✓ Done — Close';
-        genBtn.disabled    = false;
-        this._pcDone       = true;
+        genBtn.textContent   = '✓ Done — Close';
+        genBtn.style.display = 'block';
+        genBtn.disabled      = false;
+        this._pcDone         = true;
         N3UI.toast(`Page "${nameVal}" created!`, 'success');
       } catch (err) {
-        progressEl.style.display = 'none';
-        genBtn.disabled   = false;
-        genBtn.textContent = '🤖 Generate Page with AI';
+        _stopSpinner();
+        formBody.style.display  = 'block';
+        genBtn.style.display    = 'block';
+        genBtn.disabled         = false;
+        genBtn.textContent      = '🤖 Generate Page with AI';
         N3UI.toast(`Error: ${err.message}`, 'error');
       }
     }
