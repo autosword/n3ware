@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/list"
+	"strings"
 	"sync"
 	"time"
 )
@@ -90,6 +91,23 @@ func (c *LRUCache) Delete(key string) {
 	if el, ok := c.items[key]; ok {
 		c.ll.Remove(el)
 		delete(c.items, key)
+	}
+}
+
+// InvalidatePrefix removes all cache entries whose key starts with the given prefix.
+func (c *LRUCache) InvalidatePrefix(prefix string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	var toRemove []*list.Element
+	for _, el := range c.items {
+		if e, ok := el.Value.(*entry); ok && strings.HasPrefix(e.key, prefix) {
+			toRemove = append(toRemove, el)
+		}
+	}
+	for _, el := range toRemove {
+		c.ll.Remove(el)
+		delete(c.items, el.Value.(*entry).key)
 	}
 }
 

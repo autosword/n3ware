@@ -37,7 +37,7 @@ func main() {
 		log.Fatalf("Firestore init: %v", err)
 	}
 
-	cache := NewLRUCache(100, 60)
+	cache := NewLRUCache(100, 10) // 10s TTL — content changes on save
 
 	assembler := &Assembler{
 		gcs:    gcs,
@@ -54,6 +54,22 @@ func main() {
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, `{"status":"ok"}`)
+	})
+
+	// Cache purge — POST /purge/{siteId} invalidates all pages for a site
+	mux.HandleFunc("/purge/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		siteId := strings.TrimPrefix(r.URL.Path, "/purge/")
+		if siteId == "" {
+			http.Error(w, "missing site id", http.StatusBadRequest)
+			return
+		}
+		cache.InvalidatePrefix(siteId)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, `{"purged":true,"siteId":"%s"}`, siteId)
 	})
 
 	// Site assembly — accepts either:

@@ -1176,10 +1176,13 @@
         this._dirty.components.clear();
         this._saveBtn.innerHTML = '✓ Saved';
         this._saveBtn.style.background = '#16A34A';
-        N3UI.toast('Changes saved to cloud', 'success');
+        N3UI.toast('Changes saved — reloading…', 'success');
         setTimeout(() => {
-          if (this._saveBtn) this._saveBtn.style.display = 'none';
-        }, 2000);
+          // Force a cache-busted reload so the user sees their saved changes
+          const url = new URL(window.location.href);
+          url.searchParams.set('_', Date.now());
+          window.location.replace(url.toString());
+        }, 1500);
       } catch (err) {
         this._saveBtn.innerHTML = '✕ Failed';
         this._saveBtn.style.background = '#DC2626';

@@ -37,7 +37,7 @@ type Assembler struct {
 	bucket string
 }
 
-const cacheControl = "public, s-maxage=300, stale-while-revalidate=60"
+const cacheControl = "public, max-age=10, s-maxage=30, stale-while-revalidate=5"
 
 // ServeRequest assembles and serves the page for the given siteId + path.
 func (a *Assembler) ServeRequest(w http.ResponseWriter, r *http.Request, siteId, pagePath string) {

@@ -111,6 +111,10 @@ router.put('/pages/:slug', async (req, res) => {
       await storage.saveSite(req.params.id, { html });
     }
     cache.onSave(req.params.id).catch(() => {});
+
+    // Fire-and-forget cache invalidation
+    _bustCaches(req.params.id, slug);
+
     res.json({ saved: true, slug });
   } catch (err) { _error(res, err); }
 });
@@ -171,6 +175,7 @@ router.put('/components/:name', async (req, res) => {
 
     await gcsFiles.saveComponent(req.params.id, name, html);
     cache.onSave(req.params.id).catch(() => {});
+    _bustCaches(req.params.id, 'index'); // component change affects all pages
     res.json({ saved: true, name });
   } catch (err) { _error(res, err); }
 });
@@ -208,6 +213,36 @@ router.patch('/manifest', async (req, res) => {
 function _error(res, err) {
   console.error('[pages api]', err);
   res.status(500).json({ error: err.message || 'Internal server error' });
+}
+
+/**
+ * Fire-and-forget cache invalidation after a page/component save.
+ * Hits the Go assembler's /purge/:siteId endpoint and purges Cloudflare URLs.
+ */
+function _bustCaches(siteId, slug) {
+  const ASSEMBLER = process.env.ASSEMBLER_URL || 'https://assembler.n3ware.com';
+  const CF_TOKEN  = process.env.CLOUDFLARE_API_TOKEN;
+  const CF_ZONE   = process.env.CLOUDFLARE_ZONE_ID || '988f3dee002b0592d10ba5d3414b82e1';
+
+  // 1. Bust assembler in-memory cache
+  fetch(`${ASSEMBLER}/purge/${siteId}`, { method: 'POST' })
+    .catch(e => console.warn('[pages] assembler purge failed:', e.message));
+
+  // 2. Purge Cloudflare CDN for affected URLs
+  if (CF_TOKEN) {
+    const urls = [
+      `${ASSEMBLER}/sites/${siteId}`,
+      `${ASSEMBLER}/sites/${siteId}/`,
+    ];
+    if (slug && slug !== 'index') {
+      urls.push(`${ASSEMBLER}/sites/${siteId}/${slug}`);
+    }
+    fetch(`https://api.cloudflare.com/client/v4/zones/${CF_ZONE}/purge_cache`, {
+      method:  'POST',
+      headers: { 'Authorization': `Bearer ${CF_TOKEN}`, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ files: urls }),
+    }).catch(e => console.warn('[pages] CF purge failed:', e.message));
+  }
 }
 
 module.exports = router;
