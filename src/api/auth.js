@@ -85,7 +85,9 @@ function verifyToken(req, res, next) {
  */
 function authOrApiKey(req, res, next) {
   const header = req.headers['authorization'] || '';
-  const bearer = header.startsWith('Bearer ') ? header.slice(7) : '';
+  // Accept Bearer token from Authorization header or n3_token cookie (set on .n3ware.com domain)
+  const bearer = header.startsWith('Bearer ') ? header.slice(7)
+               : (req.cookies && req.cookies.n3_token) || '';
 
   if (bearer) {
     try {

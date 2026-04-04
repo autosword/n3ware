@@ -35,7 +35,7 @@ router.post('/register', async (req, res) => {
     }
 
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
-    const user = users.createUser(email, hash);
+    const user = await users.createUser(email, hash);
     const token = _sign(user);
     res.status(201).json({ token, user });
   } catch (err) {
@@ -55,7 +55,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'email and password are required' });
     }
 
-    const user = users.getUserByEmail(email);
+    const user = await users.getUserByEmail(email);
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -75,8 +75,8 @@ router.post('/login', async (req, res) => {
 });
 
 // ── Me ────────────────────────────────────────────────────────────────────────
-router.get('/me', verifyToken, (req, res) => {
-  const user = users.getUserById(req.user.id);
+router.get('/me', verifyToken, async (req, res) => {
+  const user = await users.getUserById(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
   res.json({ user });
 });

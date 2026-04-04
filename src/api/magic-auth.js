@@ -84,10 +84,10 @@ router.get('/verify', async (req, res) => {
     tokens.markTokenUsed(rawToken);
 
     // Find or create user (auto-register on first login)
-    let user = users.getUserByEmail(record.email);
+    let user = await users.getUserByEmail(record.email);
     if (!user) {
       // Create account with no password
-      user = users.createUser(record.email, '');
+      user = await users.createUser(record.email, '');
     }
 
     // Issue JWT (same format as password auth)

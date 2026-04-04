@@ -43,7 +43,7 @@ app.use(cookieParser());
 // ── CORS ────────────────────────────────────────────────────────────────────
 app.use(cors({
   origin:  config.nodeEnv === 'production' ? false : '*',
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'X-API-Key', 'Authorization'],
 }));
 
