@@ -11,9 +11,10 @@
  *   - stale-while-revalidate=60
  */
 
-const storage = require('../storage');
-const cache   = require('../cache');
-const config  = require('../config');
+const storage        = require('../storage');
+const cache          = require('../cache');
+const config         = require('../config');
+const { generateScripts } = require('../integrations/tracker-scripts');
 
 const CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=60';
 
@@ -32,7 +33,8 @@ function serveSites() {
       const site = await cache.getSite(storage, siteId);
       if (!site) return res.status(404).send(_notFoundPage(siteId));
 
-      const html = _injectEditor(site.html, siteId);
+      const trackerScripts = generateScripts(site.integrations || {});
+      const html = _injectEditor(_injectTrackers(site.html, trackerScripts), siteId);
       res.set('Content-Type', 'text/html; charset=utf-8');
       res.set('Cache-Control', CACHE_CONTROL);
       res.set('X-Site-Id', siteId);
@@ -43,6 +45,21 @@ function serveSites() {
       next(err);
     }
   };
+}
+
+/**
+ * Inject tracker scripts into <head> (before </head>).
+ * @param {string} html
+ * @param {string} scripts  raw HTML from generateScripts()
+ * @returns {string}
+ */
+function _injectTrackers(html, scripts) {
+  if (!scripts) return html;
+  const comment = `\n<!-- n3ware integrations -->\n${scripts}\n`;
+  if (html.includes('</head>')) {
+    return html.replace(/<\/head>/i, `${comment}</head>`);
+  }
+  return html;
 }
 
 /**
