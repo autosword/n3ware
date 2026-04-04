@@ -30,6 +30,7 @@ const gaApi           = require('./src/api/ga');
 const componentsApi         = require('./src/api/components');
 const integrationsConfigApi = require('./src/api/integrations-config');
 const pagesApi              = require('./src/api/pages');
+const pageTemplatesApi      = require('./src/api/page-templates');
 
 // Initialize integrations (logs mock-mode notices)
 require('./src/integrations');
@@ -106,6 +107,9 @@ app.use('/api/sites',        gaApi);  // nested: /api/sites/:id/ga/*
 
 // ── Component library ─────────────────────────────────────────────────────────
 app.use('/api/components', componentsApi);
+
+// ── Page templates ────────────────────────────────────────────────────────────
+app.use('/api/page-templates', pageTemplatesApi);
 
 // ── Integrations config (nested under sites) ──────────────────────────────────
 app.use('/api/sites/:id/integrations', integrationsConfigApi);

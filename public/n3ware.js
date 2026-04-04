@@ -829,6 +829,18 @@
 
       actions.appendChild(analyticsBtn);
       actions.appendChild(compBtn);
+
+      if (this._cloudCfg) {
+        const PLUS = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+        const pageBtn = document.createElement('button');
+        pageBtn.className = 'n3-fab-btn';
+        pageBtn.innerHTML = PLUS;
+        pageBtn.title = 'New Page';
+        pageBtn.addEventListener('click', e => { e.stopPropagation(); this._openPageCreator(); });
+        actions.appendChild(pageBtn);
+        this._pageFabBtn = pageBtn;
+      }
+
       actions.appendChild(editBtn);
       this._editFabBtn      = editBtn;
       this._analyticsFabBtn = analyticsBtn;
@@ -853,6 +865,358 @@
       this._editFabBtn.classList.toggle('n3-editing', on);
       const toggle = this._fab && this._fab.querySelector('.n3-fab-toggle');
       if (toggle) toggle.classList.toggle('n3-editing', on);
+    }
+
+    // ── Page Creator Modal ────────────────────────────────────────────────────
+
+    _openPageCreator() {
+      if (!this._cloudCfg) return;
+      if (!this._pageCreatorEl) this._buildPageCreator();
+      this._selectedTemplate = undefined;
+      this._pcImages = [];
+      this._pcDone   = false;
+      this._pcGoToStep1();
+      this._pageCreatorEl.style.display = 'flex';
+    }
+
+    _pcGoToStep1() {
+      const el = this._pageCreatorEl;
+      el.querySelector('#n3pc-step1').style.display = 'block';
+      el.querySelector('#n3pc-step2').style.display = 'none';
+    }
+
+    _pcGoToStep2(template) {
+      this._selectedTemplate = template || null;
+      const el = this._pageCreatorEl;
+      el.querySelector('#n3pc-step1').style.display = 'none';
+
+      // Reset step 2 state
+      const nameInput = el.querySelector('#n3pc-name');
+      el.querySelector('#n3pc-slug-preview').textContent = '';
+      el.querySelector('#n3pc-thumbs').innerHTML = '';
+      el.querySelector('#n3pc-form-body').style.display = 'block';
+      el.querySelector('#n3pc-spinner').style.display = 'none';
+      el.querySelector('#n3pc-success').style.display = 'none';
+      el.querySelector('#n3pc-generate-btn').disabled = false;
+      el.querySelector('#n3pc-generate-btn').style.display = 'block';
+
+      // Update heading + badge
+      const badge = el.querySelector('#n3pc-template-badge');
+      if (template) {
+        el.querySelector('#n3pc-step2-title').textContent = `Customize: ${template.name}`;
+        badge.textContent = `${template.icon} ${template.name}`;
+        badge.style.display = 'inline-block';
+        nameInput.value = template.defaultName || '';
+        el.querySelector('#n3pc-desc').value = template.defaultPrompt || '';
+        const slug = this._toSlug(nameInput.value);
+        const sp = el.querySelector('#n3pc-slug-preview');
+        sp.textContent = slug ? `URL slug: /${slug}` : '';
+        sp.style.color = slug ? '#E31137' : '#555';
+        el.querySelector('#n3pc-generate-btn').textContent = '🤖 Customize with AI';
+      } else {
+        el.querySelector('#n3pc-step2-title').textContent = 'Create New Page';
+        badge.style.display = 'none';
+        nameInput.value = '';
+        el.querySelector('#n3pc-desc').value = '';
+        el.querySelector('#n3pc-generate-btn').textContent = '🤖 Generate Page with AI';
+      }
+
+      el.querySelector('#n3pc-step2').style.display = 'block';
+      setTimeout(() => nameInput.focus(), 80);
+    }
+
+    _buildPageCreator() {
+      // Template metadata (mirrors page-templates.json, subset for UI)
+      const TEMPLATES = [
+        { id: 'about-team',    name: 'About & Team',  icon: '👥', description: 'Company story, mission & team',  defaultName: 'About Us',    defaultSlug: 'about',        defaultPrompt: 'A professional About Us page with our company story, mission, values, and team members.' },
+        { id: 'services',      name: 'Services',       icon: '🛠️', description: 'Showcase your services',         defaultName: 'Services',    defaultSlug: 'services',     defaultPrompt: 'A services page listing all the services we offer with descriptions and a CTA.' },
+        { id: 'pricing',       name: 'Pricing',        icon: '💰', description: 'Tiered plans with feature lists', defaultName: 'Pricing',     defaultSlug: 'pricing',      defaultPrompt: 'A pricing page with 3 tiers, feature comparison, and a bold CTA.' },
+        { id: 'contact',       name: 'Contact',        icon: '📬', description: 'Contact form + map + hours',     defaultName: 'Contact Us',  defaultSlug: 'contact',      defaultPrompt: 'A contact page with a form, phone/email, address, hours of operation, and a map embed.' },
+        { id: 'faq',           name: 'FAQ',            icon: '❓', description: 'Accordion Q&A section',          defaultName: 'FAQ',         defaultSlug: 'faq',          defaultPrompt: 'A FAQ page with an accordion-style list of common questions and detailed answers.' },
+        { id: 'portfolio',     name: 'Portfolio',      icon: '🖼️', description: 'Project / work showcase grid',   defaultName: 'Portfolio',   defaultSlug: 'portfolio',    defaultPrompt: 'A portfolio page with a filterable grid of projects, descriptions, and links.' },
+        { id: 'testimonials',  name: 'Testimonials',   icon: '⭐', description: 'Customer reviews & quotes',      defaultName: 'Reviews',     defaultSlug: 'testimonials', defaultPrompt: 'A testimonials page with customer quotes, star ratings, and photos.' },
+        { id: 'locations',     name: 'Locations',      icon: '📍', description: 'Multi-location cards + maps',    defaultName: 'Locations',   defaultSlug: 'locations',    defaultPrompt: 'A locations page with each location\'s address, hours, phone number, and map link.' },
+        { id: 'blog',          name: 'Blog',           icon: '📝', description: 'Article listing with previews',  defaultName: 'Blog',        defaultSlug: 'blog',         defaultPrompt: 'A blog index page with article cards, categories, and a newsletter signup.' },
+        { id: 'menu',          name: 'Menu',           icon: '🍽️', description: 'Restaurant / café menu layout',  defaultName: 'Menu',        defaultSlug: 'menu',         defaultPrompt: 'A restaurant menu page with sections for appetizers, mains, desserts, drinks, and prices.' },
+        { id: 'booking',       name: 'Booking',        icon: '📅', description: 'Appointment / reservation CTA',  defaultName: 'Book Now',    defaultSlug: 'booking',      defaultPrompt: 'A booking page with service options, availability info, and a prominent booking CTA.' },
+        { id: 'landing',       name: 'Landing Page',   icon: '🚀', description: 'High-conversion promo page',     defaultName: 'Special Offer', defaultSlug: 'landing',   defaultPrompt: 'A high-conversion landing page with a hero, benefits, social proof, and a strong CTA.' },
+      ];
+
+      const el = document.createElement('div');
+      el.setAttribute('data-n3-ui', '1');
+      Object.assign(el.style, {
+        position: 'fixed', inset: '0', zIndex: '100002',
+        background: 'rgba(0,0,0,0.88)',
+        display: 'none', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'system-ui,-apple-system,sans-serif',
+      });
+
+      const card = document.createElement('div');
+      Object.assign(card.style, {
+        background: '#1A1A1A', color: '#fff',
+        borderRadius: '16px', border: '1px solid #2a2a2a',
+        width: '100%', maxWidth: '680px', maxHeight: '90vh',
+        overflowY: 'auto', padding: '32px',
+        position: 'relative', boxSizing: 'border-box', margin: '16px',
+      });
+
+      card.innerHTML = `
+        <button id="n3pc-close" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1" title="Close">✕</button>
+
+        <!-- Step 1: Template picker -->
+        <div id="n3pc-step1">
+          <h2 style="margin:0 0 6px;font-size:21px;font-weight:700;color:#fff">Create New Page</h2>
+          <p style="margin:0 0 24px;color:#888;font-size:14px">Choose a starting point</p>
+          <div id="n3pc-tpl-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+            <button class="n3pc-tpl-card" data-tpl="__scratch__" style="background:#0A0A0A;border:1px solid #333;border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;color:#fff;transition:border-color 0.15s">
+              <div style="font-size:22px;margin-bottom:6px">✏️</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:3px">From Scratch</div>
+              <div style="font-size:11px;color:#666">AI writes everything</div>
+            </button>
+            ${TEMPLATES.map(t => `
+            <button class="n3pc-tpl-card" data-tpl="${t.id}" style="background:#0A0A0A;border:1px solid #333;border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;color:#fff;transition:border-color 0.15s">
+              <div style="font-size:22px;margin-bottom:6px">${t.icon}</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:3px">${t.name}</div>
+              <div style="font-size:11px;color:#666">${t.description}</div>
+            </button>`).join('')}
+          </div>
+        </div>
+
+        <!-- Step 2: Form -->
+        <div id="n3pc-step2" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+            <button id="n3pc-back" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px" title="Back">←</button>
+            <h2 id="n3pc-step2-title" style="margin:0;font-size:21px;font-weight:700;color:#fff">Create New Page</h2>
+          </div>
+          <div id="n3pc-template-badge" style="display:none;background:#1e1e1e;border:1px solid #333;border-radius:8px;padding:6px 12px;font-size:12px;color:#aaa;margin-bottom:20px"></div>
+
+          <div id="n3pc-form-body">
+            <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Name <span style="color:#E31137">*</span></label>
+            <input id="n3pc-name" type="text" placeholder="e.g. Our Menu" autocomplete="off"
+              style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:15px;outline:none;margin-bottom:4px">
+            <div id="n3pc-slug-preview" style="font-size:12px;color:#555;margin-bottom:18px;min-height:16px"></div>
+
+            <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Description <span style="color:#555">(optional)</span></label>
+            <textarea id="n3pc-desc" rows="4" placeholder="Describe your business context, key content, tone…"
+              style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;resize:vertical;margin-bottom:20px;font-family:inherit"></textarea>
+
+            <label style="display:block;margin-bottom:8px;font-size:13px;color:#aaa;font-weight:500">Upload Images <span style="color:#555">(optional)</span></label>
+            <div id="n3pc-dropzone" style="background:#0A0A0A;border:2px dashed #333;border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color 0.2s">
+              <div style="font-size:26px;margin-bottom:6px">📷</div>
+              <div style="color:#666;font-size:14px">Drop images here or <span style="color:#E31137">click to browse</span></div>
+              <div style="color:#444;font-size:12px;margin-top:4px">JPG, PNG, WebP · max 5 MB each</div>
+              <input id="n3pc-file-input" type="file" accept="image/*" multiple style="display:none">
+            </div>
+            <div id="n3pc-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+          </div>
+
+          <div id="n3pc-spinner" style="display:none;text-align:center;padding:48px 20px">
+            <div style="width:64px;height:64px;border:4px solid #2a2a2a;border-top-color:#E31137;border-radius:50%;animation:n3-spin 1s linear infinite;margin:0 auto 24px"></div>
+            <h3 style="color:#fff;font-size:20px;font-weight:700;margin:0 0 10px">Creating your page…</h3>
+            <p id="n3pc-spin-status" style="color:#888;font-size:14px;margin:0;min-height:20px">Picking the best components…</p>
+          </div>
+
+          <div id="n3pc-success" style="display:none;background:#0c2318;border:1px solid #1a5c38;border-radius:10px;padding:14px 16px;margin-bottom:18px">
+            <div style="color:#4ade80;font-size:14px;font-weight:600;margin-bottom:6px">✓ Page created!</div>
+            <div id="n3pc-success-msg" style="font-size:13px;color:#86efac"></div>
+          </div>
+
+          <button id="n3pc-generate-btn"
+            style="width:100%;background:#E31137;color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:opacity 0.2s">
+            🤖 Generate Page with AI
+          </button>
+        </div>`;
+
+      el.appendChild(card);
+
+      // Close / backdrop
+      card.querySelector('#n3pc-close').addEventListener('click', () => { el.style.display = 'none'; });
+      el.addEventListener('click', e => { if (e.target === el) el.style.display = 'none'; });
+
+      // Back button
+      card.querySelector('#n3pc-back').addEventListener('click', () => this._pcGoToStep1());
+
+      // Template cards (step 1)
+      card.querySelectorAll('.n3pc-tpl-card').forEach(btn => {
+        btn.addEventListener('mouseenter', () => { btn.style.borderColor = '#E31137'; });
+        btn.addEventListener('mouseleave', () => { btn.style.borderColor = '#333'; });
+        btn.addEventListener('click', () => {
+          const tplId = btn.dataset.tpl;
+          if (tplId === '__scratch__') {
+            this._pcGoToStep2(null);
+          } else {
+            const tpl = TEMPLATES.find(t => t.id === tplId);
+            this._pcGoToStep2(tpl || null);
+          }
+        });
+      });
+
+      // Slug preview
+      const nameInput   = card.querySelector('#n3pc-name');
+      const slugPreview = card.querySelector('#n3pc-slug-preview');
+      nameInput.addEventListener('input', () => {
+        const slug = this._toSlug(nameInput.value);
+        slugPreview.textContent = slug ? `URL slug: /${slug}` : '';
+        slugPreview.style.color = slug ? '#E31137' : '#555';
+      });
+
+      // Image drop zone
+      const dropzone  = card.querySelector('#n3pc-dropzone');
+      const fileInput = card.querySelector('#n3pc-file-input');
+      const thumbsEl  = card.querySelector('#n3pc-thumbs');
+      dropzone.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#E31137'; });
+      dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = '#333'; });
+      dropzone.addEventListener('drop', e => {
+        e.preventDefault(); dropzone.style.borderColor = '#333';
+        this._pcAddImages(Array.from(e.dataTransfer.files), thumbsEl);
+      });
+      fileInput.addEventListener('change', () => {
+        this._pcAddImages(Array.from(fileInput.files), thumbsEl);
+        fileInput.value = '';
+      });
+
+      // Generate button
+      card.querySelector('#n3pc-generate-btn').addEventListener('click', () => {
+        if (this._pcDone) { el.style.display = 'none'; return; }
+        this._runPageGeneration(el);
+      });
+
+      this._pageCreatorEl = el;
+      this._pcImages = [];
+      this._pcDone   = false;
+      document.body.appendChild(el);
+    }
+
+    _toSlug(name) {
+      return String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    _pcAddImages(files, thumbsEl) {
+      if (!this._pcImages) this._pcImages = [];
+      files.filter(f => f.type.startsWith('image/')).forEach(file => {
+        if (file.size > 5 * 1024 * 1024) { N3UI.toast(`${file.name} exceeds 5 MB`, 'error'); return; }
+        this._pcImages.push(file);
+        const wrap = document.createElement('div');
+        Object.assign(wrap.style, { position: 'relative', width: '72px', height: '72px', flexShrink: '0' });
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        Object.assign(img.style, { width:'72px', height:'72px', objectFit:'cover', borderRadius:'8px', border:'1px solid #333', display:'block' });
+        const rm = document.createElement('button');
+        rm.textContent = '×';
+        Object.assign(rm.style, { position:'absolute', top:'-6px', right:'-6px', background:'#E31137', color:'#fff', border:'none', borderRadius:'50%', width:'18px', height:'18px', fontSize:'13px', cursor:'pointer', lineHeight:'18px', padding:'0', textAlign:'center' });
+        rm.addEventListener('click', e => { e.stopPropagation(); this._pcImages = this._pcImages.filter(f => f !== file); wrap.remove(); });
+        wrap.appendChild(img); wrap.appendChild(rm); thumbsEl.appendChild(wrap);
+      });
+    }
+
+    async _runPageGeneration(el) {
+      const nameVal   = el.querySelector('#n3pc-name').value.trim();
+      if (!nameVal) { N3UI.toast('Page name is required', 'error'); el.querySelector('#n3pc-name').focus(); return; }
+      const description = el.querySelector('#n3pc-desc').value.trim() || `A page called ${nameVal}`;
+      const formBody    = el.querySelector('#n3pc-form-body');
+      const spinnerEl   = el.querySelector('#n3pc-spinner');
+      const spinStatus  = el.querySelector('#n3pc-spin-status');
+      const successEl   = el.querySelector('#n3pc-success');
+      const genBtn      = el.querySelector('#n3pc-generate-btn');
+
+      const { api, site, key } = this._cloudCfg;
+
+      // Build auth headers: prefer JWT cookie, fall back to site API key
+      const cookieJwt = document.cookie.match(/n3_token=([^;]+)/)?.[1]
+                     || sessionStorage.getItem('n3_auth');
+      const jsonHeaders = { 'Content-Type': 'application/json' };
+      const uploadHdrBase = {};
+      if (cookieJwt) {
+        jsonHeaders['Authorization']   = 'Bearer ' + cookieJwt;
+        uploadHdrBase['Authorization'] = 'Bearer ' + cookieJwt;
+      } else if (key) {
+        jsonHeaders['X-API-Key']   = key;
+        uploadHdrBase['X-API-Key'] = key;
+      }
+
+      // Inject spin keyframes once
+      if (!document.getElementById('n3-spin-kf')) {
+        const s = document.createElement('style');
+        s.id = 'n3-spin-kf';
+        s.textContent = '@keyframes n3-spin{to{transform:rotate(360deg)}}';
+        document.head.appendChild(s);
+      }
+
+      // Switch to spinner view
+      formBody.style.display  = 'none';
+      genBtn.style.display    = 'none';
+      successEl.style.display = 'none';
+      spinnerEl.style.display = 'block';
+
+      const statuses = [
+        'Picking the best components…',
+        'Writing your content…',
+        'Adding photos…',
+        'Updating your navigation…',
+        'Almost done…',
+      ];
+      let statusIdx = 0;
+      spinStatus.textContent = statuses[0];
+      const statusInterval = setInterval(() => {
+        statusIdx = (statusIdx + 1) % statuses.length;
+        spinStatus.textContent = statuses[statusIdx];
+      }, 4000);
+
+      const _stopSpinner = () => {
+        clearInterval(statusInterval);
+        spinnerEl.style.display = 'none';
+      };
+
+      try {
+        // 1. Upload images
+        const imageUrls = [];
+        const images    = this._pcImages || [];
+        if (images.length > 0) {
+          spinStatus.textContent = `Uploading ${images.length} image(s)…`;
+          for (let i = 0; i < images.length; i++) {
+            const fd = new FormData();
+            fd.append('file', images[i]);
+            const r = await fetch(`${api}/uploads/${site}/upload`, { method: 'POST', headers: uploadHdrBase, credentials: 'include', body: fd });
+            if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || `Upload failed: ${r.status}`); }
+            const { file: uploaded } = await r.json();
+            imageUrls.push(uploaded.url);
+          }
+        }
+
+        // 2. Generate page with AI (pass templateId if a template was selected)
+        const body = { name: nameVal, description, imageUrls };
+        if (this._selectedTemplate) body.templateId = this._selectedTemplate.id;
+        const genRes = await fetch(`${api}/sites/${site}/pages/generate`, {
+          method: 'POST', headers: jsonHeaders, credentials: 'include',
+          body: JSON.stringify(body),
+        });
+        if (!genRes.ok) {
+          const e = await genRes.json().catch(() => ({}));
+          throw new Error(e.error || `Generation failed: ${genRes.status}`);
+        }
+        const genData = await genRes.json();
+
+        _stopSpinner();
+
+        // 3. Show success
+        successEl.style.display = 'block';
+        const pageUrl = `https://assembler.n3ware.com/sites/${site}/${genData.slug}`;
+        el.querySelector('#n3pc-success-msg').innerHTML =
+          `<strong>${nameVal}</strong> — <a href="${pageUrl}" target="_blank" style="color:#4ade80;text-decoration:underline">View page →</a>`;
+        genBtn.textContent   = '✓ Done — Close';
+        genBtn.style.display = 'block';
+        genBtn.disabled      = false;
+        this._pcDone         = true;
+        N3UI.toast(`Page "${nameVal}" created!`, 'success');
+      } catch (err) {
+        _stopSpinner();
+        formBody.style.display  = 'block';
+        genBtn.style.display    = 'block';
+        genBtn.disabled         = false;
+        genBtn.textContent      = this._selectedTemplate ? '🤖 Customize with AI' : '🤖 Generate Page with AI';
+        N3UI.toast(`Error: ${err.message}`, 'error');
+      }
     }
 
     _enter() {
