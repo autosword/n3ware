@@ -410,11 +410,11 @@
           { path: '/our-chef',     views: Math.round(totalViews * 0.07), avgTime: 76  },
         ],
         events: [
-          { icon: '📞', label: 'Phone Number Tapped',        count: Math.round(47 * scale), prev: Math.round(39 * scale), trend: 1  },
-          { icon: '📅', label: 'Reservation Button Clicked', count: Math.round(23 * scale), prev: Math.round(18 * scale), trend: 1  },
-          { icon: '🍽',  label: 'Menu Viewed',                count: Math.round(89 * scale), prev: Math.round(94 * scale), trend: -1 },
-          { icon: '🗺',  label: 'Directions Clicked',          count: Math.round(31 * scale), prev: Math.round(24 * scale), trend: 1  },
-          { icon: '✉',  label: 'Contact Form Submitted',      count: Math.round(8  * scale), prev: Math.round(5  * scale), trend: 1  },
+          { lucideIcon: 'phone',     label: 'Phone Number Tapped',        count: Math.round(47 * scale), prev: Math.round(39 * scale), trend: 1  },
+          { lucideIcon: 'calendar',  label: 'Reservation Button Clicked', count: Math.round(23 * scale), prev: Math.round(18 * scale), trend: 1  },
+          { lucideIcon: 'utensils',  label: 'Menu Viewed',                count: Math.round(89 * scale), prev: Math.round(94 * scale), trend: -1 },
+          { lucideIcon: 'navigation',label: 'Directions Clicked',          count: Math.round(31 * scale), prev: Math.round(24 * scale), trend: 1  },
+          { lucideIcon: 'mail',      label: 'Contact Form Submitted',      count: Math.round(8  * scale), prev: Math.round(5  * scale), trend: 1  },
         ],
         referrers: [
           { domain: 'maps.google.com', visits: Math.round(420 * scale) },
@@ -493,7 +493,9 @@
           const trendCls   = ev.trend >= 0 ? 'n3-an-trend-up' : 'n3-an-trend-dn';
           const trendArrow = ev.trend >= 0 ? '↑' : '↓';
           const trendPct   = ev.prev ? Math.abs(Math.round((ev.count - ev.prev) / ev.prev * 100)) : 0;
-          return `<div class="n3-an-event"><span class="n3-an-event-icon">${ev.icon}</span><span class="n3-an-event-label">${_esc(ev.label)}</span><span class="n3-an-event-count">${ev.count}</span><span class="n3-an-event-trend ${trendCls}">${trendArrow}${trendPct}%</span></div>`;
+          const _iconFn = (window._n3wareModules || {}).icon;
+          const evIcon = _iconFn ? _iconFn(ev.lucideIcon || ev.icon || 'mouse-pointer-click', { size: 16 }) : (ev.icon || '');
+          return `<div class="n3-an-event"><span class="n3-an-event-icon" style="display:inline-flex;align-items:center">${evIcon}</span><span class="n3-an-event-label">${_esc(ev.label)}</span><span class="n3-an-event-count">${ev.count}</span><span class="n3-an-event-trend ${trendCls}">${trendArrow}${trendPct}%</span></div>`;
         }).join('');
         eventsHtml = `<div class="n3-an-section"><p class="n3-an-section-title">⚡ Customer Actions</p><div class="n3-an-events">${evRows}</div></div>`;
       }

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>n3ware — Edit Any Website. Visually.</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -190,61 +191,61 @@
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Feature cards -->
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">✏️</div>
+          <div class="text-3xl mb-4"><i data-lucide="pencil" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Inline Text Editing</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Click any text element to edit in place. Bold, italic, links, colors, heading levels — all via a floating toolbar.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">↕️</div>
+          <div class="text-3xl mb-4"><i data-lucide="grip-vertical" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Drag & Drop Layout</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Grab the ⠿ handle to reorder any block element. A glowing blue line shows exactly where it'll land.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">🎨</div>
+          <div class="text-3xl mb-4"><i data-lucide="settings" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Style Panel</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Adjust colors, padding, margin, border radius, opacity, CSS classes, and raw CSS — all from a sleek side panel.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">🖼️</div>
+          <div class="text-3xl mb-4"><i data-lucide="image" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Image Controls</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Replace images via URL, edit alt text, align with one click, and drag corner handles to resize visually.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">↩️</div>
+          <div class="text-3xl mb-4"><i data-lucide="undo" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Undo / Redo</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Full history stack. Ctrl+Z / Cmd+Z to undo, Ctrl+Shift+Z to redo. Every change is tracked.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">💾</div>
+          <div class="text-3xl mb-4"><i data-lucide="download" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Export Options</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Save clean HTML, copy to clipboard, or get a JSON diff of exactly what changed — selector, before, and after.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">🔒</div>
+          <div class="text-3xl mb-4"><i data-lucide="check" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Non-Destructive</h3>
           <p class="text-[#888888] text-sm leading-relaxed">Zero impact when not editing. No external CSS. All editor UI injected via JS and namespaced with <code class="text-[#E31337]">n3-</code>.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">📱</div>
+          <div class="text-3xl mb-4"><i data-lucide="phone" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Mobile Ready</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Touch-friendly drag and drop. Works on iOS and Android. Editor UI adapts to any screen size.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4">⚡</div>
+          <div class="text-3xl mb-4"><i data-lucide="code" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">Zero Dependencies</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Pure vanilla JavaScript. Works on WordPress, static HTML, React apps — any website. No npm, no bundler.</p>
         </div>
 
         <a href="/components" class="bg-gray-900 border border-[#E31337]/30 bg-[#E31337]/10 rounded-2xl p-6 hover:border-[#E31337]/60 transition-all hover:-translate-y-1 block">
-          <div class="text-3xl mb-4">🧩</div>
+          <div class="text-3xl mb-4"><i data-lucide="layout-grid" class="w-8 h-8"></i></div>
           <h3 class="font-bold text-lg mb-2">30+ Ready-Made Components</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Heroes, pricing tables, testimonials, menus, galleries — professionally designed Tailwind blocks for any SMB site.</p>
           <div class="mt-4 text-[#E31337] text-sm font-medium">Browse component library →</div>
@@ -591,5 +592,6 @@
       });
     }
   </script>
+  <script>if(window.lucide) lucide.createIcons();</script>
 </body>
 </html>

@@ -62,6 +62,7 @@
   // ─── Module loader ────────────────────────────────────────────────────────
   /** Names of companion script files to load in parallel */
   const _MODULES = [
+    'n3ware-icons.js',
     'n3ware-text.js',
     'n3ware-style.js',
     'n3ware-charts.js',
@@ -902,9 +903,10 @@
 
       // Update heading + badge
       const badge = el.querySelector('#n3pc-template-badge');
+      const _iconFn = (name, sz) => { const fn = (window._n3wareModules || {}).icon; return fn ? fn(name, { size: sz || 14 }) : ''; };
       if (template) {
         el.querySelector('#n3pc-step2-title').textContent = `Customize: ${template.name}`;
-        badge.textContent = `${template.icon} ${template.name}`;
+        badge.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle">${_iconFn(template.lucideIcon, 14)} ${template.name}</span>`;
         badge.style.display = 'inline-block';
         nameInput.value = template.defaultName || '';
         el.querySelector('#n3pc-desc').value = template.defaultPrompt || '';
@@ -912,13 +914,13 @@
         const sp = el.querySelector('#n3pc-slug-preview');
         sp.textContent = slug ? `URL slug: /${slug}` : '';
         sp.style.color = slug ? '#E31137' : '#555';
-        el.querySelector('#n3pc-generate-btn').textContent = '🤖 Customize with AI';
+        el.querySelector('#n3pc-generate-btn').textContent = 'Customize with AI';
       } else {
         el.querySelector('#n3pc-step2-title').textContent = 'Create New Page';
         badge.style.display = 'none';
         nameInput.value = '';
         el.querySelector('#n3pc-desc').value = '';
-        el.querySelector('#n3pc-generate-btn').textContent = '🤖 Generate Page with AI';
+        el.querySelector('#n3pc-generate-btn').textContent = 'Generate Page with AI';
       }
 
       el.querySelector('#n3pc-step2').style.display = 'block';
@@ -928,18 +930,18 @@
     _buildPageCreator() {
       // Template metadata (mirrors page-templates.json, subset for UI)
       const TEMPLATES = [
-        { id: 'about-team',    name: 'About & Team',  icon: '👥', description: 'Company story, mission & team',  defaultName: 'About Us',    defaultSlug: 'about',        defaultPrompt: 'A professional About Us page with our company story, mission, values, and team members.' },
-        { id: 'services',      name: 'Services',       icon: '🛠️', description: 'Showcase your services',         defaultName: 'Services',    defaultSlug: 'services',     defaultPrompt: 'A services page listing all the services we offer with descriptions and a CTA.' },
-        { id: 'pricing',       name: 'Pricing',        icon: '💰', description: 'Tiered plans with feature lists', defaultName: 'Pricing',     defaultSlug: 'pricing',      defaultPrompt: 'A pricing page with 3 tiers, feature comparison, and a bold CTA.' },
-        { id: 'contact',       name: 'Contact',        icon: '📬', description: 'Contact form + map + hours',     defaultName: 'Contact Us',  defaultSlug: 'contact',      defaultPrompt: 'A contact page with a form, phone/email, address, hours of operation, and a map embed.' },
-        { id: 'faq',           name: 'FAQ',            icon: '❓', description: 'Accordion Q&A section',          defaultName: 'FAQ',         defaultSlug: 'faq',          defaultPrompt: 'A FAQ page with an accordion-style list of common questions and detailed answers.' },
-        { id: 'portfolio',     name: 'Portfolio',      icon: '🖼️', description: 'Project / work showcase grid',   defaultName: 'Portfolio',   defaultSlug: 'portfolio',    defaultPrompt: 'A portfolio page with a filterable grid of projects, descriptions, and links.' },
-        { id: 'testimonials',  name: 'Testimonials',   icon: '⭐', description: 'Customer reviews & quotes',      defaultName: 'Reviews',     defaultSlug: 'testimonials', defaultPrompt: 'A testimonials page with customer quotes, star ratings, and photos.' },
-        { id: 'locations',     name: 'Locations',      icon: '📍', description: 'Multi-location cards + maps',    defaultName: 'Locations',   defaultSlug: 'locations',    defaultPrompt: 'A locations page with each location\'s address, hours, phone number, and map link.' },
-        { id: 'blog',          name: 'Blog',           icon: '📝', description: 'Article listing with previews',  defaultName: 'Blog',        defaultSlug: 'blog',         defaultPrompt: 'A blog index page with article cards, categories, and a newsletter signup.' },
-        { id: 'menu',          name: 'Menu',           icon: '🍽️', description: 'Restaurant / café menu layout',  defaultName: 'Menu',        defaultSlug: 'menu',         defaultPrompt: 'A restaurant menu page with sections for appetizers, mains, desserts, drinks, and prices.' },
-        { id: 'booking',       name: 'Booking',        icon: '📅', description: 'Appointment / reservation CTA',  defaultName: 'Book Now',    defaultSlug: 'booking',      defaultPrompt: 'A booking page with service options, availability info, and a prominent booking CTA.' },
-        { id: 'landing',       name: 'Landing Page',   icon: '🚀', description: 'High-conversion promo page',     defaultName: 'Special Offer', defaultSlug: 'landing',   defaultPrompt: 'A high-conversion landing page with a hero, benefits, social proof, and a strong CTA.' },
+        { id: 'about-team',    name: 'About & Team',  lucideIcon: 'users',        description: 'Company story, mission & team',  defaultName: 'About Us',    defaultSlug: 'about',        defaultPrompt: 'A professional About Us page with our company story, mission, values, and team members.' },
+        { id: 'services',      name: 'Services',       lucideIcon: 'wrench',       description: 'Showcase your services',         defaultName: 'Services',    defaultSlug: 'services',     defaultPrompt: 'A services page listing all the services we offer with descriptions and a CTA.' },
+        { id: 'pricing',       name: 'Pricing',        lucideIcon: 'dollar-sign',  description: 'Tiered plans with feature lists', defaultName: 'Pricing',     defaultSlug: 'pricing',      defaultPrompt: 'A pricing page with 3 tiers, feature comparison, and a bold CTA.' },
+        { id: 'contact',       name: 'Contact',        lucideIcon: 'mail',         description: 'Contact form + map + hours',     defaultName: 'Contact Us',  defaultSlug: 'contact',      defaultPrompt: 'A contact page with a form, phone/email, address, hours of operation, and a map embed.' },
+        { id: 'faq',           name: 'FAQ',            lucideIcon: 'help-circle',  description: 'Accordion Q&A section',          defaultName: 'FAQ',         defaultSlug: 'faq',          defaultPrompt: 'A FAQ page with an accordion-style list of common questions and detailed answers.' },
+        { id: 'portfolio',     name: 'Portfolio',      lucideIcon: 'image',        description: 'Project / work showcase grid',   defaultName: 'Portfolio',   defaultSlug: 'portfolio',    defaultPrompt: 'A portfolio page with a filterable grid of projects, descriptions, and links.' },
+        { id: 'testimonials',  name: 'Testimonials',   lucideIcon: 'star',         description: 'Customer reviews & quotes',      defaultName: 'Reviews',     defaultSlug: 'testimonials', defaultPrompt: 'A testimonials page with customer quotes, star ratings, and photos.' },
+        { id: 'locations',     name: 'Locations',      lucideIcon: 'map-pin',      description: 'Multi-location cards + maps',    defaultName: 'Locations',   defaultSlug: 'locations',    defaultPrompt: 'A locations page with each location\'s address, hours, phone number, and map link.' },
+        { id: 'blog',          name: 'Blog',           lucideIcon: 'newspaper',    description: 'Article listing with previews',  defaultName: 'Blog',        defaultSlug: 'blog',         defaultPrompt: 'A blog index page with article cards, categories, and a newsletter signup.' },
+        { id: 'menu',          name: 'Menu',           lucideIcon: 'utensils',     description: 'Restaurant / café menu layout',  defaultName: 'Menu',        defaultSlug: 'menu',         defaultPrompt: 'A restaurant menu page with sections for appetizers, mains, desserts, drinks, and prices.' },
+        { id: 'booking',       name: 'Booking',        lucideIcon: 'calendar',     description: 'Appointment / reservation CTA',  defaultName: 'Book Now',    defaultSlug: 'booking',      defaultPrompt: 'A booking page with service options, availability info, and a prominent booking CTA.' },
+        { id: 'landing',       name: 'Landing Page',   lucideIcon: 'rocket',       description: 'High-conversion promo page',     defaultName: 'Special Offer', defaultSlug: 'landing',   defaultPrompt: 'A high-conversion landing page with a hero, benefits, social proof, and a strong CTA.' },
       ];
 
       const el = document.createElement('div');
@@ -960,8 +962,13 @@
         position: 'relative', boxSizing: 'border-box', margin: '16px',
       });
 
+      const _icon = (name, sz) => {
+        const fn = (window._n3wareModules || {}).icon;
+        return fn ? fn(name, { size: sz || 22 }) : '';
+      };
+
       card.innerHTML = `
-        <button id="n3pc-close" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1" title="Close">✕</button>
+        <button id="n3pc-close" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#666;cursor:pointer;padding:6px;border-radius:6px;line-height:1;display:flex;align-items:center;justify-content:center" title="Close">${_icon('x', 18)}</button>
 
         <!-- Step 1: Template picker -->
         <div id="n3pc-step1">
@@ -969,13 +976,13 @@
           <p style="margin:0 0 24px;color:#888;font-size:14px">Choose a starting point</p>
           <div id="n3pc-tpl-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
             <button class="n3pc-tpl-card" data-tpl="__scratch__" style="background:#0A0A0A;border:1px solid #333;border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;color:#fff;transition:border-color 0.15s">
-              <div style="font-size:22px;margin-bottom:6px">✏️</div>
+              <div style="display:flex;align-items:center;justify-content:center;margin-bottom:6px">${_icon('sparkles', 22)}</div>
               <div style="font-size:13px;font-weight:600;margin-bottom:3px">From Scratch</div>
               <div style="font-size:11px;color:#666">AI writes everything</div>
             </button>
             ${TEMPLATES.map(t => `
             <button class="n3pc-tpl-card" data-tpl="${t.id}" style="background:#0A0A0A;border:1px solid #333;border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;color:#fff;transition:border-color 0.15s">
-              <div style="font-size:22px;margin-bottom:6px">${t.icon}</div>
+              <div style="display:flex;align-items:center;justify-content:center;margin-bottom:6px">${_icon(t.lucideIcon, 22)}</div>
               <div style="font-size:13px;font-weight:600;margin-bottom:3px">${t.name}</div>
               <div style="font-size:11px;color:#666">${t.description}</div>
             </button>`).join('')}
