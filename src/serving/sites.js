@@ -6,6 +6,10 @@
  * Serves published sites at  GET /sites/:siteId
  * with n3ware.js injected before </body> and correct Cache-Control headers.
  *
+ * For v2 sites (GCS-backed), content is fetched from the assembler so that
+ * page edits saved to GCS are reflected immediately.  The assembler URL is
+ * read from ASSEMBLER_URL (default: https://assembler.n3ware.com).
+ *
  * Cache-Control strategy:
  *   - public, s-maxage=300  (CDN caches 5 min)
  *   - stale-while-revalidate=60
@@ -16,7 +20,8 @@ const cache          = require('../cache');
 const config         = require('../config');
 const { generateScripts, wrapScript } = require('../integrations/tracker-scripts');
 
-const CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=60';
+const CACHE_CONTROL   = 'public, s-maxage=300, stale-while-revalidate=60';
+const ASSEMBLER_URL   = process.env.ASSEMBLER_URL || 'https://assembler.n3ware.com';
 
 /**
  * Express middleware factory.
@@ -25,16 +30,35 @@ const CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=60';
  */
 function serveSites() {
   return async function siteHandler(req, res, next) {
-    // Expect /:siteId or /:siteId/
-    const siteId = req.path.replace(/^\//, '').replace(/\/$/, '').split('/')[0];
+    // Expect /:siteId[/:page] or /:siteId/
+    const parts  = req.path.replace(/^\//, '').split('/');
+    const siteId = parts[0];
     if (!siteId) return next();
 
     try {
       const site = await cache.getSite(storage, siteId);
       if (!site) return res.status(404).send(_notFoundPage(siteId));
 
+      // v2 sites: assemble from GCS via the assembler service
+      const assemblerResp = await fetch(
+        `${ASSEMBLER_URL}/sites/${siteId}${req.path.slice(siteId.length + 1) || '/'}`,
+        { headers: { 'Accept': 'text/html' } }
+      );
+
+      let rawHtml;
+      let fromAssembler = false;
+      if (assemblerResp.ok) {
+        rawHtml = await assemblerResp.text();
+        fromAssembler = true;
+      } else {
+        // Assembler failed (not a v2 site or error) — fall back to Firestore html
+        rawHtml = site.html || '';
+      }
+
       const trackerScripts = generateScripts(site.integrations || {});
-      const html = _injectEditor(_injectTrackers(site.html, trackerScripts), siteId, site.apiKey);
+      // Assembler already injects the editor script for v2 sites; skip re-injection
+      const withTrackers = _injectTrackers(rawHtml, trackerScripts);
+      const html = fromAssembler ? withTrackers : _injectEditor(withTrackers, siteId, site.apiKey);
       res.set('Content-Type', 'text/html; charset=utf-8');
       res.set('Cache-Control', CACHE_CONTROL);
       res.set('X-Site-Id', siteId);
