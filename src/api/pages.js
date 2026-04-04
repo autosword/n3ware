@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const { generatePageWithAI, addPageToNav } = require('../integrations/page-generator');
 
 /**
  * Multi-page management API — v2 architecture.
@@ -116,6 +117,51 @@ router.put('/pages/:slug', async (req, res) => {
     _bustCaches(req.params.id, slug);
 
     res.json({ saved: true, slug });
+  } catch (err) { _error(res, err); }
+});
+
+// POST /api/sites/:id/pages/generate — AI page generation
+router.post('/pages/generate', async (req, res) => {
+  try {
+    if (!await _requireSite(req, res)) return;
+    if (!GCS_ENABLED) return res.status(503).json({ error: 'GCS not configured — page generation requires GCS storage' });
+
+    const { name, description = '', imageUrls = [] } = req.body || {};
+    if (!name || !String(name).trim()) return res.status(400).json({ error: '`name` is required' });
+
+    const slug = String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    if (!slug) return res.status(400).json({ error: 'Page name could not be converted to a valid slug' });
+    if (slug === 'index') return res.status(400).json({ error: 'Cannot generate a page with slug "index"' });
+
+    // Load component library for the AI prompt
+    let components = [];
+    try { components = require('../../public/components/components.json'); } catch (_) {}
+
+    // Generate HTML with Claude (or mock fallback)
+    const html = await generatePageWithAI(String(description), components, imageUrls, String(name).trim());
+
+    // Write page to GCS + update manifest
+    await gcsFiles.savePage(req.params.id, slug, html, String(name).trim());
+
+    // Update nav component to include the new page link
+    try {
+      const navHtml    = await gcsFiles.getComponent(req.params.id, 'nav');
+      const updatedNav = addPageToNav(navHtml, slug, String(name).trim());
+      await gcsFiles.saveComponent(req.params.id, 'nav', updatedNav);
+    } catch (navErr) {
+      console.warn('[pages/generate] nav update failed:', navErr.message);
+    }
+
+    // Bust assembler + CDN caches
+    cache.onSave(req.params.id).catch(() => {});
+    _bustCaches(req.params.id, slug);
+
+    res.status(201).json({
+      success: true,
+      slug,
+      title:   String(name).trim(),
+      html:    html.substring(0, 300) + (html.length > 300 ? '…' : ''),
+    });
   } catch (err) { _error(res, err); }
 });
 

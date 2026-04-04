@@ -829,6 +829,16 @@
 
       actions.appendChild(analyticsBtn);
       actions.appendChild(compBtn);
+      if (this._cloudCfg) {
+        const PLUS = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+        const pageBtn = document.createElement('button');
+        pageBtn.className = 'n3-fab-btn';
+        pageBtn.innerHTML = PLUS;
+        pageBtn.title = 'New Page';
+        pageBtn.addEventListener('click', e => { e.stopPropagation(); this._openPageCreator(); });
+        actions.appendChild(pageBtn);
+        this._pageFabBtn = pageBtn;
+      }
       actions.appendChild(editBtn);
       this._editFabBtn      = editBtn;
       this._analyticsFabBtn = analyticsBtn;
@@ -853,6 +863,223 @@
       this._editFabBtn.classList.toggle('n3-editing', on);
       const toggle = this._fab && this._fab.querySelector('.n3-fab-toggle');
       if (toggle) toggle.classList.toggle('n3-editing', on);
+    }
+
+    // ── Page Creator Modal ────────────────────────────────────────────────────
+
+    _openPageCreator() {
+      if (!this._cloudCfg) return;
+      if (!this._pageCreatorEl) this._buildPageCreator();
+      const el = this._pageCreatorEl;
+      el.querySelector('#n3pc-name').value = '';
+      el.querySelector('#n3pc-slug-preview').textContent = '';
+      el.querySelector('#n3pc-desc').value = '';
+      el.querySelector('#n3pc-thumbs').innerHTML = '';
+      el.querySelector('#n3pc-progress').style.display = 'none';
+      el.querySelector('#n3pc-success').style.display = 'none';
+      el.querySelector('#n3pc-generate-btn').disabled = false;
+      el.querySelector('#n3pc-generate-btn').textContent = '🤖 Generate Page with AI';
+      this._pcImages = [];
+      this._pcDone   = false;
+      el.style.display = 'flex';
+      setTimeout(() => el.querySelector('#n3pc-name').focus(), 80);
+    }
+
+    _buildPageCreator() {
+      const el = document.createElement('div');
+      el.setAttribute('data-n3-ui', '1');
+      Object.assign(el.style, {
+        position: 'fixed', inset: '0', zIndex: '100002',
+        background: 'rgba(0,0,0,0.88)',
+        display: 'none', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'system-ui,-apple-system,sans-serif',
+      });
+
+      const card = document.createElement('div');
+      Object.assign(card.style, {
+        background: '#1A1A1A', color: '#fff',
+        borderRadius: '16px', border: '1px solid #2a2a2a',
+        width: '100%', maxWidth: '580px', maxHeight: '90vh',
+        overflowY: 'auto', padding: '32px',
+        position: 'relative', boxSizing: 'border-box', margin: '16px',
+      });
+
+      card.innerHTML = `
+        <button id="n3pc-close" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1" title="Close">✕</button>
+        <h2 style="margin:0 0 24px;font-size:21px;font-weight:700;color:#fff">Create New Page</h2>
+
+        <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Name <span style="color:#E31137">*</span></label>
+        <input id="n3pc-name" type="text" placeholder="e.g. Our Menu" autocomplete="off"
+          style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:15px;outline:none;margin-bottom:4px">
+        <div id="n3pc-slug-preview" style="font-size:12px;color:#555;margin-bottom:18px;min-height:16px"></div>
+
+        <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Description</label>
+        <textarea id="n3pc-desc" rows="5" placeholder="Describe what this page should contain — style, sections, key content, tone…"
+          style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;resize:vertical;margin-bottom:20px;font-family:inherit"></textarea>
+
+        <label style="display:block;margin-bottom:8px;font-size:13px;color:#aaa;font-weight:500">Upload Images <span style="color:#555">(optional)</span></label>
+        <div id="n3pc-dropzone" style="background:#0A0A0A;border:2px dashed #333;border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color 0.2s">
+          <div style="font-size:26px;margin-bottom:6px">📷</div>
+          <div style="color:#666;font-size:14px">Drop images here or <span style="color:#E31137">click to browse</span></div>
+          <div style="color:#444;font-size:12px;margin-top:4px">JPG, PNG, WebP · max 5 MB each</div>
+          <input id="n3pc-file-input" type="file" accept="image/*" multiple style="display:none">
+        </div>
+        <div id="n3pc-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+
+        <div id="n3pc-progress" style="display:none;margin-bottom:20px">
+          <div id="n3pc-status-text" style="font-size:13px;color:#aaa;margin-bottom:8px">Generating…</div>
+          <div style="background:#0A0A0A;border-radius:8px;height:8px;overflow:hidden">
+            <div id="n3pc-bar" style="background:#E31137;height:100%;width:0%;transition:width 0.4s ease;border-radius:8px"></div>
+          </div>
+        </div>
+
+        <div id="n3pc-success" style="display:none;background:#0c2318;border:1px solid #1a5c38;border-radius:10px;padding:14px 16px;margin-bottom:18px">
+          <div style="color:#4ade80;font-size:14px;font-weight:600;margin-bottom:6px">✓ Page created!</div>
+          <div id="n3pc-success-msg" style="font-size:13px;color:#86efac"></div>
+        </div>
+
+        <button id="n3pc-generate-btn"
+          style="width:100%;background:#E31137;color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:opacity 0.2s">
+          🤖 Generate Page with AI
+        </button>`;
+
+      el.appendChild(card);
+
+      // Close
+      card.querySelector('#n3pc-close').addEventListener('click', () => { el.style.display = 'none'; });
+      el.addEventListener('click', e => { if (e.target === el) el.style.display = 'none'; });
+
+      // Slug preview from name input
+      const nameInput   = card.querySelector('#n3pc-name');
+      const slugPreview = card.querySelector('#n3pc-slug-preview');
+      nameInput.addEventListener('input', () => {
+        const slug = this._toSlug(nameInput.value);
+        slugPreview.textContent = slug ? `URL slug: /${slug}` : '';
+        slugPreview.style.color = slug ? '#E31137' : '#555';
+      });
+
+      // Image drop zone
+      const dropzone  = card.querySelector('#n3pc-dropzone');
+      const fileInput = card.querySelector('#n3pc-file-input');
+      const thumbsEl  = card.querySelector('#n3pc-thumbs');
+      dropzone.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#E31137'; });
+      dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = '#333'; });
+      dropzone.addEventListener('drop', e => {
+        e.preventDefault(); dropzone.style.borderColor = '#333';
+        this._pcAddImages(Array.from(e.dataTransfer.files), thumbsEl);
+      });
+      fileInput.addEventListener('change', () => {
+        this._pcAddImages(Array.from(fileInput.files), thumbsEl);
+        fileInput.value = '';
+      });
+
+      // Generate button
+      card.querySelector('#n3pc-generate-btn').addEventListener('click', () => {
+        if (this._pcDone) { el.style.display = 'none'; return; }
+        this._runPageGeneration(el);
+      });
+
+      this._pageCreatorEl = el;
+      this._pcImages = [];
+      this._pcDone   = false;
+      document.body.appendChild(el);
+    }
+
+    _toSlug(name) {
+      return String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    _pcAddImages(files, thumbsEl) {
+      if (!this._pcImages) this._pcImages = [];
+      files.filter(f => f.type.startsWith('image/')).forEach(file => {
+        if (file.size > 5 * 1024 * 1024) { N3UI.toast(`${file.name} exceeds 5 MB`, 'error'); return; }
+        this._pcImages.push(file);
+        const wrap = document.createElement('div');
+        Object.assign(wrap.style, { position: 'relative', width: '72px', height: '72px', flexShrink: '0' });
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        Object.assign(img.style, { width:'72px', height:'72px', objectFit:'cover', borderRadius:'8px', border:'1px solid #333', display:'block' });
+        const rm = document.createElement('button');
+        rm.textContent = '×';
+        Object.assign(rm.style, { position:'absolute', top:'-6px', right:'-6px', background:'#E31137', color:'#fff', border:'none', borderRadius:'50%', width:'18px', height:'18px', fontSize:'13px', cursor:'pointer', lineHeight:'18px', padding:'0', textAlign:'center' });
+        rm.addEventListener('click', e => { e.stopPropagation(); this._pcImages = this._pcImages.filter(f => f !== file); wrap.remove(); });
+        wrap.appendChild(img); wrap.appendChild(rm); thumbsEl.appendChild(wrap);
+      });
+    }
+
+    async _runPageGeneration(el) {
+      const nameVal   = el.querySelector('#n3pc-name').value.trim();
+      if (!nameVal) { N3UI.toast('Page name is required', 'error'); el.querySelector('#n3pc-name').focus(); return; }
+      const slug        = this._toSlug(nameVal);
+      const description = el.querySelector('#n3pc-desc').value.trim() || `A page called ${nameVal}`;
+      const progressEl  = el.querySelector('#n3pc-progress');
+      const statusEl    = el.querySelector('#n3pc-status-text');
+      const barEl       = el.querySelector('#n3pc-bar');
+      const successEl   = el.querySelector('#n3pc-success');
+      const genBtn      = el.querySelector('#n3pc-generate-btn');
+
+      const { api, site, key } = this._cloudCfg;
+      const jsonHeaders = { 'Content-Type': 'application/json' };
+      if (key) jsonHeaders['X-API-Key'] = key;
+
+      const setProgress = (pct, msg) => { barEl.style.width = pct + '%'; statusEl.textContent = msg; };
+
+      genBtn.disabled = true;
+      genBtn.textContent = 'Working…';
+      progressEl.style.display = 'block';
+      successEl.style.display  = 'none';
+
+      try {
+        // 1. Upload images
+        const imageUrls = [];
+        const images    = this._pcImages || [];
+        if (images.length > 0) {
+          setProgress(5, `Uploading ${images.length} image(s)…`);
+          for (let i = 0; i < images.length; i++) {
+            const fd = new FormData();
+            fd.append('file', images[i]);
+            const uploadHdr = {};
+            if (key) uploadHdr['X-API-Key'] = key;
+            const r = await fetch(`${api}/uploads/${site}/upload`, { method: 'POST', headers: uploadHdr, credentials: 'include', body: fd });
+            if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || `Upload failed: ${r.status}`); }
+            const { file: uploaded } = await r.json();
+            imageUrls.push(uploaded.url);
+            setProgress(5 + Math.round((i + 1) / images.length * 30), `Uploaded ${i + 1}/${images.length} image(s)…`);
+          }
+        }
+
+        // 2. Generate page with AI
+        setProgress(40, 'Generating page with AI… (this takes ~10s)');
+        const genRes = await fetch(`${api}/sites/${site}/pages/generate`, {
+          method: 'POST', headers: jsonHeaders, credentials: 'include',
+          body: JSON.stringify({ name: nameVal, description, imageUrls }),
+        });
+        if (!genRes.ok) {
+          const e = await genRes.json().catch(() => ({}));
+          throw new Error(e.error || `Generation failed: ${genRes.status}`);
+        }
+        const genData = await genRes.json();
+        setProgress(95, 'Updating navigation…');
+
+        await new Promise(r => setTimeout(r, 400));
+        setProgress(100, 'Done!');
+
+        // 3. Show success
+        successEl.style.display = 'block';
+        const pageUrl = `https://assembler.n3ware.com/sites/${site}/${genData.slug}`;
+        el.querySelector('#n3pc-success-msg').innerHTML =
+          `<strong>${nameVal}</strong> — <a href="${pageUrl}" target="_blank" style="color:#4ade80;text-decoration:underline">View page →</a>`;
+        genBtn.textContent = '✓ Done — Close';
+        genBtn.disabled    = false;
+        this._pcDone       = true;
+        N3UI.toast(`Page "${nameVal}" created!`, 'success');
+      } catch (err) {
+        progressEl.style.display = 'none';
+        genBtn.disabled   = false;
+        genBtn.textContent = '🤖 Generate Page with AI';
+        N3UI.toast(`Error: ${err.message}`, 'error');
+      }
     }
 
     _enter() {
