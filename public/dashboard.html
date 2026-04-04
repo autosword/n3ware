@@ -532,13 +532,15 @@ function toast(msg, type = 'info') {
 
 // ── Auth — Magic Link ─────────────────────────────────────────────────────────
 
-// Pick up JWT from URL hash set by /api/auth/verify redirect
+// Pick up JWT from URL hash set by /api/auth/verify redirect.
+// Must run before checkAuth() so S.token is populated before the auth check.
 (function pickUpMagicToken() {
-  const m = window.location.hash.match(/[#&]token=([^&]+)/);
-  if (m) {
-    S.token = decodeURIComponent(m[1]);
-    localStorage.setItem('n3_token', S.token);
-    history.replaceState(null, '', window.location.pathname + window.location.search);
+  const hash = window.location.hash;
+  if (hash.startsWith('#token=')) {
+    const token = hash.substring(7);
+    S.token = token;
+    localStorage.setItem('n3_token', token);
+    history.replaceState(null, '', '/dashboard');
   }
   // Pick up auth_error from query string on failed verify
   const errParam = new URL(window.location.href).searchParams.get('auth_error');

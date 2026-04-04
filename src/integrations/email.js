@@ -77,7 +77,7 @@ function _httpsPost(options, body) {
  * @param {string} htmlBody
  * @returns {Promise<{ messageId: string }>}
  */
-async function _sendViaSendGrid(to, subject, htmlBody) {
+async function _sendViaSendGrid(to, subject, htmlBody, extraPayload = {}) {
   const result = await _httpsPost(
     {
       hostname: 'api.sendgrid.com',
@@ -92,6 +92,7 @@ async function _sendViaSendGrid(to, subject, htmlBody) {
       from:             { email: FROM },
       subject,
       content:          [{ type: 'text/html', value: htmlBody }],
+      ...extraPayload,
     }
   );
   const messageId = `sg_${Date.now()}`;
@@ -290,7 +291,16 @@ async function sendMagicLink(email, magicUrl) {
     _logEmail(email, subject, html);
     return { messageId: `mock_${Date.now()}`, mock: true };
   }
-  return _send(email, subject, html);
+  // Send via SendGrid with click tracking disabled so the magic link URL is
+  // not rewritten through SendGrid's tracking proxy (url####.n3ware.com).
+  if (process.env.SENDGRID_API_KEY) {
+    return _sendViaSendGrid(email, subject, html, {
+      tracking_settings: {
+        click_tracking: { enable: false, enable_text: false },
+      },
+    });
+  }
+  return _sendViaPostmark(email, subject, html);
 }
 
 module.exports = { sendWelcome, sendPasswordReset, sendSitePublished, sendWeeklyReport, sendMagicLink };
