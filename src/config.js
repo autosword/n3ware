@@ -12,7 +12,7 @@ module.exports = {
   // Storage
   storageBackend:  process.env.STORAGE_BACKEND || 'local',          // 'local' | 'firestore'
   dataDir:         process.env.DATA_DIR        || './data/sites',
-  gcpProject:      process.env.GCP_PROJECT_ID  || '',
+  gcpProject:      process.env.GCP_PROJECT_ID  || process.env.GOOGLE_CLOUD_PROJECT || '',
 
   // Auth
   masterApiKey:    process.env.MASTER_API_KEY  || 'dev-master-key',
