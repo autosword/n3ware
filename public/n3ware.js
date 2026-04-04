@@ -1136,7 +1136,8 @@
 
       const { api, site, key } = this._cloudCfg;
       const headers = { 'Content-Type': 'application/json' };
-      const jwt = sessionStorage.getItem('n3_auth');
+      const jwt = document.cookie.match(/n3_token=([^;]+)/)?.[1]
+               || sessionStorage.getItem('n3_auth');
       if (jwt) {
         headers['Authorization'] = 'Bearer ' + jwt;
       } else if (key) {

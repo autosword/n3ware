@@ -4,6 +4,7 @@ const express      = require('express');
 const cors         = require('cors');
 const morgan       = require('morgan');
 const path         = require('path');
+const cookieParser = require('cookie-parser');
 
 // ── App construction (synchronous) ───────────────────────────────────────────
 // All requires and route wiring happen here so that module.exports = app is
@@ -37,6 +38,7 @@ const app = express();
 
 // ── Request logging ─────────────────────────────────────────────────────────
 app.use(morgan(config.nodeEnv === 'production' ? 'combined' : 'dev'));
+app.use(cookieParser());
 
 // ── CORS ────────────────────────────────────────────────────────────────────
 app.use(cors({

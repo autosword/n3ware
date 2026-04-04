@@ -685,7 +685,7 @@ function renderSiteCard(site) {
       <p class="text-[#666666] text-xs mb-4">Edited ${updated}</p>
       <div class="flex gap-2">
         <button onclick="editSite('${esc(site.id)}')" class="flex-1 text-xs font-semibold bg-[#E31337] hover:bg-[#E31337] text-white py-2 rounded-lg transition">Edit</button>
-        <a href="https://n3ware-assembler-196247551045.us-east1.run.app/sites/${esc(site.id)}#auth=${encodeURIComponent(state.token)}" target="_blank" rel="noopener" class="text-xs font-semibold bg-[#2A2A2A] hover:bg-[#444444] text-[#E5E5E5] px-3 py-2 rounded-lg transition flex items-center" title="View Live Site">
+        <a href="https://assembler.n3ware.com/sites/${esc(site.id)}" target="_blank" rel="noopener" class="text-xs font-semibold bg-[#2A2A2A] hover:bg-[#444444] text-[#E5E5E5] px-3 py-2 rounded-lg transition flex items-center" title="View Live Site">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
         </a>
         <button onclick="openAnalytics('${esc(site.id)}')" class="text-xs font-semibold bg-[#2A2A2A] hover:bg-[#444444] text-[#E5E5E5] px-3 py-2 rounded-lg transition" title="Analytics">

@@ -97,8 +97,16 @@ router.get('/verify', async (req, res) => {
       { expiresIn: JWT_TTL }
     );
 
-    // Redirect to dashboard with token in hash (never in query string / server logs)
-    res.redirect(`/dashboard#token=${jwtToken}`);
+    // Set cookie on .n3ware.com so it's readable by the assembler subdomain too
+    res.cookie('n3_token', jwtToken, {
+      domain:   '.n3ware.com',
+      path:     '/',
+      httpOnly: false,   // JS on the assembler subdomain needs to read it
+      secure:   true,
+      sameSite: 'Lax',
+      maxAge:   7 * 24 * 60 * 60 * 1000,
+    });
+    res.redirect('/dashboard');
   } catch (err) {
     console.error('[magic-auth] GET /verify error:', err);
     return fail('Authentication failed — please request a new link');
