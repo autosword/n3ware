@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brand Guidelines — n3ware</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            n3: {
+              red: '#E31837', dark: '#111111', darker: '#0A0A0A',
+              surface: '#1A1A1A', border: '#2A2A2A', text: '#E5E5E5', muted: '#888888'
+            }
+          },
+          fontFamily: {
+            grotesk: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .swatch-btn { transition: transform 0.1s ease, box-shadow 0.1s ease; }
+    .swatch-btn:active { transform: scale(0.97); }
+    .circuit-line {
+      position: absolute;
+      background: #E31837;
+      opacity: 0.12;
+    }
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    ::selection { background: #E31837; color: #fff; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0A0A0A; }
+    ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #E31837; }
+  </style>
+</head>
+<body class="bg-n3-darker text-n3-text">
+
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-n3-dark border-b border-n3-border">
+    <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/images/n3ware-logo-white.png" onerror="this.style.display='none'" alt="n3ware" class="h-8">
+        <span class="font-grotesk font-bold text-xl" style="color:#E31837">n3ware</span>
+        <span class="text-xs text-n3-muted bg-n3-surface px-2 py-0.5 rounded-full ml-1 border border-n3-border">Brand</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="/" class="text-sm text-n3-muted hover:text-n3-text transition-colors flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          Back to Site
+        </a>
+        <a href="/dashboard" class="text-sm text-n3-muted hover:text-n3-text transition-colors">Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="bg-n3-dark pt-14 relative overflow-hidden">
+    <!-- Circuit board decorative lines -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="circuit-line" style="left:8%;top:20%;width:1px;height:60%;"></div>
+      <div class="circuit-line" style="left:8%;top:20%;width:80px;height:1px;"></div>
+      <div class="circuit-line" style="right:8%;bottom:20%;width:1px;height:60%;"></div>
+      <div class="circuit-line" style="right:8%;bottom:20%;width:80px;height:1px;transform:translateX(-80px)"></div>
+      <div class="circuit-line" style="left:12%;top:50%;width:40px;height:1px;"></div>
+      <div class="circuit-line" style="right:12%;top:40%;width:40px;height:1px;"></div>
+      <div style="position:absolute;top:24%;left:8%;width:8px;height:8px;border:1px solid #E31837;border-radius:50%;opacity:0.25;background:#E31837;"></div>
+      <div style="position:absolute;bottom:24%;right:8%;width:6px;height:6px;border:1px solid #E31837;border-radius:50%;opacity:0.2;background:#E31837;"></div>
+    </div>
+    <div class="max-w-5xl mx-auto px-6 py-28 flex flex-col items-center text-center relative">
+      <!-- Logo wordmark display -->
+      <div class="mb-10">
+        <div class="inline-flex items-center gap-0 bg-n3-red px-8 py-5 rounded-xl shadow-2xl" style="box-shadow: 0 0 60px rgba(227,24,55,0.25)">
+          <span class="font-grotesk font-black text-5xl text-white tracking-tight">n3</span><span class="font-grotesk font-black text-5xl text-white/80 tracking-tight">ware</span>
+        </div>
+      </div>
+      <h1 class="font-grotesk font-black text-4xl md:text-5xl text-white mb-4 tracking-tight">Brand Guidelines</h1>
+      <p class="text-n3-muted text-lg max-w-xl leading-relaxed">The official visual identity for n3ware — the visual web editor for local business.</p>
+      <div class="mt-6 inline-flex items-center gap-2 text-xs font-mono text-n3-muted border border-n3-border bg-n3-surface px-4 py-2 rounded-full">
+        <span style="color:#E31837">●</span>
+        v1.0 — April 2026
+      </div>
+      <!-- Section nav pills -->
+      <div class="mt-12 flex flex-wrap justify-center gap-2">
+        <a href="#logo" class="text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red bg-n3-surface px-3 py-1.5 rounded-full transition-colors">Logo</a>
+        <a href="#colors" class="text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red bg-n3-surface px-3 py-1.5 rounded-full transition-colors">Colors</a>
+        <a href="#typography" class="text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red bg-n3-surface px-3 py-1.5 rounded-full transition-colors">Typography</a>
+        <a href="#voice" class="text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red bg-n3-surface px-3 py-1.5 rounded-full transition-colors">Brand Voice</a>
+        <a href="#usage" class="text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red bg-n3-surface px-3 py-1.5 rounded-full transition-colors">Usage</a>
+        <a href="#download" class="text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red bg-n3-surface px-3 py-1.5 rounded-full transition-colors">Download</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGO VARIANTS -->
+  <section id="logo" class="py-20 border-t border-n3-border">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="mb-10 scroll-reveal">
+        <p class="text-xs font-mono text-n3-red mb-2 tracking-widest uppercase">01</p>
+        <h2 class="font-grotesk font-black text-3xl text-white">Logo Variants</h2>
+        <p class="text-n3-muted mt-2 text-sm max-w-xl">The n3ware wordmark is built for bold, angular environments. Always use the approved variants below — never modify or reconstruct the logo.</p>
+      </div>
+
+      <!-- 2x2 Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 scroll-reveal">
+
+        <!-- Card 1: Primary on Red -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
+          <div class="bg-[#E31837] flex items-center justify-center h-40 relative">
+            <img src="/images/n3ware-logo-white.png" alt="n3ware logo white" data-logo class="max-h-14 hidden" id="logo-white">
+            <div class="inline-flex items-center" id="fallback-white">
+              <span class="font-mono font-bold text-3xl text-white tracking-tight">n3</span><span class="font-mono font-bold text-3xl text-white/80 tracking-tight">ware</span>
+            </div>
+          </div>
+          <div class="px-5 py-4">
+            <p class="font-grotesk font-semibold text-white text-sm">Primary — On Red</p>
+            <p class="text-n3-muted text-xs mt-1">White wordmark on n3 Red. The primary logo configuration for most use cases.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">#E31837 bg · #FFFFFF mark</span>
+          </div>
+        </div>
+
+        <!-- Card 2: On Black -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
+          <div class="bg-[#0A0A0A] flex items-center justify-center h-40 relative">
+            <img src="/images/n3ware-logo-red.png" alt="n3ware logo red" data-logo class="max-h-14 hidden" id="logo-red">
+            <div class="inline-flex items-center" id="fallback-red">
+              <span class="font-mono font-bold text-3xl tracking-tight" style="color:#E31837">n3</span><span class="font-mono font-bold text-3xl text-white/80 tracking-tight">ware</span>
+            </div>
+          </div>
+          <div class="px-5 py-4">
+            <p class="font-grotesk font-semibold text-white text-sm">On Black</p>
+            <p class="text-n3-muted text-xs mt-1">Red &amp; white wordmark on near-black. Ideal for product UI, dashboards, and dark contexts.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">#0A0A0A bg · #E31837 + #FFF mark</span>
+          </div>
+        </div>
+
+        <!-- Card 3: On White / Light -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
+          <div class="bg-white flex items-center justify-center h-40 relative">
+            <img src="/images/n3ware-logo-black.png" alt="n3ware logo black" data-logo class="max-h-14 hidden" id="logo-black">
+            <div class="inline-flex items-center" id="fallback-black">
+              <span class="font-mono font-bold text-3xl tracking-tight" style="color:#E31837">n3</span><span class="font-mono font-bold text-3xl text-black/80 tracking-tight">ware</span>
+            </div>
+          </div>
+          <div class="px-5 py-4">
+            <p class="font-grotesk font-semibold text-white text-sm">On White / Light</p>
+            <p class="text-n3-muted text-xs mt-1">Red &amp; dark wordmark for light backgrounds — print, invoices, white-label documents.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">#FFFFFF bg · #E31837 + #000 mark</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Alternate on Dark Surface -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
+          <div class="bg-[#1A1A1A] flex items-center justify-center h-40 relative border-b border-n3-border">
+            <img src="/images/n3ware-logo-red2.png" alt="n3ware logo alternate" data-logo class="max-h-14 hidden" id="logo-red2">
+            <div class="inline-flex items-center gap-2" id="fallback-red2">
+              <div style="width:28px;height:28px;background:#E31837;border-radius:5px;display:flex;align-items:center;justify-content:center;">
+                <span class="font-mono font-bold text-white text-sm">3</span>
+              </div>
+              <span class="font-grotesk font-black text-2xl text-white tracking-tight">n3ware</span>
+            </div>
+          </div>
+          <div class="px-5 py-4">
+            <p class="font-grotesk font-semibold text-white text-sm">Alternate — Icon + Wordmark</p>
+            <p class="text-n3-muted text-xs mt-1">Badge icon paired with full wordmark. Use in compact horizontal layouts.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">#1A1A1A bg · icon + mark</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Do / Don't Rules -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 scroll-reveal">
+        <div class="bg-n3-surface border border-n3-border rounded-2xl p-6">
+          <p class="font-grotesk font-bold text-white mb-4 flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs">✓</span>
+            Do
+          </p>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3 text-sm text-n3-muted">
+              <span class="text-green-400 mt-0.5 shrink-0">✅</span>
+              <span>Always maintain clear space equal to the height of the "n3" letterform around the logo on all sides.</span>
+            </li>
+            <li class="flex items-start gap-3 text-sm text-n3-muted">
+              <span class="text-green-400 mt-0.5 shrink-0">✅</span>
+              <span>Use the logo on approved background colors only — n3 Red, Black (#0A0A0A), Dark (#111111), or White.</span>
+            </li>
+            <li class="flex items-start gap-3 text-sm text-n3-muted">
+              <span class="text-green-400 mt-0.5 shrink-0">✅</span>
+              <span>Maintain a minimum display size of 80px wide to preserve legibility of the "3" numeral.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="bg-n3-surface border border-n3-border rounded-2xl p-6">
+          <p class="font-grotesk font-bold text-white mb-4 flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center text-xs">✕</span>
+            Don't
+          </p>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3 text-sm text-n3-muted">
+              <span class="text-red-400 mt-0.5 shrink-0">❌</span>
+              <span>Don't stretch, skew, or distort the logo proportions in any direction.</span>
+            </li>
+            <li class="flex items-start gap-3 text-sm text-n3-muted">
+              <span class="text-red-400 mt-0.5 shrink-0">❌</span>
+              <span>Don't recolor the logo — no gradients, tints, or off-brand colors. Use only approved variants.</span>
+            </li>
+            <li class="flex items-start gap-3 text-sm text-n3-muted">
+              <span class="text-red-400 mt-0.5 shrink-0">❌</span>
+              <span>Don't add drop shadows, glows, outlines, or decorative effects to the logo mark.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLOR PALETTE -->
+  <section id="colors" class="py-20 border-t border-n3-border bg-n3-dark">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="mb-10 scroll-reveal">
+        <p class="text-xs font-mono text-n3-red mb-2 tracking-widest uppercase">02</p>
+        <h2 class="font-grotesk font-black text-3xl text-white">Color Palette</h2>
+        <p class="text-n3-muted mt-2 text-sm max-w-xl">A tight, intentional palette. Red leads. Black grounds. Everything else supports hierarchy without competing for attention.</p>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 scroll-reveal">
+
+        <!-- n3 Red -->
+        <div class="flex flex-col">
+          <div class="h-24 rounded-xl mb-3 relative overflow-hidden cursor-pointer swatch-btn" style="background:#E31837;" onclick="copyColor('#E31837', document.getElementById('copy-red'))">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/20">
+              <svg class="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <p class="font-grotesk font-semibold text-white text-xs">n3 Red</p>
+          <p class="font-mono text-n3-muted text-xs mt-0.5">#E31837</p>
+          <p class="text-n3-muted text-xs mt-0.5">Primary / Action</p>
+          <button id="copy-red" onclick="copyColor('#E31837', this)" class="mt-2 text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red rounded px-2 py-1 transition-colors text-left">Copy</button>
+        </div>
+
+        <!-- Black -->
+        <div class="flex flex-col">
+          <div class="h-24 rounded-xl mb-3 relative overflow-hidden cursor-pointer swatch-btn border border-n3-border" style="background:#0A0A0A;" onclick="copyColor('#0A0A0A', document.getElementById('copy-black'))">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-white/5">
+              <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <p class="font-grotesk font-semibold text-white text-xs">Black</p>
+          <p class="font-mono text-n3-muted text-xs mt-0.5">#0A0A0A</p>
+          <p class="text-n3-muted text-xs mt-0.5">Background</p>
+          <button id="copy-black" onclick="copyColor('#0A0A0A', this)" class="mt-2 text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red rounded px-2 py-1 transition-colors text-left">Copy</button>
+        </div>
+
+        <!-- Dark -->
+        <div class="flex flex-col">
+          <div class="h-24 rounded-xl mb-3 relative overflow-hidden cursor-pointer swatch-btn border border-n3-border" style="background:#111111;" onclick="copyColor('#111111', document.getElementById('copy-dark'))">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-white/5">
+              <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <p class="font-grotesk font-semibold text-white text-xs">Dark</p>
+          <p class="font-mono text-n3-muted text-xs mt-0.5">#111111</p>
+          <p class="text-n3-muted text-xs mt-0.5">Surfaces</p>
+          <button id="copy-dark" onclick="copyColor('#111111', this)" class="mt-2 text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red rounded px-2 py-1 transition-colors text-left">Copy</button>
+        </div>
+
+        <!-- Surface -->
+        <div class="flex flex-col">
+          <div class="h-24 rounded-xl mb-3 relative overflow-hidden cursor-pointer swatch-btn border border-n3-border" style="background:#1A1A1A;" onclick="copyColor('#1A1A1A', document.getElementById('copy-surface'))">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-white/5">
+              <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <p class="font-grotesk font-semibold text-white text-xs">Surface</p>
+          <p class="font-mono text-n3-muted text-xs mt-0.5">#1A1A1A</p>
+          <p class="text-n3-muted text-xs mt-0.5">Cards</p>
+          <button id="copy-surface" onclick="copyColor('#1A1A1A', this)" class="mt-2 text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red rounded px-2 py-1 transition-colors text-left">Copy</button>
+        </div>
+
+        <!-- Text/White -->
+        <div class="flex flex-col">
+          <div class="h-24 rounded-xl mb-3 relative overflow-hidden cursor-pointer swatch-btn border border-n3-border" style="background:#E5E5E5;" onclick="copyColor('#E5E5E5', document.getElementById('copy-text'))">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/10">
+              <svg class="w-5 h-5 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <p class="font-grotesk font-semibold text-white text-xs">White</p>
+          <p class="font-mono text-n3-muted text-xs mt-0.5">#E5E5E5</p>
+          <p class="text-n3-muted text-xs mt-0.5">Text</p>
+          <button id="copy-text" onclick="copyColor('#E5E5E5', this)" class="mt-2 text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red rounded px-2 py-1 transition-colors text-left">Copy</button>
+        </div>
+
+        <!-- Muted -->
+        <div class="flex flex-col">
+          <div class="h-24 rounded-xl mb-3 relative overflow-hidden cursor-pointer swatch-btn border border-n3-border" style="background:#888888;" onclick="copyColor('#888888', document.getElementById('copy-muted'))">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/10">
+              <svg class="w-5 h-5 text-black/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <p class="font-grotesk font-semibold text-white text-xs">Muted</p>
+          <p class="font-mono text-n3-muted text-xs mt-0.5">#888888</p>
+          <p class="text-n3-muted text-xs mt-0.5">Secondary text</p>
+          <button id="copy-muted" onclick="copyColor('#888888', this)" class="mt-2 text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red rounded px-2 py-1 transition-colors text-left">Copy</button>
+        </div>
+
+        <!-- Border -->
+        <div class="flex flex-col">
+          <div class="h-24 rounded-xl mb-3 relative overflow-hidden cursor-pointer swatch-btn border border-n3-border" style="background:#2A2A2A;" onclick="copyColor('#2A2A2A', document.getElementById('copy-border'))">
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-white/5">
+              <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </div>
+          </div>
+          <p class="font-grotesk font-semibold text-white text-xs">Border</p>
+          <p class="font-mono text-n3-muted text-xs mt-0.5">#2A2A2A</p>
+          <p class="text-n3-muted text-xs mt-0.5">Borders</p>
+          <button id="copy-border" onclick="copyColor('#2A2A2A', this)" class="mt-2 text-xs text-n3-muted hover:text-white border border-n3-border hover:border-n3-red rounded px-2 py-1 transition-colors text-left">Copy</button>
+        </div>
+
+      </div>
+
+      <!-- Color usage note -->
+      <div class="mt-10 bg-n3-surface border border-n3-border rounded-2xl p-6 scroll-reveal">
+        <p class="font-grotesk font-semibold text-white text-sm mb-3">Color Usage</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-n3-muted">
+          <div>
+            <p class="text-white font-medium mb-1">Primary actions</p>
+            <p>Use n3 Red (#E31837) for CTAs, active states, links, and the primary brand mark. Never use it for large background fills in UI contexts — it draws the eye and should signal action.</p>
+          </div>
+          <div>
+            <p class="text-white font-medium mb-1">Depth &amp; layering</p>
+            <p>The four dark tones (#0A0A0A, #111111, #1A1A1A, #2A2A2A) create depth. Stack them: page background → section → card → border. Never skip a step.</p>
+          </div>
+          <div>
+            <p class="text-white font-medium mb-1">Text hierarchy</p>
+            <p>#E5E5E5 for primary text, #888888 for secondary/muted, pure white (#FFFFFF) only over the red brand color. Avoid pure white on dark — it's harsher than necessary.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section id="typography" class="py-20 border-t border-n3-border">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="mb-10 scroll-reveal">
+        <p class="text-xs font-mono text-n3-red mb-2 tracking-widest uppercase">03</p>
+        <h2 class="font-grotesk font-black text-3xl text-white">Typography</h2>
+        <p class="text-n3-muted mt-2 text-sm max-w-xl">Three fonts. Each owns its role. No mixing within a single typographic context.</p>
+      </div>
+
+      <!-- Font specimens -->
+      <div class="space-y-4 mb-12 scroll-reveal">
+
+        <!-- Space Grotesk -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl p-8 group hover:border-n3-red/50 transition-colors">
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div class="flex-1">
+              <div class="font-grotesk font-black text-7xl text-white leading-none mb-4">Aa</div>
+              <p class="font-grotesk text-2xl text-white mb-1">Space Grotesk</p>
+              <p class="text-n3-muted text-sm">Headlines, nav, CTAs, any bold display text. The primary voice of the brand.</p>
+            </div>
+            <div class="shrink-0 space-y-2">
+              <div class="flex items-baseline gap-3">
+                <span class="text-xs font-mono text-n3-muted w-8">400</span>
+                <span class="font-grotesk font-normal text-n3-text">Regular — The visual editor for local business.</span>
+              </div>
+              <div class="flex items-baseline gap-3">
+                <span class="text-xs font-mono text-n3-muted w-8">600</span>
+                <span class="font-grotesk font-semibold text-n3-text">Semibold — The visual editor for local business.</span>
+              </div>
+              <div class="flex items-baseline gap-3">
+                <span class="text-xs font-mono text-n3-muted w-8">700</span>
+                <span class="font-grotesk font-bold text-white">Bold — Edit any website. Visually.</span>
+              </div>
+              <div class="flex items-baseline gap-3">
+                <span class="text-xs font-mono text-n3-muted w-8">900</span>
+                <span class="font-grotesk font-black text-white">Black — n3ware.</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-5 border-t border-n3-border flex gap-4 text-xs">
+            <span class="font-mono text-n3-muted">Google Fonts</span>
+            <span class="text-n3-border">·</span>
+            <span class="font-mono text-n3-muted">space-grotesk</span>
+            <span class="text-n3-border">·</span>
+            <span class="font-mono text-n3-muted">wght@400;500;600;700</span>
+          </div>
+        </div>
+
+        <!-- JetBrains Mono -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl p-8 group hover:border-n3-red/50 transition-colors">
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div class="flex-1">
+              <div class="font-mono font-bold text-7xl leading-none mb-4" style="color:#E31837">n3</div>
+              <p class="font-grotesk text-2xl text-white mb-1">JetBrains Mono</p>
+              <p class="text-n3-muted text-sm">Code blocks, terminal output, the brand wordmark. Technical precision made readable.</p>
+            </div>
+            <div class="shrink-0 space-y-2">
+              <div class="flex items-baseline gap-3">
+                <span class="text-xs font-mono text-n3-muted w-8">400</span>
+                <span class="font-mono font-normal text-n3-text text-sm">const editor = new n3ware();</span>
+              </div>
+              <div class="flex items-baseline gap-3">
+                <span class="text-xs font-mono text-n3-muted w-8">500</span>
+                <span class="font-mono font-medium text-n3-text text-sm">editor.init({ visual: true });</span>
+              </div>
+              <div class="mt-3 bg-n3-darker rounded-xl p-4 border border-n3-border">
+                <p class="font-mono text-xs" style="color:#E31837">// brand wordmark</p>
+                <p class="font-mono text-sm text-white mt-1">n3ware</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-5 border-t border-n3-border flex gap-4 text-xs">
+            <span class="font-mono text-n3-muted">Google Fonts</span>
+            <span class="text-n3-border">·</span>
+            <span class="font-mono text-n3-muted">jetbrains-mono</span>
+            <span class="text-n3-border">·</span>
+            <span class="font-mono text-n3-muted">wght@400;500</span>
+          </div>
+        </div>
+
+        <!-- Inter -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl p-8 group hover:border-n3-red/50 transition-colors">
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <div class="flex-1">
+              <div class="text-7xl text-n3-text leading-none mb-4 font-normal" style="font-family:'Inter',sans-serif">Aa</div>
+              <p class="font-grotesk text-2xl text-white mb-1">Inter</p>
+              <p class="text-n3-muted text-sm">Body copy, descriptions, UI labels. Invisible when it works. Optimized for screens.</p>
+            </div>
+            <div class="shrink-0 max-w-xs">
+              <p class="text-sm text-n3-text leading-relaxed" style="font-family:'Inter',sans-serif">n3ware lets you edit any website visually — without touching code. Drop in one script tag and your whole site becomes editable. Built for business owners who move fast.</p>
+            </div>
+          </div>
+          <div class="mt-5 pt-5 border-t border-n3-border flex gap-4 text-xs">
+            <span class="font-mono text-n3-muted">Google Fonts</span>
+            <span class="text-n3-border">·</span>
+            <span class="font-mono text-n3-muted">inter</span>
+            <span class="text-n3-border">·</span>
+            <span class="font-mono text-n3-muted">wght@400;500;600</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Type Scale -->
+      <div class="bg-n3-surface border border-n3-border rounded-2xl p-8 scroll-reveal">
+        <p class="font-grotesk font-bold text-white mb-6">Type Scale</p>
+        <div class="space-y-6">
+          <div class="flex items-baseline gap-6 border-b border-n3-border pb-6">
+            <span class="text-xs font-mono text-n3-muted w-20 shrink-0">Display<br>72px</span>
+            <span class="font-grotesk font-black text-white leading-none" style="font-size:clamp(36px,5vw,72px)">n3ware</span>
+          </div>
+          <div class="flex items-baseline gap-6 border-b border-n3-border pb-6">
+            <span class="text-xs font-mono text-n3-muted w-20 shrink-0">H1<br>48px</span>
+            <span class="font-grotesk font-black text-white leading-tight" style="font-size:clamp(28px,4vw,48px)">Edit any website.</span>
+          </div>
+          <div class="flex items-baseline gap-6 border-b border-n3-border pb-6">
+            <span class="text-xs font-mono text-n3-muted w-20 shrink-0">H2<br>36px</span>
+            <span class="font-grotesk font-bold text-white leading-tight" style="font-size:clamp(22px,3vw,36px)">The visual editor for local business.</span>
+          </div>
+          <div class="flex items-baseline gap-6 border-b border-n3-border pb-5">
+            <span class="text-xs font-mono text-n3-muted w-20 shrink-0">Body<br>16px</span>
+            <span class="text-n3-text text-base leading-relaxed max-w-lg" style="font-family:'Inter',sans-serif">Drop in one script tag. Edit text, images, and layout visually. Publish changes in real time. No developers needed.</span>
+          </div>
+          <div class="flex items-baseline gap-6">
+            <span class="text-xs font-mono text-n3-muted w-20 shrink-0">Caption<br>12px</span>
+            <span class="text-n3-muted text-xs" style="font-family:'Inter',sans-serif">Version 1.0.0 · Last updated April 2026 · n3ware Brand Guidelines</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRAND VOICE -->
+  <section id="voice" class="py-20 border-t border-n3-border bg-n3-dark">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="mb-10 scroll-reveal">
+        <p class="text-xs font-mono text-n3-red mb-2 tracking-widest uppercase">04</p>
+        <h2 class="font-grotesk font-black text-3xl text-white">Brand Voice</h2>
+        <p class="text-n3-muted mt-2 text-sm max-w-xl">How n3ware speaks. Consistent tone builds trust faster than any visual asset.</p>
+      </div>
+
+      <!-- Three voice cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 scroll-reveal">
+        <div class="bg-n3-surface border border-n3-border rounded-2xl p-7 group hover:border-n3-red/50 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-n3-red/10 border border-n3-red/20 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5" style="color:#E31837" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <p class="font-grotesk font-bold text-white text-lg mb-3">Technical but accessible</p>
+          <p class="text-n3-muted text-sm leading-relaxed">We speak the language of builders, but we never lose the client. Clear, direct, jargon-free when it counts. A developer gets it. A bakery owner gets it too.</p>
+        </div>
+        <div class="bg-n3-surface border border-n3-border rounded-2xl p-7 group hover:border-n3-red/50 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-n3-red/10 border border-n3-red/20 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5" style="color:#E31837" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <p class="font-grotesk font-bold text-white text-lg mb-3">Bold and direct</p>
+          <p class="text-n3-muted text-sm leading-relaxed">No fluff. No filler. n3ware does what it says. Our copy leads with the result, not the feature. Tell people what changes for them — not how the sausage gets made.</p>
+        </div>
+        <div class="bg-n3-surface border border-n3-border rounded-2xl p-7 group hover:border-n3-red/50 transition-colors">
+          <div class="w-10 h-10 rounded-xl bg-n3-red/10 border border-n3-red/20 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5" style="color:#E31837" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <p class="font-grotesk font-bold text-white text-lg mb-3">Builder-first</p>
+          <p class="text-n3-muted text-sm leading-relaxed">We respect the developer. We celebrate the business owner who tries to build. Meet both where they are — no condescension for the non-technical, no hand-holding for the experienced.</p>
+        </div>
+      </div>
+
+      <!-- Tone example -->
+      <div class="bg-n3-surface border border-n3-border rounded-2xl p-8 scroll-reveal">
+        <p class="font-grotesk font-bold text-white mb-6">Tone in Practice</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-n3-darker border border-red-900/40 rounded-xl p-5">
+            <p class="text-xs font-mono text-red-400 mb-3 flex items-center gap-1.5">
+              <span>❌</span> Don't write this
+            </p>
+            <p class="text-n3-muted text-sm leading-relaxed italic">"Leverage our comprehensive suite of visual editing tools to optimize your web presence and drive digital engagement across your customer touchpoints."</p>
+          </div>
+          <div class="bg-n3-darker border border-green-900/40 rounded-xl p-5">
+            <p class="text-xs font-mono text-green-400 mb-3 flex items-center gap-1.5">
+              <span>✅</span> Write this
+            </p>
+            <p class="text-white text-sm leading-relaxed font-grotesk font-semibold">"Edit any website. Visually. One script tag."</p>
+          </div>
+        </div>
+        <div class="mt-5 pt-5 border-t border-n3-border grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-n3-muted">
+          <div>
+            <p class="text-white font-medium mb-1">Start with the result</p>
+            <p>Lead with what the user gets, not the technology that enables it. Outcome first, mechanism second (if at all).</p>
+          </div>
+          <div>
+            <p class="text-white font-medium mb-1">Cut 30% of every sentence</p>
+            <p>Every first draft has words that add length without meaning. Find them. Delete them. Then delete 10% more.</p>
+          </div>
+          <div>
+            <p class="text-white font-medium mb-1">Avoid adverbs and intensifiers</p>
+            <p>"Incredibly powerful," "extremely fast," "truly seamless" — these weaken the claim. Trust the noun and verb.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USAGE IN CONTEXT -->
+  <section id="usage" class="py-20 border-t border-n3-border">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="mb-10 scroll-reveal">
+        <p class="text-xs font-mono text-n3-red mb-2 tracking-widest uppercase">05</p>
+        <h2 class="font-grotesk font-black text-3xl text-white">Usage in Context</h2>
+        <p class="text-n3-muted mt-2 text-sm max-w-xl">Approved and rejected logo-on-background combinations. When in doubt, check contrast — minimum 4.5:1 for text, 3:1 for the logo mark.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 scroll-reveal">
+
+        <!-- Approved 1: Red on dark -->
+        <div class="rounded-2xl overflow-hidden border border-n3-border">
+          <div class="bg-[#0A0A0A] h-32 flex items-center justify-center">
+            <div class="inline-flex items-center gap-1">
+              <span class="font-mono font-bold text-2xl tracking-tight" style="color:#E31837">n3</span><span class="font-mono font-bold text-2xl text-white/80 tracking-tight">ware</span>
+            </div>
+          </div>
+          <div class="bg-n3-surface px-5 py-4 flex items-start justify-between gap-4">
+            <div>
+              <p class="font-grotesk font-semibold text-sm text-white flex items-center gap-2"><span class="text-green-400">✅</span> Approved</p>
+              <p class="text-n3-muted text-xs mt-1">Red + white mark on near-black (#0A0A0A). Primary product context. Highest contrast.</p>
+            </div>
+            <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-1 rounded text-n3-muted shrink-0">14:1</span>
+          </div>
+        </div>
+
+        <!-- Approved 2: White on red -->
+        <div class="rounded-2xl overflow-hidden border border-n3-border">
+          <div class="h-32 flex items-center justify-center" style="background:#E31837;">
+            <div class="inline-flex items-center">
+              <span class="font-mono font-bold text-2xl text-white tracking-tight">n3</span><span class="font-mono font-bold text-2xl text-white/80 tracking-tight">ware</span>
+            </div>
+          </div>
+          <div class="bg-n3-surface px-5 py-4 flex items-start justify-between gap-4">
+            <div>
+              <p class="font-grotesk font-semibold text-sm text-white flex items-center gap-2"><span class="text-green-400">✅</span> Approved</p>
+              <p class="text-n3-muted text-xs mt-1">White wordmark on n3 Red (#E31837). Primary logo — marketing, print, hero sections.</p>
+            </div>
+            <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-1 rounded text-n3-muted shrink-0">4.6:1</span>
+          </div>
+        </div>
+
+        <!-- Rejected 1: Red on white -->
+        <div class="rounded-2xl overflow-hidden border border-red-900/50">
+          <div class="h-32 flex items-center justify-center bg-white relative">
+            <div class="inline-flex items-center">
+              <span class="font-mono font-bold text-2xl tracking-tight" style="color:#E31837">n3</span><span class="font-mono font-bold text-2xl tracking-tight text-gray-200">ware</span>
+            </div>
+            <div class="absolute inset-0 bg-red-950/10 flex items-center justify-center">
+              <div class="bg-red-900/80 rounded-lg px-3 py-1">
+                <span class="text-xs font-mono text-red-200">LOW CONTRAST</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-n3-surface px-5 py-4 flex items-start justify-between gap-4">
+            <div>
+              <p class="font-grotesk font-semibold text-sm text-white flex items-center gap-2"><span class="text-red-400">❌</span> Rejected</p>
+              <p class="text-n3-muted text-xs mt-1">Red mark, white secondary text on white bg — the "ware" portion becomes illegible on screen and in print.</p>
+            </div>
+            <span class="text-xs font-mono bg-red-950/50 border border-red-900/50 px-2 py-1 rounded text-red-400 shrink-0">1.1:1</span>
+          </div>
+        </div>
+
+        <!-- Rejected 2: Colored on colored -->
+        <div class="rounded-2xl overflow-hidden border border-red-900/50">
+          <div class="h-32 flex items-center justify-center relative" style="background:linear-gradient(135deg,#1a0a2e,#0a1a2e)">
+            <div class="inline-flex items-center">
+              <span class="font-mono font-bold text-2xl tracking-tight" style="color:#9b59b6">n3</span><span class="font-mono font-bold text-2xl tracking-tight" style="color:#3498db">ware</span>
+            </div>
+            <div class="absolute inset-0 bg-red-950/10 flex items-center justify-center">
+              <div class="bg-red-900/80 rounded-lg px-3 py-1">
+                <span class="text-xs font-mono text-red-200">OFF-BRAND COLORS</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-n3-surface px-5 py-4 flex items-start justify-between gap-4">
+            <div>
+              <p class="font-grotesk font-semibold text-sm text-white flex items-center gap-2"><span class="text-red-400">❌</span> Rejected</p>
+              <p class="text-n3-muted text-xs mt-1">Colored logo on colored background — destroys brand consistency. Never recolor the wordmark.</p>
+            </div>
+            <span class="text-xs font-mono bg-red-950/50 border border-red-900/50 px-2 py-1 rounded text-red-400 shrink-0">off-brand</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD ASSETS -->
+  <section id="download" class="py-20 border-t border-n3-border bg-n3-dark">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="mb-10 scroll-reveal">
+        <p class="text-xs font-mono text-n3-red mb-2 tracking-widest uppercase">06</p>
+        <h2 class="font-grotesk font-black text-3xl text-white">Download Assets</h2>
+        <p class="text-n3-muted mt-2 text-sm max-w-xl">Official logo files for all contexts. Always use the asset that matches your background — never adapt one variant for an unapproved use.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 scroll-reveal">
+
+        <!-- Asset 1: n3ware-logo-red.png -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
+          <div class="bg-[#0A0A0A] h-28 flex items-center justify-center">
+            <div class="inline-flex items-center">
+              <span class="font-mono font-bold text-xl tracking-tight" style="color:#E31837">n3</span><span class="font-mono font-bold text-xl text-white/80 tracking-tight">ware</span>
+            </div>
+          </div>
+          <div class="p-5 flex flex-col flex-1">
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-red</p>
+            <p class="text-n3-muted text-xs mb-1">For dark backgrounds</p>
+            <div class="flex gap-2 mt-1 mb-4">
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">SVG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">~12 KB</span>
+            </div>
+            <div class="mt-auto">
+              <a href="/images/n3ware-logo-red.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asset 2: n3ware-logo-black.png -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
+          <div class="bg-white h-28 flex items-center justify-center">
+            <div class="inline-flex items-center">
+              <span class="font-mono font-bold text-xl tracking-tight" style="color:#E31837">n3</span><span class="font-mono font-bold text-xl text-black/80 tracking-tight">ware</span>
+            </div>
+          </div>
+          <div class="p-5 flex flex-col flex-1">
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-black</p>
+            <p class="text-n3-muted text-xs mb-1">For light backgrounds</p>
+            <div class="flex gap-2 mt-1 mb-4">
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">SVG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">~12 KB</span>
+            </div>
+            <div class="mt-auto">
+              <a href="/images/n3ware-logo-black.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asset 3: n3ware-logo-white.png -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
+          <div class="h-28 flex items-center justify-center" style="background:#E31837">
+            <div class="inline-flex items-center">
+              <span class="font-mono font-bold text-xl text-white tracking-tight">n3</span><span class="font-mono font-bold text-xl text-white/80 tracking-tight">ware</span>
+            </div>
+          </div>
+          <div class="p-5 flex flex-col flex-1">
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-white</p>
+            <p class="text-n3-muted text-xs mb-1">For red backgrounds</p>
+            <div class="flex gap-2 mt-1 mb-4">
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">SVG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">~12 KB</span>
+            </div>
+            <div class="mt-auto">
+              <a href="/images/n3ware-logo-white.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asset 4: n3ware-logo-red2.png -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
+          <div class="bg-[#1A1A1A] h-28 flex items-center justify-center border-b border-n3-border">
+            <div class="inline-flex items-center gap-2">
+              <div style="width:24px;height:24px;background:#E31837;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+                <span class="font-mono font-bold text-white text-xs">3</span>
+              </div>
+              <span class="font-grotesk font-black text-xl text-white tracking-tight">n3ware</span>
+            </div>
+          </div>
+          <div class="p-5 flex flex-col flex-1">
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-red2</p>
+            <p class="text-n3-muted text-xs mb-1">Icon + wordmark lockup</p>
+            <div class="flex gap-2 mt-1 mb-4">
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">SVG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">~14 KB</span>
+            </div>
+            <div class="mt-auto">
+              <a href="/images/n3ware-logo-red2.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Usage note -->
+      <div class="mt-6 bg-n3-surface border border-n3-border rounded-xl p-5 flex gap-4 items-start scroll-reveal">
+        <svg class="w-5 h-5 text-n3-muted mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <p class="text-n3-muted text-xs leading-relaxed">Need SVG source files, brand guidelines PDF, or have a licensing question? Contact <a href="mailto:hello@n3ware.com" class="text-n3-text hover:text-white transition-colors underline underline-offset-2">hello@n3ware.com</a>. Do not modify distributed logo files — if you need a custom size or format, request it directly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-n3-border bg-[#0A0A0A]">
+    <div class="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="font-grotesk font-bold" style="color:#E31837">n3ware</span>
+        <span class="text-n3-border">·</span>
+        <span class="text-xs text-n3-muted font-mono">Brand Guidelines v1.0</span>
+      </div>
+      <div class="flex items-center gap-4 text-xs text-n3-muted">
+        <a href="/" class="hover:text-n3-text transition-colors">n3ware.com</a>
+        <span class="text-n3-border">·</span>
+        <a href="/dashboard" class="hover:text-n3-text transition-colors">Dashboard</a>
+        <span class="text-n3-border">·</span>
+        <a href="/privacy" class="hover:text-n3-text transition-colors">Privacy</a>
+        <span class="text-n3-border">·</span>
+        <a href="/terms" class="hover:text-n3-text transition-colors">Terms</a>
+        <span class="text-n3-border">·</span>
+        <span class="font-mono">&copy; 2026 n3ware</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Copy color hex to clipboard
+    function copyColor(hex, btn) {
+      navigator.clipboard.writeText(hex).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.color = '#E31837';
+        setTimeout(() => {
+          btn.textContent = orig;
+          btn.style.color = '';
+        }, 2000);
+      }).catch(() => {
+        // Fallback for browsers without clipboard API
+        const el = document.createElement('textarea');
+        el.value = hex;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+      });
+    }
+
+    // Try loading real PNG logos — show them if they load
+    document.querySelectorAll('img[data-logo]').forEach(img => {
+      img.onload = () => {
+        img.classList.remove('hidden');
+        // Hide the fallback wordmark if the real image loads
+        const fallbackId = 'fallback-' + img.id.replace('logo-', '');
+        const fallback = document.getElementById(fallbackId);
+        if (fallback) fallback.style.display = 'none';
+      };
+    });
+
+    // Scroll reveal animation
+    const revealEls = document.querySelectorAll('.scroll-reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(el => observer.observe(el));
+
+    // Active nav section highlighting
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('a[href^="#"]');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (window.scrollY >= sectionTop - 80) {
+          current = section.getAttribute('id');
+        }
+      });
+      navLinks.forEach(link => {
+        link.classList.remove('border-n3-red', 'text-white');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('border-n3-red', 'text-white');
+        }
+      });
+    }, { passive: true });
+  </script>
+</body>
+</html>

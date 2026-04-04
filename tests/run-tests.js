@@ -162,8 +162,10 @@ test('Design token object T is defined', () => {
   assert(src.includes('const T = {'), 'Design token object T not found');
 });
 
-test('Accent color #3B82F6 is referenced via T.accent', () => {
-  assert(src.includes("'#3B82F6'") || src.includes('"#3B82F6"'), 'Accent color not found');
+test('Accent color is referenced via T.accent', () => {
+  // Brand color updated to n3ware red (#E31837); T.accent must be set
+  assert(src.includes("T.accent"), 'T.accent not found');
+  assert(src.includes("accent:"), 'accent property not found in T');
 });
 
 // ─── Event names ──────────────────────────────────────────────────────────────

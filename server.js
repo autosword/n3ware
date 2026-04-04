@@ -124,6 +124,9 @@ app.get('/',          (req, res) => res.sendFile(path.join(__dirname, 'public', 
 app.get('/demo',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'demo.html')));
 app.get('/dashboard',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/components', (req, res) => res.sendFile(path.join(__dirname, 'public', 'components.html')));
+app.get('/brand',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'brand.html')));
+app.get('/privacy',    (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
+app.get('/terms',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'terms.html')));
 app.get('/tests',      (req, res) => res.sendFile(path.join(__dirname, 'tests', 'n3ware.test.html')));
 
 // ── Health check ─────────────────────────────────────────────────────────────

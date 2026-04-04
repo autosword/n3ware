@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { box-sizing: border-box; }
-    body { background: #0F172A; color: #F1F5F9; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #0A0A0A; color: #E5E5E5; font-family: system-ui, -apple-system, sans-serif; }
     .slide-panel { transform: translateX(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1); }
     .slide-panel.open { transform: translateX(0); }
     .modal-bg { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
@@ -17,18 +17,18 @@
     .site-preview { background: linear-gradient(135deg, var(--c1), var(--c2)); }
     .toast { transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(.4,0,.2,1); }
     .toast.show { transform: translateY(0); opacity: 1; }
-    input, select, textarea { background: #1E293B; border: 1px solid #334155; color: #F1F5F9; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #3B82F6; }
-    .template-card { border: 2px solid #334155; cursor: pointer; transition: all 0.15s; }
-    .template-card:hover { border-color: #3B82F6; background: #1E293B; }
-    .template-card.selected { border-color: #3B82F6; background: #1E3A5F; }
+    input, select, textarea { background: #1A1A1A; border: 1px solid #2A2A2A; color: #E5E5E5; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #E31837; }
+    .template-card { border: 2px solid #2A2A2A; cursor: pointer; transition: all 0.15s; }
+    .template-card:hover { border-color: #E31837; background: #1A1A1A; }
+    .template-card.selected { border-color: #E31837; background: rgba(227,24,55,0.12); }
     .tab-btn { transition: all 0.15s; }
-    .tab-btn.active { background: #1E293B; color: #F1F5F9; }
+    .tab-btn.active { background: #1A1A1A; color: #E5E5E5; }
     .settings-tab { display: none; }
     .settings-tab.active { display: block; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -38,29 +38,29 @@
   <div class="w-full max-w-md">
     <div class="text-center mb-8">
       <div class="inline-flex items-center gap-2 mb-3">
-        <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white text-lg">n</div>
+        <div class="w-9 h-9 bg-[#E31837] rounded-xl flex items-center justify-center font-black text-white text-lg">n</div>
         <span class="text-2xl font-extrabold">n3ware</span>
       </div>
-      <p class="text-slate-400 text-sm">Visual editing, powered by the cloud</p>
+      <p class="text-[#888888] text-sm">Visual editing, powered by the cloud</p>
     </div>
-    <div class="flex bg-slate-800 rounded-xl p-1 mb-6">
+    <div class="flex bg-[#1A1A1A] rounded-xl p-1 mb-6">
       <button id="tab-login" onclick="switchTab('login')"
-        class="flex-1 py-2 rounded-lg text-sm font-semibold transition bg-slate-700 text-white">Sign In</button>
+        class="flex-1 py-2 rounded-lg text-sm font-semibold transition bg-[#2A2A2A] text-white">Sign In</button>
       <button id="tab-register" onclick="switchTab('register')"
-        class="flex-1 py-2 rounded-lg text-sm font-semibold transition text-slate-400">Create Account</button>
+        class="flex-1 py-2 rounded-lg text-sm font-semibold transition text-[#888888]">Create Account</button>
     </div>
-    <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-8">
+    <div class="bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-2xl p-8">
       <form id="auth-form" onsubmit="submitAuth(event)">
         <div class="mb-4">
-          <label class="block text-sm font-medium text-slate-300 mb-1.5">Email</label>
+          <label class="block text-sm font-medium text-[#E5E5E5] mb-1.5">Email</label>
           <input type="email" id="auth-email" required placeholder="you@company.com" class="w-full rounded-xl px-4 py-3 text-sm">
         </div>
         <div class="mb-6">
-          <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+          <label class="block text-sm font-medium text-[#E5E5E5] mb-1.5">Password</label>
           <input type="password" id="auth-password" required placeholder="••••••••" minlength="8" class="w-full rounded-xl px-4 py-3 text-sm">
         </div>
         <button type="submit" id="auth-btn"
-          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">Sign In</button>
+          class="w-full bg-[#E31837] hover:bg-[#E31837] text-white font-bold py-3 rounded-xl transition text-sm">Sign In</button>
         <p id="auth-error" class="text-red-400 text-sm text-center mt-3 hidden"></p>
       </form>
     </div>
@@ -71,27 +71,27 @@
 <div id="dashboard" class="hidden min-h-screen flex flex-col">
 
   <!-- Header -->
-  <header class="border-b border-slate-800 px-6 py-4 sticky top-0 z-30 bg-slate-900/95 backdrop-blur">
+  <header class="border-b border-[#1A1A1A] px-6 py-4 sticky top-0 z-30 bg-[#111111]/95 backdrop-blur">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black text-white">n</div>
+          <div class="w-8 h-8 bg-[#E31837] rounded-lg flex items-center justify-center font-black text-white">n</div>
           <span class="text-lg font-extrabold">n3ware</span>
-          <span class="text-xs text-slate-500 font-medium">Cloud</span>
+          <span class="text-xs text-[#666666] font-medium">Cloud</span>
         </div>
         <!-- Main nav tabs -->
         <nav class="hidden sm:flex gap-1">
           <button onclick="showView('sites')" id="nav-sites"
-            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-slate-800">Sites</button>
+            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-[#1A1A1A]">Sites</button>
           <button onclick="showView('billing')" id="nav-billing"
-            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800">Billing</button>
+            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-[#888888] hover:text-white hover:bg-[#1A1A1A]">Billing</button>
           <button onclick="showView('analytics')" id="nav-analytics"
-            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800">Analytics</button>
+            class="text-sm font-medium px-3 py-1.5 rounded-lg transition text-[#888888] hover:text-white hover:bg-[#1A1A1A]">Analytics</button>
         </nav>
       </div>
       <div class="flex items-center gap-3">
-        <span id="user-email" class="text-sm text-slate-400 hidden sm:block"></span>
-        <button onclick="logout()" class="text-sm text-slate-400 hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-slate-800">Sign out</button>
+        <span id="user-email" class="text-sm text-[#888888] hidden sm:block"></span>
+        <button onclick="logout()" class="text-sm text-[#888888] hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-[#1A1A1A]">Sign out</button>
       </div>
     </div>
   </header>
@@ -103,23 +103,23 @@
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-2xl font-bold">My Sites</h1>
-          <p id="site-count" class="text-slate-400 text-sm mt-0.5"></p>
+          <p id="site-count" class="text-[#888888] text-sm mt-0.5"></p>
         </div>
         <button onclick="openCreateModal()"
-          class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-xl transition text-sm">
+          class="flex items-center gap-2 bg-[#E31837] hover:bg-[#E31837] text-white font-semibold px-5 py-2.5 rounded-xl transition text-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
           New Site
         </button>
       </div>
       <div id="sites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
       <div id="empty-state" class="hidden text-center py-24">
-        <div class="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <div class="w-20 h-20 bg-[#1A1A1A] rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-[#555555]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </div>
         <h2 class="text-xl font-bold mb-2">No sites yet</h2>
-        <p class="text-slate-400 text-sm mb-6">Create your first site to get started.</p>
+        <p class="text-[#888888] text-sm mb-6">Create your first site to get started.</p>
         <button onclick="openCreateModal()"
-          class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition">
+          class="inline-flex items-center gap-2 bg-[#E31837] hover:bg-[#E31837] text-white font-semibold px-6 py-3 rounded-xl transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
           Create Your First Site
         </button>
@@ -130,7 +130,7 @@
     <div id="view-analytics" class="hidden">
       <div class="mb-8">
         <h1 class="text-2xl font-bold">Analytics</h1>
-        <p class="text-slate-400 text-sm mt-0.5">Traffic across all connected sites.</p>
+        <p class="text-[#888888] text-sm mt-0.5">Traffic across all connected sites.</p>
       </div>
       <div id="analytics-view-content" class="space-y-5"></div>
     </div>
@@ -139,12 +139,12 @@
     <div id="view-billing" class="hidden">
       <div class="mb-8">
         <h1 class="text-2xl font-bold">Billing & Plans</h1>
-        <p class="text-slate-400 text-sm mt-0.5">Manage your subscription and see what's included.</p>
+        <p class="text-[#888888] text-sm mt-0.5">Manage your subscription and see what's included.</p>
       </div>
-      <div id="billing-current" class="bg-slate-800 border border-slate-700 rounded-2xl p-5 mb-8 hidden">
-        <p class="text-xs text-slate-400 uppercase tracking-widest mb-1">Current Plan</p>
+      <div id="billing-current" class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-5 mb-8 hidden">
+        <p class="text-xs text-[#888888] uppercase tracking-widest mb-1">Current Plan</p>
         <p id="billing-plan-name" class="text-lg font-bold"></p>
-        <p id="billing-plan-status" class="text-sm text-slate-400 mt-0.5"></p>
+        <p id="billing-plan-status" class="text-sm text-[#888888] mt-0.5"></p>
       </div>
       <div id="billing-plans" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
     </div>
@@ -155,37 +155,37 @@
 <!-- ── CREATE SITE MODAL ────────────────────────────────────────────────────── -->
 <div id="create-modal" class="modal-bg fixed inset-0 z-50 flex items-center justify-center p-4"
      style="background:rgba(0,0,0,0.7)" onclick="closeCreateModal(event)">
-  <div class="modal-card bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+  <div class="modal-card bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
        onclick="event.stopPropagation()">
 
     <!-- Modal header -->
-    <div class="flex items-center justify-between px-6 pt-6 pb-0 sticky top-0 bg-slate-800 z-10">
+    <div class="flex items-center justify-between px-6 pt-6 pb-0 sticky top-0 bg-[#1A1A1A] z-10">
       <h2 class="text-lg font-bold pb-4">Create New Site</h2>
-      <button onclick="closeCreateModal()" class="text-slate-400 hover:text-white transition pb-4">
+      <button onclick="closeCreateModal()" class="text-[#888888] hover:text-white transition pb-4">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
 
     <!-- Create mode tabs -->
-    <div class="flex gap-1 px-6 bg-slate-800 border-b border-slate-700">
+    <div class="flex gap-1 px-6 bg-[#1A1A1A] border-b border-[#2A2A2A]">
       <button onclick="switchCreateTab('template')" id="ctab-template"
-        class="tab-btn active text-sm font-semibold px-4 py-2.5 rounded-t-lg text-white bg-slate-700">From Template</button>
+        class="tab-btn active text-sm font-semibold px-4 py-2.5 rounded-t-lg text-white bg-[#2A2A2A]">From Template</button>
       <button onclick="switchCreateTab('import')" id="ctab-import"
-        class="tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg text-slate-400 hover:text-white">Import Website</button>
+        class="tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg text-[#888888] hover:text-white">Import Website</button>
     </div>
 
     <!-- ── Template tab ── -->
     <div id="create-tab-template" class="settings-tab active p-6">
       <div class="mb-6">
-        <label class="block text-sm font-medium text-slate-300 mb-1.5">Site Name</label>
+        <label class="block text-sm font-medium text-[#E5E5E5] mb-1.5">Site Name</label>
         <input type="text" id="new-site-name" placeholder="My Awesome Site" class="w-full rounded-xl px-4 py-3 text-sm">
       </div>
       <div class="mb-6">
-        <label class="block text-sm font-medium text-slate-300 mb-3">Choose a Template</label>
+        <label class="block text-sm font-medium text-[#E5E5E5] mb-3">Choose a Template</label>
         <div id="template-grid"></div>
       </div>
       <button onclick="createSite()" id="create-btn"
-        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">
+        class="w-full bg-[#E31837] hover:bg-[#E31837] text-white font-bold py-3 rounded-xl transition text-sm">
         Create Site
       </button>
     </div>
@@ -195,9 +195,9 @@
 
       <!-- Step 1: URL input -->
       <div id="import-step-url">
-        <p class="text-sm text-slate-400 mb-5">Paste your existing website URL. n3ware will scrape it, strip the CMS bloat, and convert it to clean HTML ready for visual editing.</p>
+        <p class="text-sm text-[#888888] mb-5">Paste your existing website URL. n3ware will scrape it, strip the CMS bloat, and convert it to clean HTML ready for visual editing.</p>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-slate-300 mb-1.5">Website URL</label>
+          <label class="block text-sm font-medium text-[#E5E5E5] mb-1.5">Website URL</label>
           <input type="url" id="import-url" placeholder="https://yourbusiness.com"
             class="w-full rounded-xl px-4 py-3 text-sm"
             onkeydown="if(event.key==='Enter')scanWebsite()">
@@ -211,17 +211,17 @@
 
       <!-- Step 2: Preview + confirm -->
       <div id="import-step-preview" class="hidden">
-        <div id="import-preview-card" class="bg-slate-700/50 border border-slate-600 rounded-2xl p-5 mb-5"></div>
+        <div id="import-preview-card" class="bg-[#2A2A2A]/50 border border-[#444444] rounded-2xl p-5 mb-5"></div>
         <div class="mb-5">
-          <label class="block text-sm font-medium text-slate-300 mb-1.5">Site Name</label>
+          <label class="block text-sm font-medium text-[#E5E5E5] mb-1.5">Site Name</label>
           <input type="text" id="import-site-name" placeholder="Imported Site"
             class="w-full rounded-xl px-4 py-3 text-sm">
         </div>
         <div class="flex gap-3">
           <button onclick="resetImport()"
-            class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold py-3 rounded-xl transition text-sm">← Back</button>
+            class="flex-1 bg-[#2A2A2A] hover:bg-[#444444] text-[#E5E5E5] font-semibold py-3 rounded-xl transition text-sm">← Back</button>
           <button onclick="startImport()" id="import-btn"
-            class="flex-[2] bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">
+            class="flex-[2] bg-[#E31837] hover:bg-[#E31837] text-white font-bold py-3 rounded-xl transition text-sm">
             Import &amp; Edit
           </button>
         </div>
@@ -229,17 +229,17 @@
 
       <!-- Step 3: In-progress -->
       <div id="import-step-progress" class="hidden text-center py-6">
-        <div class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-5">
-          <svg class="w-8 h-8 text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+        <div class="w-16 h-16 bg-[#E31837]/20 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg class="w-8 h-8 text-[#FF6B80] animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
         </div>
-        <p id="import-status-text" class="text-slate-300 font-semibold mb-3">Scanning website…</p>
-        <div class="w-full bg-slate-700 rounded-full h-2 mb-2 max-w-xs mx-auto">
-          <div id="import-progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-700" style="width:0%"></div>
+        <p id="import-status-text" class="text-[#E5E5E5] font-semibold mb-3">Scanning website…</p>
+        <div class="w-full bg-[#2A2A2A] rounded-full h-2 mb-2 max-w-xs mx-auto">
+          <div id="import-progress-bar" class="bg-[#E31837] h-2 rounded-full transition-all duration-700" style="width:0%"></div>
         </div>
-        <p class="text-xs text-slate-500 mt-1">This may take up to 30 seconds</p>
+        <p class="text-xs text-[#666666] mt-1">This may take up to 30 seconds</p>
       </div>
 
       <!-- Step 4: Complete -->
@@ -250,10 +250,10 @@
           </svg>
         </div>
         <p class="text-xl font-bold text-white mb-1">Import Complete!</p>
-        <p id="import-done-text" class="text-slate-400 text-sm mb-5"></p>
-        <div id="import-report" class="bg-slate-700/50 rounded-xl p-4 text-left text-sm mb-5 space-y-1.5 max-w-sm mx-auto"></div>
+        <p id="import-done-text" class="text-[#888888] text-sm mb-5"></p>
+        <div id="import-report" class="bg-[#2A2A2A]/50 rounded-xl p-4 text-left text-sm mb-5 space-y-1.5 max-w-sm mx-auto"></div>
         <button onclick="openImportedSite()"
-          class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition text-sm">
+          class="w-full bg-[#E31837] hover:bg-[#E31837] text-white font-bold py-3 rounded-xl transition text-sm">
           Open in Editor →
         </button>
       </div>
@@ -264,13 +264,13 @@
 
 <!-- ── REVISIONS PANEL ──────────────────────────────────────────────────────── -->
 <div id="revisions-backdrop" class="hidden fixed inset-0 z-40 bg-black/50" onclick="closeRevisions()"></div>
-<div id="revisions-panel" class="slide-panel fixed right-0 top-0 h-full w-full max-w-sm z-50 bg-slate-900 border-l border-slate-700 flex flex-col">
-  <div class="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+<div id="revisions-panel" class="slide-panel fixed right-0 top-0 h-full w-full max-w-sm z-50 bg-[#111111] border-l border-[#2A2A2A] flex flex-col">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-[#2A2A2A]">
     <div>
       <h2 class="font-bold">Revision History</h2>
-      <p id="rev-site-name" class="text-xs text-slate-400 mt-0.5"></p>
+      <p id="rev-site-name" class="text-xs text-[#888888] mt-0.5"></p>
     </div>
-    <button onclick="closeRevisions()" class="text-slate-400 hover:text-white">
+    <button onclick="closeRevisions()" class="text-[#888888] hover:text-white">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
   </div>
@@ -279,13 +279,13 @@
 
 <!-- ── ANALYTICS PANEL ─────────────────────────────────────────────────────── -->
 <div id="analytics-backdrop" class="hidden fixed inset-0 z-40 bg-black/50" onclick="closeAnalytics()"></div>
-<div id="analytics-panel" class="slide-panel fixed right-0 top-0 h-full w-full max-w-md z-50 bg-slate-900 border-l border-slate-700 flex flex-col">
-  <div class="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+<div id="analytics-panel" class="slide-panel fixed right-0 top-0 h-full w-full max-w-md z-50 bg-[#111111] border-l border-[#2A2A2A] flex flex-col">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-[#2A2A2A]">
     <div>
       <h2 class="font-bold">Analytics</h2>
-      <p id="analytics-site-name" class="text-xs text-slate-400 mt-0.5"></p>
+      <p id="analytics-site-name" class="text-xs text-[#888888] mt-0.5"></p>
     </div>
-    <button onclick="closeAnalytics()" class="text-slate-400 hover:text-white">
+    <button onclick="closeAnalytics()" class="text-[#888888] hover:text-white">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
   </div>
@@ -295,55 +295,55 @@
 <!-- ── SETTINGS MODAL ───────────────────────────────────────────────────────── -->
 <div id="settings-modal" class="modal-bg fixed inset-0 z-50 flex items-center justify-center p-4"
      style="background:rgba(0,0,0,0.7)" onclick="closeSettings(event)">
-  <div class="modal-card bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+  <div class="modal-card bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
        onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-700 sticky top-0 bg-slate-800">
+    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#2A2A2A] sticky top-0 bg-[#1A1A1A]">
       <h2 class="text-lg font-bold">Site Settings</h2>
-      <button onclick="closeSettings()" class="text-slate-400 hover:text-white">
+      <button onclick="closeSettings()" class="text-[#888888] hover:text-white">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
     <!-- Settings tabs -->
-    <div class="flex gap-1 px-6 pt-4 border-b border-slate-700 pb-0">
+    <div class="flex gap-1 px-6 pt-4 border-b border-[#2A2A2A] pb-0">
       <button onclick="switchSettingsTab('general')" id="stab-general"
-        class="tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-slate-700">General</button>
+        class="tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-[#2A2A2A]">General</button>
       <button onclick="switchSettingsTab('files')" id="stab-files"
-        class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-slate-400 hover:text-white">Files</button>
+        class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-[#888888] hover:text-white">Files</button>
       <button onclick="switchSettingsTab('ga')" id="stab-ga"
-        class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-slate-400 hover:text-white">Analytics</button>
+        class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-[#888888] hover:text-white">Analytics</button>
     </div>
 
     <!-- General tab -->
     <div id="settings-general" class="settings-tab active p-6 space-y-6">
       <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Site Name</label>
+        <label class="block text-sm font-semibold text-[#E5E5E5] mb-1.5">Site Name</label>
         <input type="text" id="settings-name" class="w-full rounded-xl px-4 py-3 text-sm">
-        <button onclick="saveSiteName()" class="mt-2 text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition">Save Name</button>
+        <button onclick="saveSiteName()" class="mt-2 text-sm bg-[#2A2A2A] hover:bg-[#444444] text-white px-4 py-2 rounded-lg transition">Save Name</button>
       </div>
       <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Live Site URL</label>
+        <label class="block text-sm font-semibold text-[#E5E5E5] mb-1.5">Live Site URL</label>
         <div class="flex gap-2">
-          <input type="text" id="settings-url" readonly class="flex-1 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-default">
-          <button onclick="copySettingsUrl()" class="bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-xl transition" title="Copy URL">
+          <input type="text" id="settings-url" readonly class="flex-1 rounded-xl px-4 py-3 text-sm text-[#888888] cursor-default">
+          <button onclick="copySettingsUrl()" class="bg-[#2A2A2A] hover:bg-[#444444] px-4 py-3 rounded-xl transition" title="Copy URL">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           </button>
         </div>
       </div>
       <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-1.5">Embed Code</label>
+        <label class="block text-sm font-semibold text-[#E5E5E5] mb-1.5">Embed Code</label>
         <div class="relative">
           <textarea id="settings-embed" readonly rows="4"
-            class="w-full rounded-xl px-4 py-3 text-xs font-mono resize-none text-slate-300 leading-relaxed"></textarea>
-          <button onclick="copyEmbed()" class="absolute top-2 right-2 text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded transition">Copy</button>
+            class="w-full rounded-xl px-4 py-3 text-xs font-mono resize-none text-[#E5E5E5] leading-relaxed"></textarea>
+          <button onclick="copyEmbed()" class="absolute top-2 right-2 text-xs bg-[#2A2A2A] hover:bg-[#444444] px-2 py-1 rounded transition">Copy</button>
         </div>
       </div>
       <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-2">Custom Domain</label>
+        <label class="block text-sm font-semibold text-[#E5E5E5] mb-2">Custom Domain</label>
         <div id="domain-connected" class="hidden mb-3">
           <div class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
             <div>
               <p id="domain-name-display" class="text-sm font-semibold text-emerald-400"></p>
-              <p class="text-xs text-slate-400">Domain connected</p>
+              <p class="text-xs text-[#888888]">Domain connected</p>
             </div>
             <button onclick="disconnectDomain()" class="text-xs text-red-400 hover:text-red-300 transition">Disconnect</button>
           </div>
@@ -351,18 +351,18 @@
         <div id="domain-form">
           <input type="text" id="settings-domain" placeholder="mysite.example.com"
             class="w-full rounded-xl px-4 py-3 text-sm mb-2">
-          <button onclick="connectDomain()" class="text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition">Connect Domain</button>
-          <p class="text-xs text-slate-500 mt-2">Point a CNAME record at your n3ware server, then enter the domain here.</p>
+          <button onclick="connectDomain()" class="text-sm bg-[#2A2A2A] hover:bg-[#444444] text-white px-4 py-2 rounded-lg transition">Connect Domain</button>
+          <p class="text-xs text-[#666666] mt-2">Point a CNAME record at your n3ware server, then enter the domain here.</p>
         </div>
-        <div id="domain-cname-instructions" class="hidden mt-3 bg-slate-700/50 rounded-xl p-4">
-          <p class="text-xs font-semibold text-slate-300 mb-2">Add this DNS record:</p>
-          <code class="text-xs text-blue-400">CNAME  @  →  <span id="cname-target"></span></code>
-          <button onclick="verifyDomain()" class="mt-3 text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition">Verify DNS</button>
+        <div id="domain-cname-instructions" class="hidden mt-3 bg-[#2A2A2A]/50 rounded-xl p-4">
+          <p class="text-xs font-semibold text-[#E5E5E5] mb-2">Add this DNS record:</p>
+          <code class="text-xs text-[#FF6B80]">CNAME  @  →  <span id="cname-target"></span></code>
+          <button onclick="verifyDomain()" class="mt-3 text-xs bg-[#E31837] hover:bg-[#E31837] text-white px-3 py-1.5 rounded-lg transition">Verify DNS</button>
         </div>
       </div>
       <div class="border border-red-900/50 rounded-xl p-5">
         <h3 class="text-sm font-bold text-red-400 mb-1">Danger Zone</h3>
-        <p class="text-xs text-slate-400 mb-4">Deleting this site is permanent. All revisions will be lost.</p>
+        <p class="text-xs text-[#888888] mb-4">Deleting this site is permanent. All revisions will be lost.</p>
         <button onclick="confirmDeleteSite()" class="text-sm bg-red-900/40 hover:bg-red-900/70 text-red-400 border border-red-900/50 px-5 py-2 rounded-lg transition">Delete This Site</button>
       </div>
     </div>
@@ -370,14 +370,14 @@
     <!-- Analytics / GA tab -->
     <div id="settings-ga" class="settings-tab p-6 space-y-5">
       <div>
-        <p class="text-sm font-semibold text-slate-300 mb-1">Google Analytics 4</p>
-        <p class="text-xs text-slate-400 mb-4">Connect a GA4 property to get richer analytics — traffic sources, device breakdown, geography, and real-time data.</p>
+        <p class="text-sm font-semibold text-[#E5E5E5] mb-1">Google Analytics 4</p>
+        <p class="text-xs text-[#888888] mb-4">Connect a GA4 property to get richer analytics — traffic sources, device breakdown, geography, and real-time data.</p>
         <!-- Connected state -->
         <div id="ga-connected-state" class="hidden mb-4">
           <div class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
             <div>
               <p id="ga-property-name" class="text-sm font-semibold text-emerald-400"></p>
-              <p class="text-xs text-slate-400 mt-0.5">Google Analytics 4 connected</p>
+              <p class="text-xs text-[#888888] mt-0.5">Google Analytics 4 connected</p>
             </div>
             <button onclick="disconnectGA()" class="text-xs text-red-400 hover:text-red-300 transition">Disconnect</button>
           </div>
@@ -385,7 +385,7 @@
         <!-- Connect form -->
         <div id="ga-connect-form">
           <button onclick="loadGAProperties()" id="ga-load-props-btn"
-            class="text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition mb-3">
+            class="text-sm bg-[#2A2A2A] hover:bg-[#444444] text-white px-4 py-2 rounded-lg transition mb-3">
             Load GA4 Properties
           </button>
           <div id="ga-properties-list" class="hidden space-y-2 mb-3"></div>
@@ -394,7 +394,7 @@
       </div>
       <!-- Quick stats for connected site -->
       <div id="ga-quick-stats" class="hidden">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Last 7 Days</p>
+        <p class="text-xs font-semibold text-[#888888] uppercase tracking-widest mb-3">Last 7 Days</p>
         <div id="ga-stats-cards" class="grid grid-cols-2 gap-3"></div>
       </div>
     </div>
@@ -402,20 +402,20 @@
     <!-- Files tab -->
     <div id="settings-files" class="settings-tab p-6">
       <div class="mb-4">
-        <label class="block text-sm font-semibold text-slate-300 mb-3">Upload Image</label>
+        <label class="block text-sm font-semibold text-[#E5E5E5] mb-3">Upload Image</label>
         <div id="upload-drop-zone"
-          class="border-2 border-dashed border-slate-600 hover:border-blue-500 rounded-xl p-8 text-center cursor-pointer transition"
+          class="border-2 border-dashed border-[#444444] hover:border-blue-500 rounded-xl p-8 text-center cursor-pointer transition"
           onclick="document.getElementById('file-input').click()"
           ondragover="event.preventDefault()"
           ondrop="handleFileDrop(event)">
-          <svg class="w-8 h-8 text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          <p class="text-sm text-slate-400">Click to upload or drag & drop</p>
-          <p class="text-xs text-slate-500 mt-1">PNG, JPG, GIF, WebP up to 5MB</p>
+          <svg class="w-8 h-8 text-[#666666] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <p class="text-sm text-[#888888]">Click to upload or drag & drop</p>
+          <p class="text-xs text-[#666666] mt-1">PNG, JPG, GIF, WebP up to 5MB</p>
         </div>
         <input type="file" id="file-input" class="hidden" accept="image/*" onchange="uploadFile(this.files[0])">
       </div>
       <div>
-        <label class="block text-sm font-semibold text-slate-300 mb-3">Uploaded Files</label>
+        <label class="block text-sm font-semibold text-[#E5E5E5] mb-3">Uploaded Files</label>
         <div id="files-list" class="space-y-2"></div>
       </div>
     </div>
@@ -463,7 +463,7 @@ async function apiHtml(path) {
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function toast(msg, type = 'info') {
-  const c = { info: 'bg-slate-700', success: 'bg-emerald-700', error: 'bg-red-800' };
+  const c = { info: 'bg-[#2A2A2A]', success: 'bg-emerald-700', error: 'bg-red-800' };
   const el = document.createElement('div');
   el.className = `toast ${c[type]} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-xl pointer-events-auto max-w-xs`;
   el.textContent = msg;
@@ -476,8 +476,8 @@ function toast(msg, type = 'info') {
 function switchTab(mode) {
   S.authMode = mode;
   const isLogin = mode === 'login';
-  document.getElementById('tab-login').className = `flex-1 py-2 rounded-lg text-sm font-semibold transition ${isLogin ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
-  document.getElementById('tab-register').className = `flex-1 py-2 rounded-lg text-sm font-semibold transition ${!isLogin ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
+  document.getElementById('tab-login').className = `flex-1 py-2 rounded-lg text-sm font-semibold transition ${isLogin ? 'bg-[#2A2A2A] text-white' : 'text-[#888888]'}`;
+  document.getElementById('tab-register').className = `flex-1 py-2 rounded-lg text-sm font-semibold transition ${!isLogin ? 'bg-[#2A2A2A] text-white' : 'text-[#888888]'}`;
   document.getElementById('auth-btn').textContent = isLogin ? 'Sign In' : 'Create Account';
   document.getElementById('auth-error').classList.add('hidden');
 }
@@ -535,8 +535,8 @@ function showView(view) {
     document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
     const nb = document.getElementById(`nav-${v}`);
     if (nb) {
-      if (v === view) nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-slate-800';
-      else            nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white hover:bg-slate-800';
+      if (v === view) nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-white bg-[#1A1A1A]';
+      else            nb.className = 'text-sm font-medium px-3 py-1.5 rounded-lg transition text-[#888888] hover:text-white hover:bg-[#1A1A1A]';
     }
   });
   if (view === 'billing')   loadBilling();
@@ -569,32 +569,32 @@ function renderSiteCard(site) {
   const revCount = site.revisionCount || 0;
   const name = esc(site.name || 'Untitled Site');
   return `
-  <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden hover:border-slate-600 transition group" data-id="${esc(site.id)}">
+  <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl overflow-hidden hover:border-[#444444] transition group" data-id="${esc(site.id)}">
     <div class="site-preview h-40 relative flex items-center justify-center cursor-pointer" style="--c1:${c1};--c2:${c2}" onclick="editSite('${esc(site.id)}')">
       <span class="text-5xl font-black text-white/30">${esc((site.name || 'U')[0].toUpperCase())}</span>
       <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center">
-        <span class="opacity-0 group-hover:opacity-100 transition bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-full">Open Editor ↗</span>
+        <span class="opacity-0 group-hover:opacity-100 transition bg-white text-[#0A0A0A] text-xs font-bold px-3 py-1.5 rounded-full">Open Editor ↗</span>
       </div>
       <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-semibold px-2.5 py-1 rounded-full">
         <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>Live
       </div>
-      <div class="absolute top-3 right-3 bg-black/40 text-slate-300 text-xs px-2 py-0.5 rounded-full" id="views-${esc(site.id)}">…</div>
+      <div class="absolute top-3 right-3 bg-black/40 text-[#E5E5E5] text-xs px-2 py-0.5 rounded-full" id="views-${esc(site.id)}">…</div>
     </div>
     <div class="p-4">
       <div class="flex items-start justify-between gap-2 mb-2">
         <h3 class="font-semibold text-sm leading-tight truncate flex-1" title="${name}">${name}</h3>
-        <span class="shrink-0 bg-slate-700 text-slate-400 text-xs px-2 py-0.5 rounded-full">${revCount} rev${revCount !== 1 ? 's' : ''}</span>
+        <span class="shrink-0 bg-[#2A2A2A] text-[#888888] text-xs px-2 py-0.5 rounded-full">${revCount} rev${revCount !== 1 ? 's' : ''}</span>
       </div>
-      <p class="text-slate-500 text-xs mb-4">Edited ${updated}</p>
+      <p class="text-[#666666] text-xs mb-4">Edited ${updated}</p>
       <div class="flex gap-2">
-        <button onclick="editSite('${esc(site.id)}')" class="flex-1 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg transition">Edit</button>
-        <button onclick="openAnalytics('${esc(site.id)}')" class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Analytics">
+        <button onclick="editSite('${esc(site.id)}')" class="flex-1 text-xs font-semibold bg-[#E31837] hover:bg-[#E31837] text-white py-2 rounded-lg transition">Edit</button>
+        <button onclick="openAnalytics('${esc(site.id)}')" class="text-xs font-semibold bg-[#2A2A2A] hover:bg-[#444444] text-[#E5E5E5] px-3 py-2 rounded-lg transition" title="Analytics">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         </button>
-        <button onclick="openRevisions('${esc(site.id)}')" class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Revisions">
+        <button onclick="openRevisions('${esc(site.id)}')" class="text-xs font-semibold bg-[#2A2A2A] hover:bg-[#444444] text-[#E5E5E5] px-3 py-2 rounded-lg transition" title="Revisions">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </button>
-        <button onclick="openSettings('${esc(site.id)}')" class="text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg transition" title="Settings">
+        <button onclick="openSettings('${esc(site.id)}')" class="text-xs font-semibold bg-[#2A2A2A] hover:bg-[#444444] text-[#E5E5E5] px-3 py-2 rounded-lg transition" title="Settings">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
       </div>
@@ -635,14 +635,14 @@ function switchCreateTab(tab) {
     document.getElementById(`create-tab-${t}`).classList.toggle('active', t === tab);
     const btn = document.getElementById(`ctab-${t}`);
     btn.className = t === tab
-      ? 'tab-btn active text-sm font-semibold px-4 py-2.5 rounded-t-lg text-white bg-slate-700'
-      : 'tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg text-slate-400 hover:text-white';
+      ? 'tab-btn active text-sm font-semibold px-4 py-2.5 rounded-t-lg text-white bg-[#2A2A2A]'
+      : 'tab-btn text-sm font-semibold px-4 py-2.5 rounded-t-lg text-[#888888] hover:text-white';
   });
   if (tab === 'import') document.getElementById('import-url').focus();
 }
 function renderTemplateGrid() {
   const container = document.getElementById('template-grid');
-  if (!S.templates.length) { container.innerHTML = '<p class="text-slate-400 text-sm">Loading…</p>'; return; }
+  if (!S.templates.length) { container.innerHTML = '<p class="text-[#888888] text-sm">Loading…</p>'; return; }
   const cats = [...new Set(S.templates.map(t => t.category))];
   const icons = { blank:'⬜', portfolio:'🎨', business:'💼', restaurant:'🍽️', realtor:'🏠', lawncare:'🌿', handyman:'🔧', salon:'✂️', petcare:'🐾' };
   const catHtml = cats.map(cat => {
@@ -653,7 +653,7 @@ function renderTemplateGrid() {
         <p class="text-xs font-semibold text-white">${esc(t.label)}</p>
       </div>`).join('');
     return `<div class="mb-4">
-      <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">${esc(cat)}</p>
+      <p class="text-xs text-[#666666] font-semibold uppercase tracking-wider mb-2">${esc(cat)}</p>
       <div class="grid grid-cols-4 gap-2">${cards}</div>
     </div>`;
   }).join('');
@@ -742,11 +742,11 @@ function _showScrapePreview(scraped, url) {
       ${thumbs ? `<div class="flex gap-1.5 shrink-0">${thumbs}</div>` : ''}
       <div class="min-w-0">
         <p class="font-semibold text-white truncate">${esc(scraped.title || url)}</p>
-        ${scraped.description ? `<p class="text-xs text-slate-400 mt-0.5 line-clamp-2">${esc(scraped.description)}</p>` : ''}
-        <p class="text-xs text-blue-400 mt-1 truncate">${esc(scraped.finalUrl || url)}</p>
+        ${scraped.description ? `<p class="text-xs text-[#888888] mt-0.5 line-clamp-2">${esc(scraped.description)}</p>` : ''}
+        <p class="text-xs text-[#FF6B80] mt-1 truncate">${esc(scraped.finalUrl || url)}</p>
       </div>
     </div>
-    <div class="flex gap-4 text-xs text-slate-400">
+    <div class="flex gap-4 text-xs text-[#888888]">
       <span>🖼 ${scraped.imageCount || 0} image${scraped.imageCount !== 1 ? 's' : ''}</span>
       <span>🎨 ${scraped.styleCount || 0} stylesheet${scraped.styleCount !== 1 ? 's' : ''}</span>
       <span class="text-emerald-400">✓ Ready to import</span>
@@ -807,9 +807,9 @@ function _showImportDone(report) {
     const warnings = (report.warnings || []).map(w =>
       `<p class="text-yellow-400 text-xs">⚠ ${esc(w)}</p>`).join('');
     document.getElementById('import-report').innerHTML =
-      `<p class="text-slate-300">✓ ${report.sectionsFound || 0} sections found</p>` +
-      `<p class="text-slate-300">✓ ${report.imagesProcessed || 0} images imported</p>` +
-      `<p class="text-slate-300">✓ ${report.linesRemoved || 0} bloat lines removed</p>` +
+      `<p class="text-[#E5E5E5]">✓ ${report.sectionsFound || 0} sections found</p>` +
+      `<p class="text-[#E5E5E5]">✓ ${report.imagesProcessed || 0} images imported</p>` +
+      `<p class="text-[#E5E5E5]">✓ ${report.linesRemoved || 0} bloat lines removed</p>` +
       warnings;
   }
 }
@@ -827,7 +827,7 @@ async function openRevisions(siteId) {
   const site = S.sites.find(s => s.id === siteId);
   S.activeSite = siteId;
   document.getElementById('rev-site-name').textContent = site ? site.name : siteId;
-  document.getElementById('revisions-list').innerHTML = '<p class="text-slate-400 text-sm text-center py-8">Loading…</p>';
+  document.getElementById('revisions-list').innerHTML = '<p class="text-[#888888] text-sm text-center py-8">Loading…</p>';
   document.getElementById('revisions-backdrop').classList.remove('hidden');
   document.getElementById('revisions-panel').classList.add('open');
   try {
@@ -843,21 +843,21 @@ function closeRevisions() {
 }
 function renderRevisions(revisions) {
   const list = document.getElementById('revisions-list');
-  if (!revisions.length) { list.innerHTML = '<p class="text-slate-400 text-sm text-center py-8">No revisions yet.</p>'; return; }
+  if (!revisions.length) { list.innerHTML = '<p class="text-[#888888] text-sm text-center py-8">No revisions yet.</p>'; return; }
   const revHtml = revisions.map((rev, i) => {
     const date = new Date(rev.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     const isCurrent = i === 0;
-    return `<div class="bg-slate-800 rounded-xl p-4 border ${isCurrent ? 'border-blue-500/50' : 'border-slate-700'}">
+    return `<div class="bg-[#1A1A1A] rounded-xl p-4 border ${isCurrent ? 'border-blue-500/50' : 'border-[#2A2A2A]'}">
       <div class="flex items-start justify-between gap-2 mb-2">
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold truncate">${esc(rev.message || 'Saved')}</p>
-          <p class="text-xs text-slate-400 mt-0.5">${esc(date)}</p>
+          <p class="text-xs text-[#888888] mt-0.5">${esc(date)}</p>
         </div>
         ${isCurrent
-          ? '<span class="shrink-0 text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full font-semibold">Current</span>'
-          : `<button onclick="rollbackTo('${esc(rev.id)}')" class="shrink-0 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-lg transition font-semibold">↺ Restore</button>`}
+          ? '<span class="shrink-0 text-xs bg-[#E31837]/20 text-[#FF6B80] border border-blue-500/30 px-2 py-0.5 rounded-full font-semibold">Current</span>'
+          : `<button onclick="rollbackTo('${esc(rev.id)}')" class="shrink-0 text-xs bg-[#2A2A2A] hover:bg-[#444444] text-[#E5E5E5] px-3 py-1.5 rounded-lg transition font-semibold">↺ Restore</button>`}
       </div>
-      <p class="text-xs text-slate-500 font-mono">${esc(rev.id)}</p>
+      <p class="text-xs text-[#666666] font-mono">${esc(rev.id)}</p>
     </div>`;
   }).join('');
   list.innerHTML = revHtml;
@@ -877,7 +877,7 @@ async function openAnalytics(siteId) {
   const site = S.sites.find(s => s.id === siteId);
   S.activeSite = siteId;
   document.getElementById('analytics-site-name').textContent = site ? site.name : siteId;
-  document.getElementById('analytics-content').innerHTML = '<p class="text-slate-400 text-sm text-center py-8">Loading…</p>';
+  document.getElementById('analytics-content').innerHTML = '<p class="text-[#888888] text-sm text-center py-8">Loading…</p>';
   document.getElementById('analytics-backdrop').classList.remove('hidden');
   document.getElementById('analytics-panel').classList.add('open');
   try {
@@ -896,28 +896,28 @@ function closeAnalytics() {
 }
 function renderAnalytics(stats, daily) {
   const topPagesHtml = (stats.topPages || []).slice(0, 5).map(p =>
-    `<div class="flex justify-between text-sm"><span class="text-slate-300 truncate">${esc(p.path)}</span><span class="text-slate-400 ml-2 shrink-0">${fmtNum(p.count)}</span></div>`
-  ).join('') || '<p class="text-slate-500 text-sm">No data</p>';
+    `<div class="flex justify-between text-sm"><span class="text-[#E5E5E5] truncate">${esc(p.path)}</span><span class="text-[#888888] ml-2 shrink-0">${fmtNum(p.count)}</span></div>`
+  ).join('') || '<p class="text-[#666666] text-sm">No data</p>';
 
   const chartMax = Math.max(...daily.map(d => d.views), 1);
   const chartHtml = daily.slice(-14).map(d => {
     const pct = Math.round((d.views / chartMax) * 100);
     return `<div class="flex flex-col items-center gap-1" title="${d.date}: ${d.views} views">
-      <div class="w-full bg-blue-600 rounded-sm transition-all" style="height:${Math.max(pct * 0.6, 2)}px;min-height:2px;"></div>
+      <div class="w-full bg-[#E31837] rounded-sm transition-all" style="height:${Math.max(pct * 0.6, 2)}px;min-height:2px;"></div>
     </div>`;
   }).join('');
 
   const contentHtml = `
     <div class="grid grid-cols-2 gap-3">
-      <div class="bg-slate-800 rounded-xl p-4 text-center"><p class="text-3xl font-bold">${fmtNum(stats.views || 0)}</p><p class="text-xs text-slate-400 mt-1">Views (30d)</p></div>
-      <div class="bg-slate-800 rounded-xl p-4 text-center"><p class="text-3xl font-bold">${fmtNum(stats.uniqueVisitors || 0)}</p><p class="text-xs text-slate-400 mt-1">Visitors (30d)</p></div>
+      <div class="bg-[#1A1A1A] rounded-xl p-4 text-center"><p class="text-3xl font-bold">${fmtNum(stats.views || 0)}</p><p class="text-xs text-[#888888] mt-1">Views (30d)</p></div>
+      <div class="bg-[#1A1A1A] rounded-xl p-4 text-center"><p class="text-3xl font-bold">${fmtNum(stats.uniqueVisitors || 0)}</p><p class="text-xs text-[#888888] mt-1">Visitors (30d)</p></div>
     </div>
-    <div class="bg-slate-800 rounded-xl p-4">
-      <p class="text-xs font-semibold text-slate-400 mb-3">Daily Views (last 14 days)</p>
+    <div class="bg-[#1A1A1A] rounded-xl p-4">
+      <p class="text-xs font-semibold text-[#888888] mb-3">Daily Views (last 14 days)</p>
       <div class="flex gap-1 items-end h-20">${chartHtml}</div>
     </div>
-    <div class="bg-slate-800 rounded-xl p-4">
-      <p class="text-xs font-semibold text-slate-400 mb-3">Top Pages</p>
+    <div class="bg-[#1A1A1A] rounded-xl p-4">
+      <p class="text-xs font-semibold text-[#888888] mb-3">Top Pages</p>
       <div class="space-y-2">${topPagesHtml}</div>
     </div>`;
   document.getElementById('analytics-content').innerHTML = contentHtml;
@@ -928,8 +928,8 @@ function switchSettingsTab(tab) {
   ['general','files','ga'].forEach(t => {
     document.getElementById(`settings-${t}`).classList.toggle('active', t === tab);
     document.getElementById(`stab-${t}`).className = t === tab
-      ? 'tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-slate-700'
-      : 'tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-slate-400 hover:text-white';
+      ? 'tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-[#2A2A2A]'
+      : 'tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-[#888888] hover:text-white';
   });
   if (tab === 'files') loadFiles();
   if (tab === 'ga')    loadGATab();
@@ -1027,24 +1027,24 @@ async function confirmDeleteSite() {
 // ── File manager ──────────────────────────────────────────────────────────────
 async function loadFiles() {
   const list = document.getElementById('files-list');
-  list.innerHTML = '<p class="text-slate-400 text-sm text-center py-4">Loading…</p>';
+  list.innerHTML = '<p class="text-[#888888] text-sm text-center py-4">Loading…</p>';
   try {
     const data = await api('GET', `/api/uploads/${S.activeSite}/files`);
     const files = data.files || [];
-    if (!files.length) { list.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">No files uploaded yet.</p>'; return; }
+    if (!files.length) { list.innerHTML = '<p class="text-[#666666] text-sm text-center py-4">No files uploaded yet.</p>'; return; }
     const filesHtml = files.map(f => `
-      <div class="flex items-center justify-between bg-slate-700/50 rounded-xl px-4 py-3">
+      <div class="flex items-center justify-between bg-[#2A2A2A]/50 rounded-xl px-4 py-3">
         <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 bg-slate-600 rounded-lg overflow-hidden shrink-0">
+          <div class="w-10 h-10 bg-[#444444] rounded-lg overflow-hidden shrink-0">
             <img src="${esc(f.url)}" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'">
           </div>
           <div class="min-w-0">
             <p class="text-sm font-medium truncate">${esc(f.name)}</p>
-            <p class="text-xs text-slate-400">${fmtBytes(f.size)}</p>
+            <p class="text-xs text-[#888888]">${fmtBytes(f.size)}</p>
           </div>
         </div>
         <div class="flex items-center gap-2 shrink-0 ml-2">
-          <button onclick="copyFileUrl('${esc(f.url)}')" class="text-xs text-slate-400 hover:text-white transition" title="Copy URL">
+          <button onclick="copyFileUrl('${esc(f.url)}')" class="text-xs text-[#888888] hover:text-white transition" title="Copy URL">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           </button>
           <button onclick="deleteFile('${esc(f.name)}')" class="text-xs text-red-400 hover:text-red-300 transition" title="Delete">
@@ -1074,7 +1074,7 @@ async function uploadFile(file) {
     toast('File uploaded!', 'success');
     loadFiles();
   } catch (err) { toast('Upload failed: ' + err.message, 'error'); }
-  finally { zone.innerHTML = '<svg class="w-8 h-8 text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><p class="text-sm text-slate-400">Click to upload or drag & drop</p><p class="text-xs text-slate-500 mt-1">PNG, JPG, GIF, WebP up to 5MB</p>'; }
+  finally { zone.innerHTML = '<svg class="w-8 h-8 text-[#666666] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><p class="text-sm text-[#888888]">Click to upload or drag & drop</p><p class="text-xs text-[#666666] mt-1">PNG, JPG, GIF, WebP up to 5MB</p>'; }
 }
 function copyFileUrl(url) {
   navigator.clipboard.writeText(window.location.origin + url).then(() => toast('URL copied!', 'success'));
@@ -1119,13 +1119,13 @@ async function loadGAProperties() {
     const props = data.properties || [];
     if (!props.length) { errEl.textContent = 'No GA4 properties found.'; errEl.classList.remove('hidden'); return; }
     list.innerHTML = props.map(p => `
-      <div class="flex items-center justify-between bg-slate-700/50 rounded-xl px-4 py-3">
+      <div class="flex items-center justify-between bg-[#2A2A2A]/50 rounded-xl px-4 py-3">
         <div>
           <p class="text-sm font-semibold">${esc(p.displayName)}</p>
-          <p class="text-xs text-slate-400">ID: ${esc(p.propertyId)}</p>
+          <p class="text-xs text-[#888888]">ID: ${esc(p.propertyId)}</p>
         </div>
         <button onclick="connectGAProperty('${esc(p.propertyId)}','${esc(p.displayName)}')"
-          class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition font-semibold">Connect</button>
+          class="text-xs bg-[#E31837] hover:bg-[#E31837] text-white px-3 py-1.5 rounded-lg transition font-semibold">Connect</button>
       </div>`).join('');
     list.classList.remove('hidden');
   } catch (err) { errEl.textContent = err.message; errEl.classList.remove('hidden'); }
@@ -1159,17 +1159,17 @@ function _renderGAQuickStats(data) {
     ['Live Now', data.realtime != null ? data.realtime : '—'],
     ['Top Page', (data.topPages || [])[0]?.path || '—'],
   ].map(([label, val]) => `
-    <div class="bg-slate-700/50 rounded-xl p-3 text-center">
+    <div class="bg-[#2A2A2A]/50 rounded-xl p-3 text-center">
       <p class="text-lg font-bold truncate">${esc(String(val))}</p>
-      <p class="text-xs text-slate-400 mt-0.5">${esc(label)}</p>
+      <p class="text-xs text-[#888888] mt-0.5">${esc(label)}</p>
     </div>`).join('');
 }
 
 // ── Analytics view (main nav tab) ─────────────────────────────────────────────
 async function loadAnalyticsView() {
   const el = document.getElementById('analytics-view-content');
-  el.innerHTML = '<p class="text-slate-400 text-sm text-center py-12">Loading…</p>';
-  if (!S.sites.length) { el.innerHTML = '<p class="text-slate-500 text-sm text-center py-12">No sites yet. Create a site to see analytics.</p>'; return; }
+  el.innerHTML = '<p class="text-[#888888] text-sm text-center py-12">Loading…</p>';
+  if (!S.sites.length) { el.innerHTML = '<p class="text-[#666666] text-sm text-center py-12">No sites yet. Create a site to see analytics.</p>'; return; }
 
   const rows = await Promise.all(S.sites.map(async site => {
     try {
@@ -1181,15 +1181,15 @@ async function loadAnalyticsView() {
   el.innerHTML = rows.map(({ site, data }) => {
     const [c1, c2] = siteColours(site.id);
     if (!data) return `
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex items-center justify-between">
+      <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-5 flex items-center justify-between">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white/50 text-lg" style="background:linear-gradient(135deg,${c1},${c2})">${esc((site.name||'U')[0].toUpperCase())}</div>
           <p class="font-semibold text-sm">${esc(site.name||'Untitled')}</p>
         </div>
-        <button onclick="openSettings('${esc(site.id)}')" class="text-xs text-blue-400 hover:text-blue-300 transition">Connect GA4 →</button>
+        <button onclick="openSettings('${esc(site.id)}')" class="text-xs text-[#FF6B80] hover:text-blue-300 transition">Connect GA4 →</button>
       </div>`;
     return `
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5">
+      <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-5">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl flex items-center justify-center font-black text-white/50" style="background:linear-gradient(135deg,${c1},${c2})">${esc((site.name||'U')[0].toUpperCase())}</div>
@@ -1198,10 +1198,10 @@ async function loadAnalyticsView() {
               ${data.propertyName ? `<p class="text-xs text-emerald-400">${esc(data.propertyName)}</p>` : ''}
             </div>
           </div>
-          <button onclick="openAnalytics('${esc(site.id)}')" class="text-xs text-slate-400 hover:text-white transition">Details →</button>
+          <button onclick="openAnalytics('${esc(site.id)}')" class="text-xs text-[#888888] hover:text-white transition">Details →</button>
         </div>
         <div class="grid grid-cols-4 gap-3">
-          ${[['Views',fmtNum(data.views||0)],['Visitors',fmtNum(data.uniqueVisitors||0)],['Live',data.realtime??'—'],['Top',((data.topPages||[])[0]?.path||'—')]].map(([l,v])=>`<div class="bg-slate-700/50 rounded-xl p-3 text-center"><p class="text-base font-bold truncate">${esc(String(v))}</p><p class="text-xs text-slate-400 mt-0.5">${esc(l)}</p></div>`).join('')}
+          ${[['Views',fmtNum(data.views||0)],['Visitors',fmtNum(data.uniqueVisitors||0)],['Live',data.realtime??'—'],['Top',((data.topPages||[])[0]?.path||'—')]].map(([l,v])=>`<div class="bg-[#2A2A2A]/50 rounded-xl p-3 text-center"><p class="text-base font-bold truncate">${esc(String(v))}</p><p class="text-xs text-[#888888] mt-0.5">${esc(l)}</p></div>`).join('')}
         </div>
       </div>`;
   }).join('');
@@ -1211,7 +1211,7 @@ async function loadAnalyticsView() {
 async function loadBilling() {
   const plansEl = document.getElementById('billing-plans');
   const currentEl = document.getElementById('billing-current');
-  plansEl.innerHTML = '<p class="text-slate-400 text-sm col-span-3 text-center py-8">Loading…</p>';
+  plansEl.innerHTML = '<p class="text-[#888888] text-sm col-span-3 text-center py-8">Loading…</p>';
   try {
     const [plansData, subData] = await Promise.all([
       api('GET', '/api/billing/plans'),
@@ -1229,16 +1229,16 @@ async function loadBilling() {
     const plansHtml = plans.map(plan => {
       const isCurrent = sub && sub.planId === plan.id;
       const priceStr = `$${(plan.price / 100).toFixed(0)}/${plan.interval}`;
-      const featuresHtml = (plan.features || []).map(f => `<li class="flex items-center gap-2 text-sm text-slate-300"><span class="text-emerald-400">✓</span> ${esc(f)}</li>`).join('');
+      const featuresHtml = (plan.features || []).map(f => `<li class="flex items-center gap-2 text-sm text-[#E5E5E5]"><span class="text-emerald-400">✓</span> ${esc(f)}</li>`).join('');
       const isPro = plan.id === 'n3ware_pro';
-      return `<div class="bg-slate-800 border ${isCurrent ? 'border-blue-500' : isPro ? 'border-slate-600' : 'border-slate-700'} rounded-2xl p-6 relative">
-        ${isPro ? '<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</div>' : ''}
+      return `<div class="bg-[#1A1A1A] border ${isCurrent ? 'border-blue-500' : isPro ? 'border-[#444444]' : 'border-[#2A2A2A]'} rounded-2xl p-6 relative">
+        ${isPro ? '<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#E31837] text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</div>' : ''}
         <h3 class="text-xl font-bold mb-1">${esc(plan.name)}</h3>
         <p class="text-3xl font-extrabold mb-4">${esc(priceStr)}</p>
         <ul class="space-y-2 mb-6">${featuresHtml}</ul>
         ${isCurrent
-          ? '<button class="w-full bg-slate-700 text-slate-400 py-2.5 rounded-xl text-sm font-semibold cursor-default">Current Plan</button>'
-          : `<button onclick="startCheckout('${esc(plan.id)}')" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-sm font-bold transition">${sub ? 'Switch Plan' : 'Subscribe'}</button>`}
+          ? '<button class="w-full bg-[#2A2A2A] text-[#888888] py-2.5 rounded-xl text-sm font-semibold cursor-default">Current Plan</button>'
+          : `<button onclick="startCheckout('${esc(plan.id)}')" class="w-full bg-[#E31837] hover:bg-[#E31837] text-white py-2.5 rounded-xl text-sm font-bold transition">${sub ? 'Switch Plan' : 'Subscribe'}</button>`}
       </div>`;
     }).join('');
     plansEl.innerHTML = plansHtml;

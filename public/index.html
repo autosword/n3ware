@@ -9,7 +9,13 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: { brand: '#3B82F6' },
+          colors: {
+            n3: {
+              red: '#E31837', dark: '#111111', darker: '#0A0A0A',
+              surface: '#1A1A1A', border: '#2A2A2A', text: '#E5E5E5', muted: '#888888'
+            },
+            brand: '#E31837'
+          },
           fontFamily: { mono: ['JetBrains Mono', 'Fira Code', 'monospace'] }
         }
       }
@@ -18,15 +24,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; background: #0A0A0A; }
     .gradient-text {
-      background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #06B6D4 100%);
+      background: linear-gradient(135deg, #E31837 0%, #FF4D6A 60%, #FF8096 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .glow { box-shadow: 0 0 40px rgba(59,130,246,0.3); }
-    .code-glow { box-shadow: 0 0 60px rgba(59,130,246,0.15); }
+    .glow { box-shadow: 0 0 40px rgba(227,24,55,0.35); }
+    .code-glow { box-shadow: 0 0 60px rgba(227,24,55,0.12); }
+    /* Subtle circuit-board grid background */
+    .circuit-bg {
+      background-image:
+        linear-gradient(rgba(227,24,55,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(227,24,55,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
@@ -38,13 +51,13 @@
     }
     .pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
     .tpl-filter {
-      background: rgb(31 41 55); color: rgb(156 163 175);
-      border: 1px solid rgb(55 65 81);
+      background: #1A1A1A; color: #888888;
+      border: 1px solid #2A2A2A;
     }
-    .tpl-filter:hover { border-color: rgb(107 114 128); color: rgb(229 231 235); }
+    .tpl-filter:hover { border-color: #444; color: #E5E5E5; }
     .tpl-filter-active {
-      background: rgb(37 99 235); color: #fff;
-      border: 1px solid rgb(59 130 246);
+      background: #E31837; color: #fff;
+      border: 1px solid #E31837;
     }
     @keyframes tpl-fade-in {
       from { opacity: 0; transform: translateY(8px); }
@@ -53,22 +66,23 @@
     .tpl-card { animation: tpl-fade-in 0.25s ease both; }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 overflow-x-hidden">
+<body class="text-[#E5E5E5] overflow-x-hidden" style="background:#0A0A0A">
 
   <!-- Nav -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-lg border-b border-gray-800/50">
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-lg border-b border-[#2A2A2A]/70">
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-blue-500 font-black text-xl tracking-tight">n3ware</span>
-        <span class="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">v1.0</span>
+        <span class="font-black" style="color:#E31837" text-xl tracking-tight">n3ware</span>
+        <span class="text-xs text-gray-500 bg-[#1A1A1A] px-2 py-0.5 rounded-full">v1.0</span>
       </div>
       <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
         <a href="#features" class="hover:text-white transition-colors">Features</a>
         <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
         <a href="#templates" class="hover:text-white transition-colors">Templates</a>
         <a href="/components" class="hover:text-white transition-colors">Components</a>
+        <a href="/brand" class="hover:text-white transition-colors">Brand</a>
         <a href="#get-started" class="hover:text-white transition-colors">Get Started</a>
-        <a href="demo.html" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">Live Demo →</a>
+        <a href="demo.html" class="bg-[#E31837] hover:bg-[#FF2847] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">Live Demo →</a>
       </div>
     </div>
   </nav>
@@ -77,13 +91,13 @@
   <section class="min-h-screen flex items-center justify-center pt-16 px-6 relative overflow-hidden">
     <!-- Background glow -->
     <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div class="w-[800px] h-[800px] rounded-full bg-blue-600/5 blur-3xl"></div>
+      <div class="w-[800px] h-[800px] rounded-full bg-[#E31837]/5 blur-3xl"></div>
     </div>
-    <div class="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-purple-600/5 blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-[#E31837]/3 blur-3xl pointer-events-none"></div>
 
     <div class="max-w-5xl mx-auto text-center relative z-10">
-      <div class="inline-flex items-center gap-2 bg-blue-950/50 border border-blue-800/50 px-4 py-2 rounded-full text-sm text-blue-400 mb-8">
-        <span class="w-2 h-2 bg-blue-400 rounded-full pulse-dot"></span>
+      <div class="inline-flex items-center gap-2 bg-[#E31837]/10 border border-[#E31837]/30 px-4 py-2 rounded-full text-sm text-[#E31837] mb-8">
+        <span class="w-2 h-2 bg-[#E31837] rounded-full pulse-dot"></span>
         Zero dependencies · Pure JavaScript · Drop-in ready
       </div>
 
@@ -99,7 +113,7 @@
       <!-- Code snippet -->
       <div class="relative inline-block max-w-xl w-full code-glow mb-12">
         <div class="bg-gray-900 border border-gray-700/50 rounded-xl overflow-hidden">
-          <div class="flex items-center gap-2 px-4 py-3 bg-gray-800/50 border-b border-gray-700/50">
+          <div class="flex items-center gap-2 px-4 py-3 bg-[#1A1A1A] border-b border-[#2A2A2A]/50">
             <div class="w-3 h-3 rounded-full bg-red-500/70"></div>
             <div class="w-3 h-3 rounded-full bg-yellow-500/70"></div>
             <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
@@ -108,19 +122,19 @@
           <div class="px-6 py-4 text-left">
             <code class="font-mono text-sm">
               <span class="text-gray-600">&lt;!-- Add before &lt;/body&gt; --&gt;</span><br>
-              <span class="text-blue-400">&lt;script</span>
-              <span class="text-green-400"> src</span><span class="text-gray-400">=</span><span class="text-yellow-400">"n3ware.js"</span>
-              <span class="text-blue-400">&gt;&lt;/script&gt;</span>
+              <span class="text-[#E31837]">&lt;script</span>
+              <span class="text-[#E5E5E5]"> src</span><span class="text-gray-400">=</span><span class="text-yellow-400">"n3ware.js"</span>
+              <span class="text-[#E31837]">&gt;&lt;/script&gt;</span>
             </code>
           </div>
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="demo.html" class="glow bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
+        <a href="demo.html" class="glow bg-[#E31837] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
           Try Live Demo →
         </a>
-        <a href="#get-started" class="border border-gray-700 hover:border-blue-500 text-gray-300 hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all">
+        <a href="#get-started" class="border border-gray-700 hover:border-[#E31837] text-[#888888] hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all">
           Get Started
         </a>
       </div>
@@ -137,17 +151,17 @@
 
       <div class="grid md:grid-cols-3 gap-8">
         <div class="relative">
-          <div class="bg-gray-900 border border-gray-800 rounded-2xl p-8 h-full hover:border-blue-600/50 transition-colors">
-            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-2xl font-black mb-6">1</div>
+          <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 h-full hover:border-[#E31837]/40 transition-colors">
+            <div class="w-12 h-12 bg-[#E31837] rounded-xl flex items-center justify-center text-2xl font-black mb-6">1</div>
             <h3 class="text-xl font-bold mb-3">Add the Script</h3>
-            <p class="text-gray-400 leading-relaxed">Drop a single <code class="text-blue-400 bg-blue-950/50 px-1 rounded">&lt;script&gt;</code> tag anywhere on your page. No npm, no build step, no configuration.</p>
+            <p class="text-gray-400 leading-relaxed">Drop a single <code class="text-[#E31837] bg-[#E31837]/10 px-1 rounded">&lt;script&gt;</code> tag anywhere on your page. No npm, no build step, no configuration.</p>
           </div>
           <div class="hidden md:block absolute top-1/2 -right-4 w-8 text-gray-700 text-2xl">→</div>
         </div>
 
         <div class="relative">
-          <div class="bg-gray-900 border border-gray-800 rounded-2xl p-8 h-full hover:border-blue-600/50 transition-colors">
-            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-2xl font-black mb-6">2</div>
+          <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 h-full hover:border-[#E31837]/40 transition-colors">
+            <div class="w-12 h-12 bg-[#E31837] rounded-xl flex items-center justify-center text-2xl font-black mb-6">2</div>
             <h3 class="text-xl font-bold mb-3">Click Edit</h3>
             <p class="text-gray-400 leading-relaxed">A floating <strong class="text-white">n3</strong> button appears. Click it (or press <kbd class="bg-gray-800 px-1 rounded text-xs">Ctrl+Shift+E</kbd>) to activate the visual editor.</p>
           </div>
@@ -155,8 +169,8 @@
         </div>
 
         <div>
-          <div class="bg-gray-900 border border-gray-800 rounded-2xl p-8 h-full hover:border-blue-600/50 transition-colors">
-            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-2xl font-black mb-6">3</div>
+          <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 h-full hover:border-[#E31837]/40 transition-colors">
+            <div class="w-12 h-12 bg-[#E31837] rounded-xl flex items-center justify-center text-2xl font-black mb-6">3</div>
             <h3 class="text-xl font-bold mb-3">Drag, Drop, Type</h3>
             <p class="text-gray-400 leading-relaxed">Click text to edit inline, drag elements to reorder, adjust styles in the panel, then export clean HTML.</p>
           </div>
@@ -166,7 +180,7 @@
   </section>
 
   <!-- Features -->
-  <section id="features" class="py-32 px-6 bg-gray-900/30">
+  <section id="features" class="py-32 px-6 bg-[#111111]/40">
     <div class="max-w-6xl mx-auto">
       <div class="text-center mb-20">
         <h2 class="text-4xl md:text-5xl font-black mb-4">Everything You Need</h2>
@@ -175,65 +189,65 @@
 
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Feature cards -->
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">✏️</div>
           <h3 class="font-bold text-lg mb-2">Inline Text Editing</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Click any text element to edit in place. Bold, italic, links, colors, heading levels — all via a floating toolbar.</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">↕️</div>
           <h3 class="font-bold text-lg mb-2">Drag & Drop Layout</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Grab the ⠿ handle to reorder any block element. A glowing blue line shows exactly where it'll land.</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">🎨</div>
           <h3 class="font-bold text-lg mb-2">Style Panel</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Adjust colors, padding, margin, border radius, opacity, CSS classes, and raw CSS — all from a sleek side panel.</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">🖼️</div>
           <h3 class="font-bold text-lg mb-2">Image Controls</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Replace images via URL, edit alt text, align with one click, and drag corner handles to resize visually.</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">↩️</div>
           <h3 class="font-bold text-lg mb-2">Undo / Redo</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Full history stack. Ctrl+Z / Cmd+Z to undo, Ctrl+Shift+Z to redo. Every change is tracked.</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">💾</div>
           <h3 class="font-bold text-lg mb-2">Export Options</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Save clean HTML, copy to clipboard, or get a JSON diff of exactly what changed — selector, before, and after.</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">🔒</div>
           <h3 class="font-bold text-lg mb-2">Non-Destructive</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Zero impact when not editing. No external CSS. All editor UI injected via JS and namespaced with <code class="text-blue-400">n3-</code>.</p>
+          <p class="text-[#888888] text-sm leading-relaxed">Zero impact when not editing. No external CSS. All editor UI injected via JS and namespaced with <code class="text-[#E31837]">n3-</code>.</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">📱</div>
           <h3 class="font-bold text-lg mb-2">Mobile Ready</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Touch-friendly drag and drop. Works on iOS and Android. Editor UI adapts to any screen size.</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all hover:-translate-y-1">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31837]/40 transition-all hover:-translate-y-1">
           <div class="text-3xl mb-4">⚡</div>
           <h3 class="font-bold text-lg mb-2">Zero Dependencies</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Pure vanilla JavaScript. Works on WordPress, static HTML, React apps — any website. No npm, no bundler.</p>
         </div>
 
-        <a href="/components" class="bg-gray-900 border border-blue-800/50 bg-blue-950/20 rounded-2xl p-6 hover:border-blue-500/70 transition-all hover:-translate-y-1 block">
+        <a href="/components" class="bg-gray-900 border border-[#E31837]/30 bg-[#E31837]/10 rounded-2xl p-6 hover:border-[#E31837]/60 transition-all hover:-translate-y-1 block">
           <div class="text-3xl mb-4">🧩</div>
           <h3 class="font-bold text-lg mb-2">30+ Ready-Made Components</h3>
           <p class="text-gray-400 text-sm leading-relaxed">Heroes, pricing tables, testimonials, menus, galleries — professionally designed Tailwind blocks for any SMB site.</p>
-          <div class="mt-4 text-blue-400 text-sm font-medium">Browse component library →</div>
+          <div class="mt-4 text-[#E31837] text-sm font-medium">Browse component library →</div>
         </a>
       </div>
     </div>
@@ -243,45 +257,45 @@
   <section id="architecture" class="py-32 px-6">
     <div class="max-w-5xl mx-auto">
       <div class="text-center mb-16">
-        <div class="inline-flex items-center gap-2 bg-blue-950/50 border border-blue-800/50 px-4 py-2 rounded-full text-sm text-blue-400 mb-6">
+        <div class="inline-flex items-center gap-2 bg-[#E31837]/10 border border-[#E31837]/30 px-4 py-2 rounded-full text-sm text-[#E31837] mb-6">
           <span>⚙️</span> Clean, modular internals
         </div>
         <h2 class="text-4xl md:text-5xl font-black mb-4">10-Class Modular Architecture</h2>
         <p class="text-gray-400 text-lg max-w-2xl mx-auto">A single file, internally organized into clean, decoupled classes. Event-driven communication. Dependency injection. JSDoc throughout.</p>
       </div>
       <div class="grid md:grid-cols-2 gap-4">
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 font-mono text-sm">
-          <div class="text-blue-400 font-bold mb-3 text-xs uppercase tracking-wider">Core</div>
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-xl p-5 font-mono text-sm">
+          <div class="text-[#E31837] font-bold mb-3 text-xs uppercase tracking-wider">Core</div>
           <div class="space-y-2">
-            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3Editor</span><span class="text-gray-500">— main orchestrator, public API surface</span></div>
-            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3Events</span><span class="text-gray-500">— pub/sub bus: on() emit() off() clear()</span></div>
-            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3History</span><span class="text-gray-500">— undo/redo stack with canUndo/canRedo</span></div>
-            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3UI</span><span class="text-gray-500">— CSS injection, toast, confirm dialog</span></div>
-            <div class="flex items-start gap-3"><span class="text-purple-400 shrink-0">N3Export</span><span class="text-gray-500">— cleanHTML(), diff(), download, copy</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E31837] shrink-0">N3Editor</span><span class="text-gray-500">— main orchestrator, public API surface</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E31837] shrink-0">N3Events</span><span class="text-gray-500">— pub/sub bus: on() emit() off() clear()</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E31837] shrink-0">N3History</span><span class="text-gray-500">— undo/redo stack with canUndo/canRedo</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E31837] shrink-0">N3UI</span><span class="text-gray-500">— CSS injection, toast, confirm dialog</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E31837] shrink-0">N3Export</span><span class="text-gray-500">— cleanHTML(), diff(), download, copy</span></div>
           </div>
         </div>
-        <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 font-mono text-sm">
-          <div class="text-blue-400 font-bold mb-3 text-xs uppercase tracking-wider">Editing</div>
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-xl p-5 font-mono text-sm">
+          <div class="text-[#E31837] font-bold mb-3 text-xs uppercase tracking-wider">Editing</div>
           <div class="space-y-2">
-            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3TextEditor</span><span class="text-gray-500">— contentEditable + formatting toolbar</span></div>
-            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3DragManager</span><span class="text-gray-500">— drag start/move/end, drop indicator</span></div>
-            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3ElementControls</span><span class="text-gray-500">— hover overlays, dup, delete</span></div>
-            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3StylePanel</span><span class="text-gray-500">— right sidebar: colors, spacing, classes</span></div>
-            <div class="flex items-start gap-3"><span class="text-green-400 shrink-0">N3Toolbar</span><span class="text-gray-500">— top bar: undo/redo, save, exit</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3TextEditor</span><span class="text-gray-500">— contentEditable + formatting toolbar</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3DragManager</span><span class="text-gray-500">— drag start/move/end, drop indicator</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3ElementControls</span><span class="text-gray-500">— hover overlays, dup, delete</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3StylePanel</span><span class="text-gray-500">— right sidebar: colors, spacing, classes</span></div>
+            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3Toolbar</span><span class="text-gray-500">— top bar: undo/redo, save, exit</span></div>
           </div>
         </div>
       </div>
-      <div class="mt-6 bg-gray-900 border border-gray-800 rounded-xl p-5 font-mono text-sm">
-        <div class="text-blue-400 font-bold mb-3 text-xs uppercase tracking-wider">Advanced API</div>
+      <div class="mt-6 bg-[#111111] border border-[#2A2A2A] rounded-xl p-5 font-mono text-sm">
+        <div class="text-[#E31837] font-bold mb-3 text-xs uppercase tracking-wider">Advanced API</div>
         <div class="grid sm:grid-cols-2 gap-x-8 gap-y-1 text-gray-300">
-          <div><span class="text-yellow-400">n3ware</span>.on(<span class="text-green-400">'editor:modeChange'</span>, cb) <span class="text-gray-600">// event bus</span></div>
-          <div><span class="text-yellow-400">n3ware</span>.on(<span class="text-green-400">'drag:drop'</span>, cb)          <span class="text-gray-600">// drag events</span></div>
-          <div><span class="text-yellow-400">n3ware</span>._modules.history.canUndo()      <span class="text-gray-600">// direct access</span></div>
-          <div><span class="text-yellow-400">n3ware</span>._modules.exporter.diff(a, b)   <span class="text-gray-600">// diff API</span></div>
+          <div><span class="text-[#E31837]">n3ware</span>.on(<span class="text-[#E5E5E5]">'editor:modeChange'</span>, cb) <span class="text-gray-600">// event bus</span></div>
+          <div><span class="text-[#E31837]">n3ware</span>.on(<span class="text-[#E5E5E5]">'drag:drop'</span>, cb)          <span class="text-gray-600">// drag events</span></div>
+          <div><span class="text-[#E31837]">n3ware</span>._modules.history.canUndo()      <span class="text-gray-600">// direct access</span></div>
+          <div><span class="text-[#E31837]">n3ware</span>._modules.exporter.diff(a, b)   <span class="text-gray-600">// diff API</span></div>
         </div>
       </div>
       <div class="mt-6 text-center">
-        <a href="/tests" class="inline-flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 border border-blue-800/50 bg-blue-950/30 px-5 py-2.5 rounded-lg transition-colors">
+        <a href="/tests" class="inline-flex items-center gap-2 text-sm text-[#E31837] hover:text-[#FF4D6A] border border-[#E31837]/40 bg-[#E31837]/10 px-5 py-2.5 rounded-lg transition-colors">
           <span>🧪</span> View Test Suite — 60+ tests across all 10 modules
         </a>
       </div>
@@ -289,11 +303,11 @@
   </section>
 
   <!-- Templates Showcase -->
-  <section id="templates" class="py-32 px-6 bg-gray-900/30">
+  <section id="templates" class="py-32 px-6 bg-[#111111]/40">
     <div class="max-w-6xl mx-auto">
 
       <div class="text-center mb-16">
-        <div class="inline-flex items-center gap-2 bg-blue-950/50 border border-blue-800/50 px-4 py-2 rounded-full text-sm text-blue-400 mb-6">
+        <div class="inline-flex items-center gap-2 bg-[#E31837]/10 border border-[#E31837]/30 px-4 py-2 rounded-full text-sm text-[#E31837] mb-6">
           <span>🏪</span> 9 ready-to-launch templates
         </div>
         <h2 class="text-4xl md:text-5xl font-black mb-4">Templates for Every Local Business</h2>
@@ -350,7 +364,7 @@
             </div>
             <p class="text-gray-400 text-sm mb-5 leading-relaxed">Property listings, market stats, and client testimonials</p>
             <div class="flex gap-3">
-              <a href="/templates/realtor.html" target="_blank" class="flex-1 text-center text-sm py-2 rounded-lg border border-gray-700 text-gray-400 hover:border-blue-500 hover:text-blue-400 transition-colors">Preview</a>
+              <a href="/templates/realtor.html" target="_blank" class="flex-1 text-center text-sm py-2 rounded-lg border border-gray-700 text-gray-400 hover:border-blue-500 hover:text-[#E31837] transition-colors">Preview</a>
               <a href="/dashboard" class="flex-1 text-center text-sm py-2 rounded-lg bg-blue-600/20 border border-blue-700/50 text-blue-400 hover:bg-blue-600/40 transition-colors font-medium">Use Template</a>
             </div>
           </div>
@@ -446,12 +460,12 @@
           <div class="p-5">
             <div class="flex items-start justify-between gap-3 mb-3">
               <h3 class="font-bold text-base text-white">Portfolio</h3>
-              <span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-full bg-purple-950 text-purple-400 border border-purple-800/70">Creative</span>
+              <span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-full bg-purple-950 text-[#E31837] border border-purple-800/70">Creative</span>
             </div>
             <p class="text-gray-400 text-sm mb-5 leading-relaxed">Project showcase, about section, contact form</p>
             <div class="flex gap-3">
-              <a href="/templates/portfolio.html" target="_blank" class="flex-1 text-center text-sm py-2 rounded-lg border border-gray-700 text-gray-400 hover:border-purple-500 hover:text-purple-400 transition-colors">Preview</a>
-              <a href="/dashboard" class="flex-1 text-center text-sm py-2 rounded-lg bg-purple-600/20 border border-purple-700/50 text-purple-400 hover:bg-purple-600/40 transition-colors font-medium">Use Template</a>
+              <a href="/templates/portfolio.html" target="_blank" class="flex-1 text-center text-sm py-2 rounded-lg border border-gray-700 text-gray-400 hover:border-purple-500 hover:text-[#E31837] transition-colors">Preview</a>
+              <a href="/dashboard" class="flex-1 text-center text-sm py-2 rounded-lg bg-purple-600/20 border border-purple-700/50 text-[#E31837] hover:bg-purple-600/40 transition-colors font-medium">Use Template</a>
             </div>
           </div>
         </div>
@@ -500,10 +514,10 @@
 
       <!-- Custom template CTA -->
       <div class="mt-16 text-center">
-        <div class="inline-block bg-gray-900 border border-gray-700/70 rounded-2xl px-8 py-7">
+        <div class="inline-block bg-[#111111] border border-[#2A2A2A] rounded-2xl px-8 py-7">
           <p class="text-gray-500 text-sm mb-1">Don't see your industry?</p>
           <p class="font-semibold text-white text-lg mb-5">We'll build a custom template for you.</p>
-          <a href="mailto:hello@n3ware.com" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 border border-blue-800/50 bg-blue-950/30 hover:bg-blue-950/50 px-5 py-2.5 rounded-lg transition-colors text-sm font-medium">
+          <a href="mailto:hello@n3ware.com" class="inline-flex items-center gap-2 text-[#E31837] hover:text-[#FF4D6A] border border-blue-800/50 bg-blue-950/30 hover:bg-blue-950/50 px-5 py-2.5 rounded-lg transition-colors text-sm font-medium">
             ✉️ Get in touch
           </a>
         </div>
@@ -516,18 +530,18 @@
   <section id="get-started" class="py-32 px-6">
     <div class="max-w-3xl mx-auto text-center">
       <h2 class="text-4xl md:text-5xl font-black mb-6">Start Editing in Seconds</h2>
-      <p class="text-gray-400 text-lg mb-12">Add this before your closing <code class="text-blue-400">&lt;/body&gt;</code> tag.</p>
+      <p class="text-[#888888] text-lg mb-12">Add this before your closing <code class="text-[#E31837]">&lt;/body&gt;</code> tag.</p>
 
-      <div class="bg-gray-900 border border-gray-700 rounded-2xl overflow-hidden mb-8 code-glow">
-        <div class="flex items-center justify-between px-6 py-3 bg-gray-800/50 border-b border-gray-700">
-          <span class="text-sm text-gray-400 font-mono">HTML</span>
-          <button onclick="copyEmbed()" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">Copy →</button>
+      <div class="bg-gray-900 border border-[#2A2A2A] rounded-2xl overflow-hidden mb-8 code-glow">
+        <div class="flex items-center justify-between px-6 py-3 bg-[#1A1A1A] border-b border-[#2A2A2A]">
+          <span class="text-sm text-[#888888] font-mono">HTML</span>
+          <button onclick="copyEmbed()" class="text-xs text-[#E31837] hover:text-[#FF4D6A] transition-colors">Copy →</button>
         </div>
         <pre class="px-6 py-6 text-left overflow-x-auto"><code id="embed-code" class="font-mono text-sm text-gray-300">&lt;script src="https://cdn.example.com/n3ware.js"&gt;&lt;/script&gt;</code></pre>
       </div>
 
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="demo.html" class="glow bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
+        <a href="demo.html" class="glow bg-[#E31837] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
           See it in action →
         </a>
       </div>
@@ -535,16 +549,17 @@
   </section>
 
   <!-- Footer -->
-  <footer class="border-t border-gray-800 py-12 px-6">
+  <footer class="border-t border-[#2A2A2A] py-12 px-6">
     <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-2">
-        <span class="text-blue-500 font-black text-lg">n3ware</span>
+        <span class="font-black" style="color:#E31837" text-lg">n3ware</span>
         <span class="text-gray-600 text-sm">— Visual editing for the web</span>
       </div>
       <div class="flex items-center gap-4 text-sm text-gray-600">
-        <a href="/tests" class="hover:text-blue-400 transition-colors">🧪 Tests</a>
-        <a href="https://github.com/autosword/n3ware" target="_blank" class="hover:text-blue-400 transition-colors">GitHub</a>
-        <span>Pure JavaScript. Zero dependencies.</span>
+        <a href="/privacy" class="hover:text-[#E31837] transition-colors">Privacy</a>
+        <a href="/terms" class="hover:text-[#E31837] transition-colors">Terms</a>
+        <a href="/brand" class="hover:text-[#E31837] transition-colors">Brand</a>
+        <a href="https://github.com/autosword/n3ware" target="_blank" class="hover:text-[#E31837] transition-colors">GitHub</a>
       </div>
     </div>
   </footer>

@@ -20,12 +20,12 @@
 
   // ─── Design tokens ────────────────────────────────────────────────────────
   const T = {
-    accent:     '#3B82F6',
-    accentDark: '#2563EB',
-    bgPanel:    '#1E293B',
-    border:     '#334155',
-    text:       '#F1F5F9',
-    muted:      '#94A3B8',
+    accent:     '#E31837',
+    accentDark: '#B91C2C',
+    bgPanel:    '#111111',
+    border:     '#2A2A2A',
+    text:       '#E5E5E5',
+    muted:      '#888888',
   };
 
   /** Selector lists shared across modules */
