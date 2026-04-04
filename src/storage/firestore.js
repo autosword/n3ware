@@ -38,7 +38,7 @@ class FirestoreStorage {
    * @param {{html:string, css?:string, message?:string}} data
    * @returns {Promise<object>} saved site record
    */
-  async saveSite(id, { html, css = '', message = '' }) {
+  async saveSite(id, { html, css = '', message = '', name, ownerId } = {}) {
     const now = new Date().toISOString();
     const existing = await this.getSite(id);
     const site = {
@@ -46,6 +46,8 @@ class FirestoreStorage {
       html,
       css,
       message,
+      name:      name      !== undefined ? name      : (existing ? existing.name      : 'Untitled Site'),
+      ownerId:   ownerId   !== undefined ? ownerId   : (existing ? existing.ownerId   : null),
       createdAt: existing ? existing.createdAt : now,
       updatedAt: now,
     };
@@ -71,8 +73,14 @@ class FirestoreStorage {
    * List all sites (metadata only).
    * @returns {Promise<object[]>}
    */
-  async listSites() {
-    const snap = await this._sites.select('id', 'message', 'createdAt', 'updatedAt').get();
+  async listSites(filter = {}) {
+    // Avoid selecting 'id' — it conflicts with Firestore's document ID property
+    // and causes INVALID_ARGUMENT. Use d.id directly instead.
+    let query = this._sites.select('name', 'message', 'ownerId', 'createdAt', 'updatedAt');
+    if (filter.ownerId) {
+      query = query.where('ownerId', '==', filter.ownerId);
+    }
+    const snap = await query.get();
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   }
 
