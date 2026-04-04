@@ -53,7 +53,7 @@ router.get('/', async (req, res) => {
     const filter = req.authType === 'jwt' && req.user
       ? { ownerId: req.user.id }
       : {};
-    const sites = await cache.listSites(storage, filter);
+    const sites = (await cache.listSites(storage, filter)).map(_meta);
     res.json({ sites });
   } catch (err) {
     _error(res, 500, err);
@@ -222,7 +222,7 @@ function _sanitize(html) {
 }
 
 function _meta(site) {
-  const { html: _html, ...meta } = site; // eslint-disable-line no-unused-vars
+  const { html: _html, apiKey: _apiKey, ...meta } = site; // eslint-disable-line no-unused-vars
   return meta;
 }
 
