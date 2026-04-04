@@ -185,7 +185,7 @@
         `.n3-fab-toggle:hover{background:${T.accentDark};transform:scale(1.1)}`,
         `.n3-fab-toggle.n3-editing{background:#EF4444;box-shadow:0 4px 24px rgba(239,68,68,.5);transform:rotate(45deg)}`,
         `.n3-fab-actions{display:flex;flex-direction:column-reverse;align-items:center;gap:8px;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .2s}`,
-        `.n3-fab.n3-expanded .n3-fab-actions{max-height:200px;opacity:1}`,
+        `.n3-fab.n3-expanded .n3-fab-actions{max-height:300px;opacity:1}`,
         `.n3-fab-btn{width:40px;height:40px;border-radius:50%;background:${T.bgPanel};color:${T.text};border:1px solid ${T.border};cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}`,
         `.n3-fab-btn:hover{background:rgba(255,255,255,.12);border-color:${T.accent};transform:scale(1.08)}`,
         `.n3-fab-btn.n3-active{background:${T.accent};border-color:${T.accent};box-shadow:0 0 0 3px rgba(59,130,246,.3)}`,
@@ -229,6 +229,34 @@
         `.n3-an-top-path{color:${T.muted};truncate:true;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:70%}`,
         `.n3-an-top-count{color:${T.text};font-weight:600;flex-shrink:0}`,
         `.n3-an-connect-prompt{display:flex;align-items:center;gap:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:10px 14px;font-size:12px;color:${T.muted};width:100%}`,
+        // ── Components panel ────────────────────────────────────────────────────
+        `.n3-comp-panel{position:fixed;top:0;left:0;bottom:0;z-index:999996;background:#0B1120;border-right:1px solid ${T.border};width:264px;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;font:13px/1.5 system-ui,sans-serif;color:${T.text};box-shadow:4px 0 24px rgba(0,0,0,.4)}`,
+        `.n3-comp-panel.n3-comp-open{transform:translateX(0)}`,
+        `.n3-comp-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 12px;border-bottom:1px solid ${T.border};background:#0B1120;position:sticky;top:0;z-index:1;flex-shrink:0}`,
+        `.n3-comp-title{font:700 13px/1 system-ui;color:${T.text};display:flex;align-items:center;gap:7px}`,
+        `.n3-comp-close{background:transparent;border:none;color:${T.muted};cursor:pointer;font-size:15px;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all .12s}`,
+        `.n3-comp-close:hover{background:rgba(255,255,255,.1);color:${T.text}}`,
+        `.n3-comp-search-wrap{padding:10px 12px 8px;flex-shrink:0}`,
+        `.n3-comp-search{width:100%;background:rgba(255,255,255,.06);border:1px solid ${T.border};color:${T.text};border-radius:7px;padding:7px 10px;font:12px/1 system-ui,sans-serif;outline:none;box-sizing:border-box;transition:border-color .15s}`,
+        `.n3-comp-search:focus{border-color:${T.accent}}`,
+        `.n3-comp-search::placeholder{color:${T.muted}}`,
+        `.n3-comp-cats{display:flex;flex-wrap:wrap;gap:4px;padding:0 12px 10px;flex-shrink:0}`,
+        `.n3-comp-cat-btn{background:rgba(255,255,255,.05);border:1px solid transparent;color:${T.muted};padding:3px 8px;border-radius:4px;cursor:pointer;font:600 10px/1 system-ui;transition:all .12s;white-space:nowrap}`,
+        `.n3-comp-cat-btn:hover{color:${T.text};border-color:${T.border}}`,
+        `.n3-comp-cat-btn.n3-comp-cat-on{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:${T.accent}}`,
+        `.n3-comp-list{flex:1;overflow-y:auto;padding-bottom:16px;scrollbar-width:thin;scrollbar-color:${T.border} transparent}`,
+        `.n3-comp-empty{color:${T.muted};font-size:12px;padding:20px 14px;text-align:center;line-height:1.6}`,
+        `.n3-comp-group-hdr{font:700 10px/1 system-ui;text-transform:uppercase;letter-spacing:.07em;color:${T.muted};padding:12px 12px 5px;position:sticky;top:0;background:#0B1120;z-index:1}`,
+        `.n3-comp-item{display:flex;align-items:center;gap:9px;padding:7px 12px;cursor:grab;transition:background .1s;user-select:none}`,
+        `.n3-comp-item:hover{background:rgba(255,255,255,.05)}`,
+        `.n3-comp-item:active{cursor:grabbing}`,
+        `.n3-comp-thumb{font-size:18px;flex-shrink:0;width:28px;text-align:center;line-height:1}`,
+        `.n3-comp-info{flex:1;min-width:0}`,
+        `.n3-comp-name{font:600 11px/1.3 system-ui;color:${T.text};white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`,
+        `.n3-comp-badge{font:500 9px/1 system-ui;color:${T.muted};margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`,
+        `.n3-comp-add{flex-shrink:0;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:${T.accent};width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s;padding:0}`,
+        `.n3-comp-add:hover{background:rgba(59,130,246,.28);border-color:rgba(59,130,246,.5);transform:scale(1.1)}`,
+        `.n3-comp-drop-target{outline:2px dashed ${T.accent}!important;outline-offset:3px;background:rgba(59,130,246,.06)!important}`,
       ].join('\n');
       document.head.appendChild(s);
     }
@@ -298,6 +326,7 @@
         el.closest('.n3-toolbar')         ||
         el.closest('.n3-fab')              ||
         el.closest('.n3-analytics-overlay') ||
+        el.closest('.n3-comp-panel')      ||
         el.closest('.n3-confirm-overlay') ||
         el.closest('.n3-toast')
       ));
@@ -1161,6 +1190,257 @@
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // N3Components — drag-and-drop component library panel
+  // ═══════════════════════════════════════════════════════════════════════════
+  class N3Components {
+    /**
+     * @param {N3Events} events
+     * @param {{ api: string, site: string, key: string }|null} cloudCfg
+     */
+    constructor(events, cloudCfg) {
+      this._events       = events;
+      this._apiBase      = cloudCfg ? cloudCfg.api : '';
+      this._el           = null;
+      this._open         = false;
+      this._components   = [];
+      this._loaded       = false;
+      this._filter       = '';
+      this._category     = 'all';
+      this._dragging     = null;   // html string while dragging
+      this._dropTarget   = null;   // highlighted block element
+    }
+
+    /** Append the panel to the document body. */
+    mount() {
+      this._el = document.createElement('div');
+      this._el.className = 'n3-comp-panel';
+      this._el.setAttribute('data-n3-ui', '1');
+      const compSkel = this._skeleton();
+      this._el.innerHTML = compSkel;
+
+      this._el.querySelector('.n3-comp-close')
+        .addEventListener('click', () => this.close());
+
+      this._el.querySelector('.n3-comp-search')
+        .addEventListener('input', e => {
+          this._filter = e.target.value.toLowerCase();
+          this._renderList();
+        });
+
+      this._el.querySelector('.n3-comp-cats')
+        .addEventListener('click', e => {
+          const btn = e.target.closest('.n3-comp-cat-btn');
+          if (!btn) return;
+          this._category = btn.dataset.cat;
+          this._el.querySelectorAll('.n3-comp-cat-btn').forEach(b =>
+            b.classList.toggle('n3-comp-cat-on', b.dataset.cat === this._category)
+          );
+          this._renderList();
+        });
+
+      document.body.appendChild(this._el);
+
+      // Global drag-over / drop handlers for inserting components onto the page
+      document.addEventListener('dragover', this._onDragOver = e => {
+        if (!this._dragging) return;
+        const block = e.target.closest('[data-n3-block]');
+        if (block && !N3UI.isEditorEl(block)) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'copy';
+          if (block !== this._dropTarget) {
+            if (this._dropTarget) this._dropTarget.classList.remove('n3-comp-drop-target');
+            block.classList.add('n3-comp-drop-target');
+            this._dropTarget = block;
+          }
+        }
+      });
+
+      document.addEventListener('drop', this._onDrop = e => {
+        const html = e.dataTransfer && e.dataTransfer.getData('application/n3-component');
+        if (!html) return;
+        e.preventDefault();
+        const target = this._dropTarget || e.target.closest('[data-n3-block]') || null;
+        if (this._dropTarget) { this._dropTarget.classList.remove('n3-comp-drop-target'); this._dropTarget = null; }
+        this._insert(html, target);
+        N3UI.toast('Component added', 'success', 2000);
+        this._dragging = null;
+      });
+    }
+
+    toggle() { this._open ? this.close() : this.open(); }
+
+    open() {
+      if (!this._el) return;
+      this._el.classList.add('n3-comp-open');
+      this._open = true;
+      if (!this._loaded) this._load();
+    }
+
+    close() {
+      if (!this._el) return;
+      this._el.classList.remove('n3-comp-open');
+      this._open = false;
+    }
+
+    /** @returns {boolean} */
+    isOpen() { return this._open; }
+
+    // ── Private ────────────────────────────────────────────────────────────────
+
+    _skeleton() {
+      return [
+        `<div class="n3-comp-hdr">`,
+        `  <div class="n3-comp-title">🧩 Components</div>`,
+        `  <button class="n3-comp-close" title="Close">✕</button>`,
+        `</div>`,
+        `<div class="n3-comp-search-wrap">`,
+        `  <input class="n3-comp-search" type="text" placeholder="Search…" autocomplete="off">`,
+        `</div>`,
+        `<div class="n3-comp-cats"></div>`,
+        `<div class="n3-comp-list"><div class="n3-comp-empty">Loading components…</div></div>`,
+      ].join('');
+    }
+
+    async _load() {
+      try {
+        const res = await fetch(`${this._apiBase}/api/components`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        this._components = await res.json();
+        this._loaded     = true;
+        this._renderCats();
+        this._renderList();
+      } catch (err) {
+        const listEl = this._el.querySelector('.n3-comp-list');
+        listEl.innerHTML = `<div class="n3-comp-empty">Could not load components.<br><small>${err.message}</small></div>`;
+      }
+    }
+
+    _renderCats() {
+      const cats = ['all', ...new Set(this._components.map(c => c.category))];
+      const catsEl = this._el.querySelector('.n3-comp-cats');
+      const catsHtml = cats.map(c =>
+        `<button class="n3-comp-cat-btn${c === this._category ? ' n3-comp-cat-on' : ''}" data-cat="${c}">${c === 'all' ? 'All' : c}</button>`
+      ).join('');
+      catsEl.innerHTML = catsHtml;
+    }
+
+    _renderList() {
+      const filtered = this._components.filter(c => {
+        const inCat    = this._category === 'all' || c.category === this._category;
+        const inSearch = !this._filter ||
+          c.name.toLowerCase().includes(this._filter) ||
+          (c.description || '').toLowerCase().includes(this._filter) ||
+          (c.tags || []).some(t => t.includes(this._filter));
+        return inCat && inSearch;
+      });
+
+      const listEl = this._el.querySelector('.n3-comp-list');
+      if (!filtered.length) {
+        const emptyHtml = '<div class="n3-comp-empty">No components match your search.</div>';
+        listEl.innerHTML = emptyHtml;
+        return;
+      }
+
+      // Group by category
+      const groups = {};
+      filtered.forEach(c => { (groups[c.category] = groups[c.category] || []).push(c); });
+
+      const listHtml = Object.entries(groups).map(([cat, comps]) =>
+        `<div>
+          <div class="n3-comp-group-hdr">${cat}</div>
+          ${comps.map(c => `<div class="n3-comp-item" data-comp-id="${c.id}" draggable="true">
+            <span class="n3-comp-thumb">${c.thumbnail || '🧩'}</span>
+            <div class="n3-comp-info">
+              <div class="n3-comp-name">${c.name}</div>
+              <div class="n3-comp-badge">${c.description ? c.description.substring(0, 38) + (c.description.length > 38 ? '…' : '') : ''}</div>
+            </div>
+            <button class="n3-comp-add" data-comp-id="${c.id}" title="Insert component">+</button>
+          </div>`).join('')}
+        </div>`
+      ).join('');
+      listEl.innerHTML = listHtml;
+
+      // Bind drag + click events
+      listEl.querySelectorAll('.n3-comp-item[data-comp-id]').forEach(item => {
+        const comp = this._components.find(c => c.id === item.dataset.compId);
+        if (!comp) return;
+
+        item.addEventListener('dragstart', e => {
+          this._dragging = comp.html;
+          e.dataTransfer.setData('application/n3-component', comp.html);
+          e.dataTransfer.effectAllowed = 'copy';
+          item.style.opacity = '0.45';
+        });
+        item.addEventListener('dragend', () => {
+          item.style.opacity = '';
+          this._dragging = null;
+          if (this._dropTarget) { this._dropTarget.classList.remove('n3-comp-drop-target'); this._dropTarget = null; }
+        });
+      });
+
+      listEl.querySelectorAll('.n3-comp-add').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const comp = this._components.find(c => c.id === btn.dataset.compId);
+          if (!comp) return;
+          // Insert after currently selected block, or at end of body
+          const selected = document.querySelector('.n3-selected');
+          this._insert(comp.html, selected);
+          N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
+        });
+      });
+    }
+
+    /**
+     * Parse and insert the component HTML at/after a target block.
+     * @param {string} html
+     * @param {Element|null} target  — insert after this; null = append to body
+     */
+    _insert(html, target) {
+      // Ensure Tailwind CDN is present when inserting Tailwind components
+      if (!document.querySelector('script[src*="tailwindcss"]')) {
+        const tw  = document.createElement('script');
+        tw.src    = 'https://cdn.tailwindcss.com';
+        tw.async  = true;
+        document.head.appendChild(tw);
+      }
+
+      const tmp      = document.createElement('div');
+      const safeHtml = html.trim();
+      tmp.innerHTML  = safeHtml;
+      const node = tmp.firstElementChild || tmp;
+
+      if (target) {
+        target.parentNode.insertBefore(node, target.nextSibling);
+      } else {
+        const blocks = document.querySelectorAll('[data-n3-block]');
+        if (blocks.length) {
+          const last = blocks[blocks.length - 1];
+          last.parentNode.insertBefore(node, last.nextSibling);
+        } else {
+          document.body.appendChild(node);
+        }
+      }
+
+      // Mark for editing
+      node.setAttribute('data-n3-block', '1');
+      node.querySelectorAll(SEL.block).forEach(el => {
+        if (!N3UI.isEditorEl(el)) el.setAttribute('data-n3-block', '1');
+      });
+      node.querySelectorAll(SEL.text).forEach(el => {
+        if (!N3UI.isEditorEl(el)) {
+          el.setAttribute('data-n3-editable', '1');
+          el.setAttribute('contenteditable', 'true');
+          el.setAttribute('spellcheck', 'false');
+        }
+      });
+
+      this._events.emit('component:insert', node);
+      node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // N3Analytics — page-level analytics overlay
   // ═══════════════════════════════════════════════════════════════════════════
   class N3Analytics {
@@ -1404,9 +1684,10 @@
         ? new N3Cloud(this._cloudCfg.api, this._cloudCfg.site, this._cloudCfg.key)
         : null;
       this.revPanel  = this.cloud ? new N3RevPanel(this.events, this.cloud) : null;
-      this.analytics = new N3Analytics(this._cloudCfg);
-      this._fab      = null;
-      this._fabOpen  = false;
+      this.analytics  = new N3Analytics(this._cloudCfg);
+      this.components = new N3Components(this.events, this._cloudCfg);
+      this._fab       = null;
+      this._fabOpen   = false;
 
       this._onKeyDown = this._handleKeyDown.bind(this);
     }
@@ -1418,6 +1699,7 @@
       this.panel.mount();
       if (this.revPanel) this.revPanel.mount();
       this.analytics.mount();
+      this.components.mount();
       this._buildControlPanel();
       this._wireEvents();
       document.addEventListener('keydown', this._onKeyDown);
@@ -1465,7 +1747,7 @@
           events: this.events, history: this.history, exporter: this.exporter,
           text: this.text, drag: this.drag, controls: this.controls,
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
-          analytics: this.analytics,
+          analytics: this.analytics, components: this.components,
         },
       };
     }
@@ -1475,6 +1757,7 @@
     _buildControlPanel() {
       const PENCIL = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
       const CHART  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>`;
+      const GRID   = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`;
 
       this._fab = document.createElement('div');
       this._fab.className = 'n3-fab';
@@ -1491,6 +1774,17 @@
       analyticsBtn.title = 'Analytics';
       analyticsBtn.addEventListener('click', e => { e.stopPropagation(); this.analytics.toggle(); analyticsBtn.classList.toggle('n3-active', this.analytics.isOpen()); });
 
+      // Components button
+      const compBtn = document.createElement('button');
+      compBtn.className = 'n3-fab-btn';
+      compBtn.innerHTML = GRID;
+      compBtn.title = 'Component Library';
+      compBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        this.components.toggle();
+        compBtn.classList.toggle('n3-active', this.components.isOpen());
+      });
+
       // Edit button
       const editBtn = document.createElement('button');
       editBtn.className = 'n3-fab-btn';
@@ -1499,9 +1793,11 @@
       editBtn.addEventListener('click', e => { e.stopPropagation(); this.toggle(); });
 
       actions.appendChild(analyticsBtn);
+      actions.appendChild(compBtn);
       actions.appendChild(editBtn);
-      this._editFabBtn     = editBtn;
+      this._editFabBtn      = editBtn;
       this._analyticsFabBtn = analyticsBtn;
+      this._compFabBtn      = compBtn;
 
       // Main toggle ("n") button
       const toggle = document.createElement('button');

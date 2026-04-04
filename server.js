@@ -23,8 +23,9 @@ const billingApi   = require('./src/api/billing');
 const domainsApi   = require('./src/api/domains');
 const uploadsApi   = require('./src/api/uploads');
 const analyticsApi = require('./src/api/analytics-routes');
-const migrateApi   = require('./src/api/migrate');
-const gaApi        = require('./src/api/ga');
+const migrateApi      = require('./src/api/migrate');
+const gaApi           = require('./src/api/ga');
+const componentsApi   = require('./src/api/components');
 
 // Initialize integrations (logs mock-mode notices)
 require('./src/integrations');
@@ -91,6 +92,9 @@ app.use('/api/migrate', migrateApi);
 app.use('/api/ga',           gaApi);
 app.use('/api/sites',        gaApi);  // nested: /api/sites/:id/ga/*
 
+// ── Component library ─────────────────────────────────────────────────────────
+app.use('/api/components', componentsApi);
+
 // ── Cache stats (internal) ───────────────────────────────────────────────────
 app.get('/api/cache/stats', (req, res) => {
   const key = req.headers['x-api-key'] || '';
@@ -118,8 +122,9 @@ app.use('/sites', (req, res, next) => {
 // ── Page routes ───────────────────────────────────────────────────────────────
 app.get('/',          (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/demo',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'demo.html')));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
-app.get('/tests',     (req, res) => res.sendFile(path.join(__dirname, 'tests', 'n3ware.test.html')));
+app.get('/dashboard',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+app.get('/components', (req, res) => res.sendFile(path.join(__dirname, 'public', 'components.html')));
+app.get('/tests',      (req, res) => res.sendFile(path.join(__dirname, 'tests', 'n3ware.test.html')));
 
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
