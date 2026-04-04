@@ -1910,7 +1910,7 @@
         sourcesHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Traffic Sources</p>${srcRows}</div>`;
       }
 
-      // ── Devices ───────────────────────────────────────────────────────────
+      // ── Devices — SVG donut chart ─────────────────────────────────────────
       let devHtml = '';
       if (data.devices && (data.devices.mobile || data.devices.desktop)) {
         const mobile  = data.devices.mobile  || 0;
@@ -1920,13 +1920,31 @@
         const mP = Math.round(mobile  / tot * 100);
         const dP = Math.round(desktop / tot * 100);
         const tP = 100 - mP - dP;
-        const devBarMob = mP ? `<div class="n3-an-device-seg" style="width:${mP}%;background:${T.accent}" title="Mobile ${mP}%"></div>` : '';
-        const devBarDesk = dP ? `<div class="n3-an-device-seg" style="width:${dP}%;background:#10B981" title="Desktop ${dP}%"></div>` : '';
-        const devBarTab = tP ? `<div class="n3-an-device-seg" style="width:${tP}%;background:#F59E0B" title="Tablet ${tP}%"></div>` : '';
-        const devLblMob  = mP ? `<span style="color:${T.accent}">📱 ${mP}% Mobile</span>` : '';
-        const devLblDesk = dP ? `<span style="color:#10B981">🖥 ${dP}% Desktop</span>` : '';
-        const devLblTab  = tP ? `<span style="color:#F59E0B">⬜ ${tP}% Tablet</span>` : '';
-        devHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Devices</p><div class="n3-an-device-bar">${devBarMob}${devBarDesk}${devBarTab}</div><div class="n3-an-device-labels">${devLblMob}${devLblDesk}${devLblTab}</div></div>`;
+        // Circumference of r=15.9 ≈ 100, so pct maps 1:1 to dasharray units.
+        // dashoffset=25 starts at 12-o'clock; each subsequent segment subtracts prior pcts.
+        const mOff =  25;
+        const dOff =  25 - mP;
+        const tOff =  25 - mP - dP;
+        // Dominant label for center
+        const domPct   = mP >= dP ? mP : dP;
+        const domLabel = mP >= dP ? 'Mobile' : 'Desktop';
+        const devSegs = [
+          mP ? `<circle cx="18" cy="18" r="15.9" fill="none" stroke="${T.accent}" stroke-width="3.2" stroke-dasharray="${mP} ${100 - mP}" stroke-dashoffset="${mOff}" stroke-linecap="butt"/>` : '',
+          dP ? `<circle cx="18" cy="18" r="15.9" fill="none" stroke="#22C55E" stroke-width="3.2" stroke-dasharray="${dP} ${100 - dP}" stroke-dashoffset="${dOff}" stroke-linecap="butt"/>` : '',
+          tP ? `<circle cx="18" cy="18" r="15.9" fill="none" stroke="#EAB308" stroke-width="3.2" stroke-dasharray="${tP} ${100 - tP}" stroke-dashoffset="${tOff}" stroke-linecap="butt"/>` : '',
+        ].join('');
+        const devSvg = `<svg viewBox="0 0 36 36" width="140" height="140" style="display:block">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="${T.border}" stroke-width="3.2"/>
+          ${devSegs}
+          <text x="18" y="16.5" text-anchor="middle" fill="${T.text}" font-size="5" font-weight="700" font-family="system-ui,sans-serif">${domPct}%</text>
+          <text x="18" y="21.5" text-anchor="middle" fill="${T.muted}" font-size="2.8" font-family="system-ui,sans-serif">${domLabel}</text>
+        </svg>`;
+        const devLegend = [
+          mP ? `<div class="n3-an-legend-item"><span class="n3-an-legend-dot" style="background:${T.accent}"></span><span>Mobile</span><span class="n3-an-legend-val">${mP}% · ${_fmtNum(mobile)}</span></div>` : '',
+          dP ? `<div class="n3-an-legend-item"><span class="n3-an-legend-dot" style="background:#22C55E"></span><span>Desktop</span><span class="n3-an-legend-val">${dP}% · ${_fmtNum(desktop)}</span></div>` : '',
+          tP ? `<div class="n3-an-legend-item"><span class="n3-an-legend-dot" style="background:#EAB308"></span><span>Tablet</span><span class="n3-an-legend-val">${tP}% · ${_fmtNum(tablet)}</span></div>` : '',
+        ].join('');
+        devHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Devices</p><div class="n3-an-sources"><div class="n3-an-donut">${devSvg}</div><div class="n3-an-legend">${devLegend}</div></div></div>`;
       }
 
       // ── Top Pages ─────────────────────────────────────────────────────────
