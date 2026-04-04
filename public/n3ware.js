@@ -618,8 +618,19 @@
       const headingTags = ['h1','h2','h3','h4','p'];
       const initTag = headingTags.includes(currentTag) ? currentTag : '';
 
-      // Current computed font size (round to nearest option)
+      // Current computed font size in whole px.
       const computedSize = Math.round(parseFloat(getComputedStyle(el).fontSize)) || 16;
+
+      // Standard size options (expanded per spec).
+      const SIZE_OPTIONS = [12,14,16,18,20,24,28,32,36,40,48,56,64,72,96];
+      // If the actual size isn't in the list, insert it in sorted order so the
+      // dropdown always shows the real current value instead of going blank.
+      if (!SIZE_OPTIONS.includes(computedSize)) {
+        const idx = SIZE_OPTIONS.findIndex(n => n > computedSize);
+        if (idx === -1) SIZE_OPTIONS.push(computedSize);
+        else SIZE_OPTIONS.splice(idx, 0, computedSize);
+      }
+      const sizeOpts = SIZE_OPTIONS.map(n => [`${n}px`, n]);
 
       // Reliable block-tag changer: replaces the element in the DOM directly.
       const changeTag = v => {
@@ -644,8 +655,7 @@
         sep(),
         fSel([['—',''],['H1','h1'],['H2','h2'],['H3','h3'],['H4','h4'],['P','p']], 'Heading level',
           v => { if (v) changeTag(v); }, initTag),
-        fSel([[12,12],[14,14],[16,16],[18,18],[20,20],[24,24],[28,28],[32,32],[36,36],[48,48],[64,64]].map(([l,v]) => [`${l}px`, v]),
-          'Font size', v => { el.style.fontSize = v + 'px'; }, computedSize),
+        fSel(sizeOpts, 'Font size', v => { el.style.fontSize = v + 'px'; }, computedSize),
         sep(),
       );
 
