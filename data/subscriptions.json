@@ -1,0 +1,22 @@
+{
+  "subscriptions": [
+    {
+      "id": "sub_mock_001",
+      "userId": "1c03b80f-1023-4b49-8ba0-15603f7945f4",
+      "planId": "n3ware_pro",
+      "status": "active",
+      "currentPeriodEnd": "2026-05-03T22:43:24.960Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-02-02T22:43:24.960Z"
+    },
+    {
+      "id": "sub_mock_002",
+      "userId": "bef19760-54da-48fe-9288-5cc71e83e0c6",
+      "planId": "n3ware_starter",
+      "status": "active",
+      "currentPeriodEnd": "2026-04-28T22:43:24.960Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-02-02T22:43:24.960Z"
+    }
+  ]
+}

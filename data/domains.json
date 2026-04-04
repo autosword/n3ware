@@ -1,0 +1,23 @@
+{
+  "zones": [
+    {
+      "id": "zone_mock_001",
+      "name": "thewaypointri.com",
+      "status": "active",
+      "nameservers": [
+        "ns1.cloudflare.com",
+        "ns2.cloudflare.com"
+      ],
+      "siteId": "2e2106b9-3122-4d4f-a1ef-0244f16b5733",
+      "createdAt": "2026-02-17T22:43:24.960Z"
+    }
+  ],
+  "registered": [
+    {
+      "id": "reg_mock_001",
+      "domain": "thewaypointri.com",
+      "status": "registered",
+      "expiresAt": "2027-02-17T22:43:24.960Z"
+    }
+  ]
+}
