@@ -101,12 +101,13 @@ router.get('/verify', async (req, res) => {
     res.cookie('n3_token', jwtToken, {
       domain:   '.n3ware.com',
       path:     '/',
-      httpOnly: false,   // JS on the assembler subdomain needs to read it
+      httpOnly: false,   // JS on assembler subdomain needs to read it
       secure:   true,
       sameSite: 'Lax',
       maxAge:   7 * 24 * 60 * 60 * 1000,
     });
-    res.redirect('/dashboard');
+    // Keep #token= hash so the dashboard's existing localStorage handler still works
+    res.redirect(`/dashboard#token=${jwtToken}`);
   } catch (err) {
     console.error('[magic-auth] GET /verify error:', err);
     return fail('Authentication failed — please request a new link');
