@@ -95,7 +95,7 @@
         `.n3-edit-btn{position:fixed;bottom:24px;right:24px;z-index:999999;background:${T.accent};color:#fff;border:none;border-radius:8px;padding:10px 20px;font:600 14px/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 24px rgba(59,130,246,.4);display:flex;align-items:center;gap:8px;transition:all .2s;letter-spacing:.02em}`,
         `.n3-edit-btn:hover{background:${T.accentDark};transform:translateY(-1px)}`,
         `.n3-edit-btn.n3-active{background:#EF4444;box-shadow:0 4px 24px rgba(239,68,68,.4)}`,
-        `.n3-toolbar{position:fixed;top:0;left:0;right:0;z-index:999998;background:${T.bgPanel};border-bottom:1px solid ${T.border};display:flex;align-items:center;padding:0 16px;height:48px;gap:8px;font:13px/1 system-ui,sans-serif;color:${T.text};box-shadow:0 2px 16px rgba(0,0,0,.4);transform:translateY(-100%);transition:transform .2s ease}`,
+        `.n3-toolbar{position:fixed;top:0;left:0;right:0;z-index:999998;background:${T.bgPanel};border-bottom:1px solid ${T.border};display:flex;align-items:center;padding:0 12px;height:48px;gap:6px;font:13px/1 system-ui,sans-serif;color:${T.text};box-shadow:0 2px 16px rgba(0,0,0,.4);transform:translateY(-100%);transition:transform .2s ease;will-change:transform}`,
         `.n3-toolbar.n3-visible{transform:translateY(0)}`,
         `.n3-toolbar-logo{font-weight:700;color:${T.accent};margin-right:8px;font-size:15px;letter-spacing:-.5px}`,
         `.n3-toolbar-sep{width:1px;height:24px;background:${T.border};margin:0 4px}`,
@@ -179,6 +179,12 @@
         `.n3-rev-msg{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`,
         `.n3-rev-empty{color:${T.muted};padding:16px;text-align:center}`,
         `.n3-rev-rollback-btn{flex-shrink:0;font-size:11px;padding:4px 8px}`,
+        // ── Mobile overflow menu ────────────────────────────────────────────
+        `.n3-mob-show{display:none}`,
+        `.n3-mob-dropdown{position:fixed;top:48px;right:0;background:${T.bgPanel};border:1px solid ${T.border};border-radius:0 0 0 8px;min-width:180px;z-index:9999999;flex-direction:column;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none}`,
+        `.n3-mob-dropdown.n3-mob-open{display:flex}`,
+        `.n3-mob-dd-btn{background:transparent;border:none;color:${T.text};padding:10px 14px;border-radius:6px;cursor:pointer;font:13px/1 system-ui,sans-serif;text-align:left;width:100%;min-height:44px;display:flex;align-items:center;gap:8px;touch-action:manipulation}`,
+        `.n3-mob-dd-btn:hover{background:rgba(255,255,255,.08)}`,
         // ── Floating Action Button cluster ──────────────────────────────────
         `.n3-fab{position:fixed;bottom:24px;right:24px;z-index:999999;display:flex;flex-direction:column-reverse;align-items:center;gap:10px}`,
         `.n3-fab-toggle{width:48px;height:48px;border-radius:50%;background:${T.accent};color:#fff;border:none;cursor:pointer;font:700 16px/1 system-ui,sans-serif;letter-spacing:-.5px;box-shadow:0 4px 24px rgba(59,130,246,.45);display:flex;align-items:center;justify-content:center;transition:all .25s cubic-bezier(.34,1.56,.64,1)}`,
@@ -259,11 +265,21 @@
         `.n3-comp-drop-target{outline:2px dashed ${T.accent}!important;outline-offset:3px;background:rgba(59,130,246,.06)!important}`,
         // ── Mobile / narrow viewport overrides ──────────────────────────────
         `@media(max-width:767px){
-          .n3-style-panel{width:100%!important;height:60vh!important;top:auto!important;bottom:0!important;border-left:none!important;border-top:1px solid ${T.border}!important;border-radius:12px 12px 0 0!important;}
+          .n3-mob-hide{display:none!important}
+          .n3-mob-show{display:flex!important;align-items:center;justify-content:center}
+          .n3-toolbar .n3-toolbar-sep{display:none!important}
+          .n3-history-count{display:none!important}
+          .n3-toolbar{overflow-x:visible;flex-wrap:nowrap;padding:0 8px;gap:4px}
+          .n3-toolbar-btn{padding:4px 8px;min-height:44px;touch-action:manipulation}
+          .n3-toolbar-logo{margin-right:4px}
+          .n3-style-panel{width:100%!important;height:40vh!important;top:auto!important;bottom:0!important;border-left:none!important;border-top:1px solid ${T.border}!important;border-radius:12px 12px 0 0!important;}
           .n3-format-bar{overflow-x:auto;flex-wrap:nowrap;max-width:calc(100vw - 16px);}
+          .n3-fmt-btn{min-width:36px;height:40px;touch-action:manipulation}
+          .n3-fmt-select{height:40px;font-size:14px;touch-action:manipulation}
+          .n3-ctrl-btn{width:36px!important;height:36px!important;touch-action:manipulation}
           .n3-fab{bottom:16px!important;right:12px!important;}
-          .n3-fab-toggle{width:40px!important;height:40px!important;font-size:14px!important;}
-          .n3-toolbar{overflow-x:auto;flex-wrap:nowrap;}
+          .n3-fab-toggle{width:40px!important;height:40px!important;font-size:14px!important;touch-action:manipulation}
+          .n3-fab-btn{touch-action:manipulation}
           body.n3-editing{padding-top:48px!important;}
         }`,
       ].join('\n');
@@ -867,6 +883,12 @@
       const dupBtn = N3UI.btn('+', 'n3-ctrl-btn n3-dup', 'Duplicate');
       dupBtn.addEventListener('click', e => { e.stopPropagation(); this._events.emit('controls:duplicate', el); });
 
+      const upBtn = N3UI.btn('↑', 'n3-ctrl-btn', 'Move up');
+      upBtn.addEventListener('click', e => { e.stopPropagation(); this._events.emit('controls:move-up', el); });
+
+      const downBtn = N3UI.btn('↓', 'n3-ctrl-btn', 'Move down');
+      downBtn.addEventListener('click', e => { e.stopPropagation(); this._events.emit('controls:move-down', el); });
+
       const delBtn = N3UI.btn('×', 'n3-ctrl-btn n3-delete', 'Delete element');
       delBtn.addEventListener('click', async e => {
         e.stopPropagation();
@@ -874,7 +896,7 @@
         if (ok) this._events.emit('controls:delete', el);
       });
 
-      overlay.append(typeLabel, dragBtn, dupBtn, delBtn);
+      overlay.append(typeLabel, dragBtn, upBtn, downBtn, dupBtn, delBtn);
       this._overlay = overlay;
       document.body.appendChild(overlay);
       this._positionOverlay(el);
@@ -981,7 +1003,9 @@
           <div class="n3-field"><input type="text" class="n3-class-input" id="n3-classes" placeholder="container hero flex"></div>
         </div>`;
 
-      p.querySelector('#n3-panel-close').onclick = () => this._events.emit('panel:close');
+      const panelCloseBtn = p.querySelector('#n3-panel-close');
+      panelCloseBtn.onclick = () => this._events.emit('panel:close');
+      panelCloseBtn.addEventListener('touchend', e => { e.preventDefault(); this._events.emit('panel:close'); });
       this._wireColor(p, '#n3-bg-color',   v => this._apply('backgroundColor', v));
       this._wireColor(p, '#n3-text-color', v => this._apply('color', v));
       this._wireSlider(p, '#n3-padding', '#n3-pad-val', 'padding',      'px');
@@ -1069,11 +1093,20 @@
       this._el = document.createElement('div');
       this._el.className = 'n3-toolbar';
       this._el.setAttribute('data-n3-ui', '1');
-      const saveBtn = this._cloud
-        ? `<button class="n3-toolbar-btn n3-cloud-btn" data-action="cloud-save" title="Publish to cloud">☁ Publish</button>
-           <button class="n3-toolbar-btn" data-action="cloud-revisions" title="Revision history">↺ History</button>
-           <button class="n3-toolbar-btn" data-action="save-html" title="Download HTML backup">⬇ Download</button>`
-        : `<button class="n3-toolbar-btn" data-action="save-html">⬇ Download</button>`;
+      const desktopBtns = this._cloud
+        ? `<button class="n3-toolbar-btn n3-cloud-btn n3-mob-hide" data-action="cloud-save" title="Publish to cloud">☁ Publish</button>
+           <button class="n3-toolbar-btn n3-mob-hide" data-action="cloud-revisions" title="Revision history">↺ History</button>
+           <button class="n3-toolbar-btn n3-mob-hide" data-action="save-html" title="Download HTML backup">⬇ Download</button>`
+        : `<button class="n3-toolbar-btn n3-mob-hide" data-action="save-html">⬇ Download</button>`;
+      const mobMenuItems = this._cloud
+        ? `<button class="n3-mob-dd-btn" data-action="cloud-save">☁ Publish</button>
+           <button class="n3-mob-dd-btn" data-action="cloud-revisions">↺ History</button>
+           <button class="n3-mob-dd-btn" data-action="save-html">⬇ Download</button>
+           <button class="n3-mob-dd-btn" data-action="copy-html">⎘ Copy HTML</button>
+           <button class="n3-mob-dd-btn" data-action="json-diff">{ } Diff</button>`
+        : `<button class="n3-mob-dd-btn" data-action="save-html">⬇ Download</button>
+           <button class="n3-mob-dd-btn" data-action="copy-html">⎘ Copy HTML</button>
+           <button class="n3-mob-dd-btn" data-action="json-diff">{ } Diff</button>`;
       this._el.innerHTML = `
         <span class="n3-toolbar-logo">n3ware</span>
         <div class="n3-toolbar-sep"></div>
@@ -1081,15 +1114,32 @@
         <button class="n3-toolbar-btn" data-action="redo" title="Redo (Ctrl+Shift+Z)">↪ Redo</button>
         <span class="n3-history-count">1/1</span>
         <div class="n3-toolbar-sep"></div>
-        ${saveBtn}
-        <button class="n3-toolbar-btn" data-action="copy-html">⎘ Copy HTML</button>
-        <button class="n3-toolbar-btn" data-action="json-diff">{ } Diff</button>
+        ${desktopBtns}
+        <button class="n3-toolbar-btn n3-mob-hide" data-action="copy-html">⎘ Copy HTML</button>
+        <button class="n3-toolbar-btn n3-mob-hide" data-action="json-diff">{ } Diff</button>
+        <button class="n3-toolbar-btn n3-mob-show" data-action="mob-menu" title="More options" style="font-size:16px;min-width:36px">☰</button>
         <div class="n3-toolbar-spacer"></div>
-        <button class="n3-toolbar-btn n3-danger" data-action="exit-edit">✕ Exit Editor</button>`;
+        <button class="n3-toolbar-btn n3-danger" data-action="exit-edit">✕ Exit</button>
+        <div class="n3-mob-dropdown" id="n3-mob-dropdown">${mobMenuItems}</div>`;
       this._el.addEventListener('click', e => {
         const b = e.target.closest('[data-action]');
-        if (b) this._events.emit('toolbar:action', b.dataset.action);
+        if (!b) return;
+        const dd = this._el.querySelector('#n3-mob-dropdown');
+        if (b.dataset.action === 'mob-menu') {
+          if (dd) dd.classList.toggle('n3-mob-open');
+          return;
+        }
+        if (dd) dd.classList.remove('n3-mob-open');
+        this._events.emit('toolbar:action', b.dataset.action);
       });
+      // Close mob dropdown when clicking outside toolbar
+      document.addEventListener('click', e => {
+        if (!this._el) return;
+        const dd = this._el.querySelector('#n3-mob-dropdown');
+        if (dd && dd.classList.contains('n3-mob-open') && !this._el.contains(e.target)) {
+          dd.classList.remove('n3-mob-open');
+        }
+      }, true);
       document.body.appendChild(this._el);
     }
 
@@ -1983,7 +2033,9 @@
       if (this._activeEl) this._activeEl.classList.remove('n3-selected');
       this._activeEl = el;
       el.classList.add('n3-selected');
-      this.panel.open(el);
+      // On mobile, don't auto-open the style panel (it blocks 60% of screen).
+      // User can open it explicitly via the Style button in the element controls.
+      if (window.innerWidth >= 768) this.panel.open(el);
     }
 
     _deactivate() {
@@ -2031,6 +2083,24 @@
       this.events.on('controls:delete', el => {
         this._snapshot(); el.remove(); this.controls.removeOverlay();
         N3UI.toast('Element deleted', 'info');
+      });
+      this.events.on('controls:move-up', el => {
+        const prev = el.previousElementSibling;
+        if (prev && !N3UI.isEditorEl(prev)) {
+          this._snapshot();
+          el.parentNode.insertBefore(el, prev);
+          this.controls.removeOverlay();
+          N3UI.toast('Moved up', 'info', 1200);
+        }
+      });
+      this.events.on('controls:move-down', el => {
+        const next = el.nextElementSibling;
+        if (next && !N3UI.isEditorEl(next)) {
+          this._snapshot();
+          el.parentNode.insertBefore(next, el);
+          this.controls.removeOverlay();
+          N3UI.toast('Moved down', 'info', 1200);
+        }
       });
       this.events.on('drag:drop', ({ dragged, el: target, above }) => {
         this._snapshot();
