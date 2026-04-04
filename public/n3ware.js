@@ -257,6 +257,15 @@
         `.n3-comp-add{flex-shrink:0;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:${T.accent};width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s;padding:0}`,
         `.n3-comp-add:hover{background:rgba(59,130,246,.28);border-color:rgba(59,130,246,.5);transform:scale(1.1)}`,
         `.n3-comp-drop-target{outline:2px dashed ${T.accent}!important;outline-offset:3px;background:rgba(59,130,246,.06)!important}`,
+        // ── Mobile / narrow viewport overrides ──────────────────────────────
+        `@media(max-width:767px){
+          .n3-style-panel{width:100%!important;height:60vh!important;top:auto!important;bottom:0!important;border-left:none!important;border-top:1px solid ${T.border}!important;border-radius:12px 12px 0 0!important;}
+          .n3-format-bar{overflow-x:auto;flex-wrap:nowrap;max-width:calc(100vw - 16px);}
+          .n3-fab{bottom:16px!important;right:12px!important;}
+          .n3-fab-toggle{width:40px!important;height:40px!important;font-size:14px!important;}
+          .n3-toolbar{overflow-x:auto;flex-wrap:nowrap;}
+          body.n3-editing{padding-top:48px!important;}
+        }`,
       ].join('\n');
       document.head.appendChild(s);
     }
@@ -594,12 +603,34 @@
         return b;
       };
       const sep = () => { const d = document.createElement('div'); d.className = 'n3-fmt-sep'; return d; };
-      const fSel = (opts, title, cb) => {
+      const fSel = (opts, title, cb, initVal) => {
         const s = document.createElement('select');
         s.className = 'n3-fmt-select'; s.title = title;
         opts.forEach(([label, val]) => { const o = document.createElement('option'); o.value = val; o.textContent = label; s.appendChild(o); });
+        if (initVal !== undefined) s.value = initVal;
+        s.addEventListener('mousedown', e => e.stopPropagation());
         s.onchange = () => cb(s.value);
         return s;
+      };
+
+      // Current tag for heading selector (h1–h6 or p; fall back to '—')
+      const currentTag = el.tagName.toLowerCase();
+      const headingTags = ['h1','h2','h3','h4','p'];
+      const initTag = headingTags.includes(currentTag) ? currentTag : '';
+
+      // Current computed font size (round to nearest option)
+      const computedSize = Math.round(parseFloat(getComputedStyle(el).fontSize)) || 16;
+
+      // Reliable block-tag changer: replaces the element in the DOM directly.
+      const changeTag = v => {
+        if (!v) return;
+        const target = el.closest('h1,h2,h3,h4,h5,h6,p') || el;
+        const newEl = document.createElement(v);
+        const innerContent = target.innerHTML;
+        newEl.innerHTML = innerContent;
+        Array.from(target.attributes).forEach(a => newEl.setAttribute(a.name, a.value));
+        target.replaceWith(newEl);
+        newEl.focus();
       };
 
       bar.append(
@@ -612,9 +643,9 @@
         fBtn('⇥', 'Align Right',  () => exec('justifyRight')),
         sep(),
         fSel([['—',''],['H1','h1'],['H2','h2'],['H3','h3'],['H4','h4'],['P','p']], 'Heading level',
-          v => { if (v) exec('formatBlock', v); }),
+          v => { if (v) changeTag(v); }, initTag),
         fSel([[12,12],[14,14],[16,16],[18,18],[20,20],[24,24],[28,28],[32,32],[36,36],[48,48],[64,64]].map(([l,v]) => [`${l}px`, v]),
-          'Font size', v => { el.style.fontSize = v + 'px'; }),
+          'Font size', v => { el.style.fontSize = v + 'px'; }, computedSize),
         sep(),
       );
 
@@ -687,6 +718,31 @@
       };
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup',   onUp);
+    }
+
+    /**
+     * Begin a touch-initiated drag sequence.
+     * @param {TouchEvent} e
+     * @param {HTMLElement} el
+     */
+    startDragTouch(e, el) {
+      e.preventDefault();
+      el.classList.add('n3-dragging');
+      this._events.emit('drag:start', el);
+
+      const onMove = mv => {
+        mv.preventDefault();
+        const t = mv.touches[0];
+        this._onMove({ clientX: t.clientX, clientY: t.clientY }, el);
+      };
+      const onEnd = up => {
+        const t = up.changedTouches[0];
+        this._onEnd({ clientX: t.clientX, clientY: t.clientY }, el);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend',  onEnd);
+      };
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend',  onEnd);
     }
 
     // ── Private ──────────────────────────────────────────────────────────────
@@ -796,6 +852,7 @@
 
       const dragBtn = N3UI.btn('⠿', 'n3-ctrl-btn n3-drag-handle', 'Drag to reorder');
       dragBtn.addEventListener('mousedown', e => this._drag.startDrag(e, el));
+      dragBtn.addEventListener('touchstart', e => this._drag.startDragTouch(e, el), { passive: false });
 
       const dupBtn = N3UI.btn('+', 'n3-ctrl-btn n3-dup', 'Duplicate');
       dupBtn.addEventListener('click', e => { e.stopPropagation(); this._events.emit('controls:duplicate', el); });
@@ -822,8 +879,15 @@
 
     _positionOverlay(el) {
       if (!this._overlay) return;
-      const rect = el.getBoundingClientRect();
-      this._overlay.style.top  = (rect.top + window.scrollY - this._overlay.offsetHeight - 4) + 'px';
+      const rect     = el.getBoundingClientRect();
+      const overlayH = this._overlay.offsetHeight || 30;
+      // Preferred: float above the element
+      let absTop = rect.top + window.scrollY - overlayH - 4;
+      // If that would put the overlay above the n3ware toolbar (48px) + a little margin,
+      // fall back to inside the top of the element.
+      const minTop = window.scrollY + 52;
+      if (absTop < minTop) absTop = rect.top + window.scrollY + 4;
+      this._overlay.style.top  = absTop + 'px';
       this._overlay.style.left = (rect.left + window.scrollX) + 'px';
     }
 
@@ -1975,7 +2039,12 @@
       if (!this._editMode || N3UI.isEditorEl(e.target)) return;
       const block = e.target.closest('[data-n3-block]');
       if (block) {
-        this._activate(block);
+        // Clicking the already-active block a second time dismisses the panel.
+        if (block === this._activeEl) {
+          this._deactivate();
+        } else {
+          this._activate(block);
+        }
       } else {
         // Clicked outside any editable block — deactivate selection and hide format bar.
         this._deactivate();
