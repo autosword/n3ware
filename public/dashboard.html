@@ -1039,7 +1039,7 @@ function openSettings(siteId) {
   document.getElementById('settings-name').value = site.name || '';
   const origin = window.location.origin;
   document.getElementById('settings-url').value = `${origin}/sites/${siteId}`;
-  document.getElementById('settings-embed').value = `<script src="${origin}/n3ware.js"\n  data-n3-site="${siteId}"\n  data-n3-api="${origin}/api"\n  data-n3-key="YOUR_API_KEY"><\/script>`;
+  document.getElementById('settings-embed').value = `\x3cscript src="${origin}/n3ware.js"\n  data-n3-site="${siteId}"\n  data-n3-api="${origin}/api"\n  data-n3-key="YOUR_API_KEY"><\/script>`;
   // Domain
   document.getElementById('settings-domain').value = '';
   document.getElementById('domain-connected').classList.add('hidden');
@@ -1369,7 +1369,7 @@ const ALL_INTEGRATIONS = [
   { key:'linkedin-insight',  name:'LinkedIn Insight Tag',    category:'social',      icon:'💼', description:'Track conversions from LinkedIn ads',                  fields:[{name:'partnerId',     label:'Partner ID',       placeholder:'123456',                          type:'id',   required:true }] },
   { key:'snapchat-pixel',    name:'Snapchat Pixel',          category:'social',      icon:'👻', description:'Track conversions from Snapchat ads',                  fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', type:'id', required:true }] },
   { key:'google-ads',        name:'Google Ads Conversion',   category:'advertising', icon:'💰', description:'Track Google Ads conversions',                         fields:[{name:'conversionId',  label:'Conversion ID',    placeholder:'AW-123456789',                    type:'id',   required:true }, {name:'conversionLabel', label:'Conversion Label (optional)', placeholder:'AbCdEfGh', type:'id', required:false}] },
-  { key:'custom-script',     name:'Custom Script',           category:'other',       icon:'🔧', description:'Paste any custom script tag',                          fields:[{name:'code',          label:'Script Code',      placeholder:'<script>...</script>',            type:'code', required:true }] },
+  { key:'custom-script',     name:'Custom Script',           category:'other',       icon:'🔧', description:'Paste any custom script tag',                          fields:[{name:'code',          label:'Script Code',      placeholder:'\x3cscript>...<\/script>',            type:'code', required:true }] },
 ];
 
 const INTEG_STATE = { siteId: null, config: {}, cat: 'all' };
