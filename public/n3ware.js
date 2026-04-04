@@ -282,6 +282,27 @@
         `.n3-comp-add{flex-shrink:0;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:${T.accent};width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s;padding:0}`,
         `.n3-comp-add:hover{background:rgba(59,130,246,.28);border-color:rgba(59,130,246,.5);transform:scale(1.1)}`,
         `.n3-comp-drop-target{outline:2px dashed ${T.accent}!important;outline-offset:3px;background:rgba(59,130,246,.06)!important}`,
+        // ── Script placeholders ─────────────────────────────────────────────
+        `.n3-script-ph{display:flex;align-items:center;gap:10px;background:#0B1120;border:1px dashed ${T.border};border-radius:8px;padding:10px 14px;margin:4px 0;font:13px/1 system-ui,sans-serif;color:${T.text};pointer-events:all;box-sizing:border-box;width:100%}`,
+        `.n3-script-ph-icon{font:700 14px/1 monospace;color:${T.accent};flex-shrink:0;width:24px;text-align:center}`,
+        `.n3-script-ph-name{flex:1;font-weight:600;font-size:12px;color:${T.text};overflow:hidden;text-overflow:ellipsis;white-space:nowrap}`,
+        `.n3-script-ph-actions{display:flex;gap:5px;flex-shrink:0}`,
+        `.n3-script-ph-btn{background:rgba(255,255,255,.07);border:1px solid ${T.border};color:${T.text};padding:4px 10px;border-radius:5px;cursor:pointer;font:600 11px/1 system-ui,sans-serif;transition:all .12s;touch-action:manipulation;white-space:nowrap}`,
+        `.n3-script-ph-btn:hover{background:rgba(255,255,255,.14);border-color:#888}`,
+        `.n3-script-ph-btn.n3-danger:hover{background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.4);color:#F87171}`,
+        // ── Script code-editor modal ────────────────────────────────────────
+        `.n3-script-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999999;display:flex;align-items:center;justify-content:center;animation:n3-fade-in .15s ease}`,
+        `.n3-script-modal{background:${T.bgPanel};border:1px solid ${T.border};border-radius:12px;width:min(640px,94vw);max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.65)}`,
+        `.n3-script-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid ${T.border};flex-shrink:0}`,
+        `.n3-script-modal-title{font:600 14px/1 system-ui,sans-serif;color:${T.text}}`,
+        `.n3-script-modal-close{background:transparent;border:none;color:${T.muted};cursor:pointer;font-size:16px;width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}`,
+        `.n3-script-modal-close:hover{background:rgba(255,255,255,.1);color:${T.text}}`,
+        `.n3-script-modal-editor{flex:1;background:#050A14;color:#9CDCFE;border:none;padding:16px 18px;font:13px/1.65 'Fira Code','Cascadia Code','Consolas',monospace;resize:none;outline:none;min-height:220px;max-height:54vh;overflow-y:auto;tab-size:2;box-sizing:border-box}`,
+        `.n3-script-modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid ${T.border};flex-shrink:0}`,
+        `.n3-script-modal-cancel{background:rgba(255,255,255,.07);border:1px solid ${T.border};color:${T.text};padding:7px 16px;border-radius:6px;cursor:pointer;font:600 13px/1 system-ui,sans-serif;transition:all .12s;touch-action:manipulation}`,
+        `.n3-script-modal-cancel:hover{background:rgba(255,255,255,.14)}`,
+        `.n3-script-modal-save{background:${T.accent};border:1px solid ${T.accent};color:#fff;padding:7px 16px;border-radius:6px;cursor:pointer;font:600 13px/1 system-ui,sans-serif;transition:all .12s;touch-action:manipulation}`,
+        `.n3-script-modal-save:hover{background:${T.accentDark}}`,
         // ── Mobile / narrow viewport overrides ──────────────────────────────
         `@media(max-width:767px){
           .n3-mob-hide{display:none!important}
@@ -369,15 +390,17 @@
      */
     static isEditorEl(el) {
       return !!(el && (
-        el.closest('.n3-controls')        ||
-        el.closest('.n3-format-bar')      ||
-        el.closest('.n3-style-panel')     ||
-        el.closest('.n3-toolbar')         ||
-        el.closest('.n3-fab')              ||
+        el.closest('.n3-controls')          ||
+        el.closest('.n3-format-bar')        ||
+        el.closest('.n3-style-panel')       ||
+        el.closest('.n3-toolbar')           ||
+        el.closest('.n3-fab')               ||
         el.closest('.n3-analytics-overlay') ||
-        el.closest('.n3-comp-panel')      ||
-        el.closest('.n3-confirm-overlay') ||
-        el.closest('.n3-toast')
+        el.closest('.n3-comp-panel')        ||
+        el.closest('.n3-confirm-overlay')   ||
+        el.closest('.n3-toast')             ||
+        el.closest('.n3-script-modal-overlay') ||
+        el.closest('.n3-script-ph')
       ));
     }
   }
@@ -472,8 +495,6 @@
       clone.querySelectorAll('[data-n3-ui]').forEach(e => e.remove());
       clone.querySelectorAll('#n3ware-styles').forEach(e => e.remove());
       clone.querySelectorAll('.n3-controls,.n3-format-bar,.n3-drop-line,.n3-toast').forEach(e => e.remove());
-      // Strip script placeholder UI elements (keep the actual comment markers + scripts between them)
-      clone.querySelectorAll('.n3-script-placeholder').forEach(e => e.remove());
       clone.querySelectorAll('[data-n3-editable]').forEach(e => {
         e.removeAttribute('data-n3-editable');
         e.removeAttribute('contenteditable');
@@ -548,6 +569,233 @@
       a.click();
       N3UI.toast(`${changes.length} change(s) exported`, 'info');
       this._events.emit('export:diff', changes);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // N3ScriptPlaceholders — visible cards for HTML-comment-wrapped <script> blocks
+  //
+  // Scans document.body for comment pairs:
+  //   <!-- n3:script:KEY:start --> … <script>…</script> … <!-- n3:script:KEY:end -->
+  // In edit mode each pair gets a dark card with Edit / Remove buttons.
+  // N3Export already strips [data-n3-ui] elements, so placeholders never appear
+  // in exported HTML; the comment wrappers and script tags are preserved.
+  // ═══════════════════════════════════════════════════════════════════════════
+  class N3ScriptPlaceholders {
+    /** @param {N3Events} events */
+    constructor(events) {
+      this._events = events;
+      /**
+       * @type {Array<{key:string,startNode:Comment,endNode:Comment,
+       *               scripts:HTMLScriptElement[],ph:HTMLElement}>}
+       */
+      this._entries = [];
+      /** @type {HTMLElement|null} */
+      this._modal = null;
+    }
+
+    /** Scan DOM and insert placeholder cards. Called when edit mode activates. */
+    enable() {
+      this._scan();
+    }
+
+    /** Remove all placeholder cards (comments and scripts stay). */
+    disable() {
+      this._entries.forEach(({ ph }) => { if (ph.parentNode) ph.remove(); });
+      this._entries = [];
+      if (this._modal) { this._modal.remove(); this._modal = null; }
+    }
+
+    // ── Private ────────────────────────────────────────────────────────────
+
+    _scan() {
+      const walker = document.createTreeWalker(
+        document.body, NodeFilter.SHOW_COMMENT, null
+      );
+      /** @type {Map<string, Comment>} */
+      const starts = new Map();
+      let node;
+      while ((node = walker.nextNode())) {
+        const text = node.nodeValue.trim();
+        const sm = text.match(/^n3:script:(.+):start$/);
+        const em = text.match(/^n3:script:(.+):end$/);
+        if (sm) {
+          starts.set(sm[1], node);
+        } else if (em) {
+          const startNode = starts.get(em[1]);
+          if (startNode) {
+            starts.delete(em[1]);
+            this._insertCard(em[1], startNode, node);
+          }
+        }
+      }
+    }
+
+    /**
+     * @param {string}  key
+     * @param {Comment} startNode
+     * @param {Comment} endNode
+     */
+    _insertCard(key, startNode, endNode) {
+      // Collect <script> elements that live between the two comment nodes
+      const scripts = [];
+      let cur = startNode.nextSibling;
+      while (cur && cur !== endNode) {
+        if (cur.nodeName === 'SCRIPT') scripts.push(cur);
+        cur = cur.nextSibling;
+      }
+
+      // Build placeholder card
+      const ph = document.createElement('div');
+      ph.className = 'n3-script-ph';
+      ph.setAttribute('data-n3-ui', '1');
+
+      const icon = document.createElement('span');
+      icon.className = 'n3-script-ph-icon';
+      icon.textContent = '{}';
+
+      const label = document.createElement('span');
+      label.className = 'n3-script-ph-name';
+      label.textContent = key;
+
+      const actions = document.createElement('div');
+      actions.className = 'n3-script-ph-actions';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'n3-script-ph-btn';
+      editBtn.textContent = 'Edit';
+      editBtn.title = 'Edit script code';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'n3-script-ph-btn n3-danger';
+      removeBtn.textContent = 'Remove';
+      removeBtn.title = 'Delete script and its comment wrappers';
+
+      actions.appendChild(editBtn);
+      actions.appendChild(removeBtn);
+      ph.appendChild(icon);
+      ph.appendChild(label);
+      ph.appendChild(actions);
+
+      // Insert card immediately after the start comment
+      startNode.parentNode.insertBefore(ph, startNode.nextSibling);
+
+      const entry = { key, startNode, endNode, scripts, ph };
+      this._entries.push(entry);
+
+      editBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        this._openEditor(entry);
+      });
+
+      removeBtn.addEventListener('click', async e => {
+        e.stopPropagation();
+        const ok = await N3UI.confirm(
+          'Remove script', `Remove "${_esc(key)}" and its comment wrappers from the page?`
+        );
+        if (!ok) return;
+        entry.scripts.forEach(s => s.remove());
+        entry.startNode.remove();
+        entry.endNode.remove();
+        entry.ph.remove();
+        const idx = this._entries.indexOf(entry);
+        if (idx !== -1) this._entries.splice(idx, 1);
+        this._events.emit('scripts:remove', key);
+        N3UI.toast(`Script "${key}" removed`, 'info');
+      });
+    }
+
+    /** Open the code-editor modal for an entry. */
+    _openEditor(entry) {
+      if (this._modal) this._modal.remove();
+
+      // Serialise existing script content for display in editor
+      const code = entry.scripts.map(s =>
+        s.src ? `<script src="${s.src}"><\/script>` : s.textContent.trim()
+      ).join('\n\n');
+
+      // ── Build modal DOM ────────────────────────────────────────────────
+      const overlay = document.createElement('div');
+      overlay.className = 'n3-script-modal-overlay';
+      overlay.setAttribute('data-n3-ui', '1');
+
+      const modal = document.createElement('div');
+      modal.className = 'n3-script-modal';
+
+      // Header
+      const hdr = document.createElement('div');
+      hdr.className = 'n3-script-modal-header';
+      const ttl = document.createElement('span');
+      ttl.className = 'n3-script-modal-title';
+      ttl.textContent = `Edit Script — ${entry.key}`;
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'n3-script-modal-close';
+      closeBtn.innerHTML = '&#x2715;';
+      closeBtn.title = 'Close';
+      hdr.appendChild(ttl);
+      hdr.appendChild(closeBtn);
+
+      // Textarea
+      const ta = document.createElement('textarea');
+      ta.className = 'n3-script-modal-editor';
+      ta.value = code;
+      ta.spellcheck = false;
+      ta.placeholder = '// Enter JavaScript here (inline code or full <script> tag)';
+      // Prevent the editor's contenteditable machinery from touching this element
+      ta.setAttribute('data-n3-no-edit', '1');
+
+      // Footer
+      const ftr = document.createElement('div');
+      ftr.className = 'n3-script-modal-footer';
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'n3-script-modal-cancel';
+      cancelBtn.textContent = 'Cancel';
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'n3-script-modal-save';
+      saveBtn.textContent = 'Save';
+      ftr.appendChild(cancelBtn);
+      ftr.appendChild(saveBtn);
+
+      modal.appendChild(hdr);
+      modal.appendChild(ta);
+      modal.appendChild(ftr);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      this._modal = overlay;
+      ta.focus();
+
+      // ── Wire close / save ──────────────────────────────────────────────
+      const close = () => { overlay.remove(); this._modal = null; };
+      closeBtn.addEventListener('click', close);
+      cancelBtn.addEventListener('click', close);
+      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+      // Tab-key indentation in the textarea
+      ta.addEventListener('keydown', e => {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          const { selectionStart: ss, selectionEnd: se } = ta;
+          ta.value = ta.value.slice(0, ss) + '  ' + ta.value.slice(se);
+          ta.selectionStart = ta.selectionEnd = ss + 2;
+        }
+      });
+
+      saveBtn.addEventListener('click', () => {
+        const newCode = ta.value;
+        // Remove existing script elements
+        entry.scripts.forEach(s => s.remove());
+        entry.scripts.length = 0;
+        // Insert replacement script before end comment
+        if (newCode.trim()) {
+          const newScript = document.createElement('script');
+          newScript.textContent = newCode;
+          entry.endNode.parentNode.insertBefore(newScript, entry.endNode);
+          entry.scripts.push(newScript);
+        }
+        close();
+        this._events.emit('scripts:change', entry.key);
+        N3UI.toast(`Script "${entry.key}" saved`, 'success');
+      });
     }
   }
 
@@ -1449,16 +1697,14 @@
       });
 
       document.addEventListener('drop', this._onDrop = e => {
-        const html   = e.dataTransfer && e.dataTransfer.getData('application/n3-component');
+        const html = e.dataTransfer && e.dataTransfer.getData('application/n3-component');
         if (!html) return;
         e.preventDefault();
-        const compId = (e.dataTransfer && e.dataTransfer.getData('application/n3-component-id')) || this._draggingId || null;
         const target = this._dropTarget || e.target.closest('[data-n3-block]') || null;
         if (this._dropTarget) { this._dropTarget.classList.remove('n3-comp-drop-target'); this._dropTarget = null; }
-        this._insert(html, target, compId);
+        this._insert(html, target);
         N3UI.toast('Component added', 'success', 2000);
-        this._dragging   = null;
-        this._draggingId = null;
+        this._dragging = null;
       });
     }
 
@@ -1561,17 +1807,14 @@
         if (!comp) return;
 
         item.addEventListener('dragstart', e => {
-          this._dragging   = comp.html;
-          this._draggingId = comp.id;
+          this._dragging = comp.html;
           e.dataTransfer.setData('application/n3-component', comp.html);
-          e.dataTransfer.setData('application/n3-component-id', comp.id);
           e.dataTransfer.effectAllowed = 'copy';
           item.style.opacity = '0.45';
         });
         item.addEventListener('dragend', () => {
           item.style.opacity = '';
-          this._dragging   = null;
-          this._draggingId = null;
+          this._dragging = null;
           if (this._dropTarget) { this._dropTarget.classList.remove('n3-comp-drop-target'); this._dropTarget = null; }
         });
       });
@@ -1583,7 +1826,7 @@
           if (!comp) return;
           // Insert after currently selected block, or at end of body
           const selected = document.querySelector('.n3-selected');
-          this._insert(comp.html, selected, comp.id);
+          this._insert(comp.html, selected);
           N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
         });
       });
@@ -1593,9 +1836,8 @@
      * Parse and insert the component HTML at/after a target block.
      * @param {string} html
      * @param {Element|null} target  — insert after this; null = append to body
-     * @param {string|null} compId  — component id for comment wrapper markers
      */
-    _insert(html, target, compId) {
+    _insert(html, target) {
       // Ensure Tailwind CDN is present when inserting Tailwind components
       if (!document.querySelector('script[src*="tailwindcss"]')) {
         const tw  = document.createElement('script');
@@ -1621,14 +1863,6 @@
         }
       }
 
-      // Wrap with n3:component comment markers if a component ID is provided
-      if (compId) {
-        const startComment = document.createComment(`n3:component:${compId}:start`);
-        const endComment   = document.createComment(`n3:component:${compId}:end`);
-        node.parentNode.insertBefore(startComment, node);
-        node.parentNode.insertBefore(endComment, node.nextSibling);
-      }
-
       // Mark for editing
       node.setAttribute('data-n3-block', '1');
       node.querySelectorAll(SEL.block).forEach(el => {
@@ -1644,174 +1878,6 @@
 
       this._events.emit('component:insert', node);
       node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // N3ScriptPlaceholders — visual UI for injected tracking scripts
-  // Scans for n3:script:KEY:start comment nodes and renders clickable blocks
-  // ═══════════════════════════════════════════════════════════════════════════
-  class N3ScriptPlaceholders {
-    constructor(events, ui) {
-      this._events       = events;
-      this._ui           = ui;
-      this._placeholders = [];
-    }
-
-    enable() {
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
-      while (walker.nextNode()) {
-        const match = walker.currentNode.textContent.trim().match(/^n3:script:(.+):start$/);
-        if (match) {
-          this._createPlaceholder(match[1], walker.currentNode);
-        }
-      }
-    }
-
-    disable() {
-      this._placeholders.forEach(p => p.el.remove());
-      this._placeholders = [];
-    }
-
-    _createPlaceholder(key, commentNode) {
-      const el = document.createElement('div');
-      el.className = 'n3-script-placeholder';
-      el.setAttribute('data-n3-script', key);
-      el.setAttribute('data-n3-ui', '1');
-      el.innerHTML = `
-        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;
-          background:#1A1A1A;border:1px dashed #E31337;border-radius:8px;
-          color:#ccc;font-size:13px;font-family:system-ui;cursor:pointer;
-          margin:8px 0;">
-          <span style="font-size:20px">${this._getIcon(key)}</span>
-          <div>
-            <div style="font-weight:600;color:white">${this._getName(key)}</div>
-            <div style="font-size:11px;color:#888">Click to edit &bull; Script tag</div>
-          </div>
-          <div style="margin-left:auto;display:flex;gap:4px">
-            <button class="n3-sp-edit" style="background:#E31337;color:white;border:none;
-              padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer">Edit</button>
-            <button class="n3-sp-remove" style="background:#333;color:#ccc;border:none;
-              padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer">Remove</button>
-          </div>
-        </div>
-      `;
-
-      commentNode.parentNode.insertBefore(el, commentNode.nextSibling);
-
-      el.querySelector('.n3-sp-edit').addEventListener('click', () => {
-        this._openEditor(key, commentNode);
-      });
-
-      el.querySelector('.n3-sp-remove').addEventListener('click', () => {
-        if (confirm(`Remove ${this._getName(key)} script?`)) {
-          this._removeScript(key, commentNode);
-          el.remove();
-          this._placeholders = this._placeholders.filter(p => p.el !== el);
-        }
-      });
-
-      this._placeholders.push({ key, el, commentNode });
-    }
-
-    _openEditor(key, startComment) {
-      let content = '';
-      let node = startComment.nextSibling;
-      while (node) {
-        if (node.nodeType === 8 && node.textContent.trim() === `n3:script:${key}:end`) break;
-        if (node.nodeType === 1 && !node.classList.contains('n3-script-placeholder')) content += node.outerHTML;
-        node = node.nextSibling;
-      }
-
-      const modal = document.createElement('div');
-      modal.className = 'n3-script-editor-modal';
-      modal.setAttribute('data-n3-ui', '1');
-      modal.innerHTML = `
-        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;
-          display:flex;align-items:center;justify-content:center;padding:20px">
-          <div style="background:#1A1A1A;border-radius:12px;padding:24px;
-            width:100%;max-width:600px;max-height:80vh;overflow:auto;border:1px solid #333">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-              <h3 style="color:white;margin:0;font-size:16px">${this._getIcon(key)} ${this._getName(key)}</h3>
-              <button class="n3-se-close" style="background:none;border:none;color:#888;
-                font-size:20px;cursor:pointer">&#215;</button>
-            </div>
-            <textarea class="n3-se-code" style="width:100%;min-height:200px;background:#111;
-              color:#0f0;border:1px solid #333;border-radius:6px;padding:12px;
-              font-family:monospace;font-size:13px;resize:vertical;box-sizing:border-box">${this._escHtml(content)}</textarea>
-            <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
-              <button class="n3-se-cancel" style="background:#333;color:#ccc;border:none;
-                padding:8px 16px;border-radius:6px;cursor:pointer">Cancel</button>
-              <button class="n3-se-save" style="background:#E31337;color:white;border:none;
-                padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600">Save</button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-
-      modal.querySelector('.n3-se-close').onclick  = () => modal.remove();
-      modal.querySelector('.n3-se-cancel').onclick = () => modal.remove();
-      modal.querySelector('.n3-se-save').onclick   = () => {
-        const newCode = modal.querySelector('.n3-se-code').value;
-        this._updateScript(key, startComment, newCode);
-        modal.remove();
-      };
-    }
-
-    _updateScript(key, startComment, newHtml) {
-      let node = startComment.nextSibling;
-      while (node) {
-        if (node.nodeType === 8 && node.textContent.trim() === `n3:script:${key}:end`) break;
-        const next = node.nextSibling;
-        if (!node.classList || !node.classList.contains('n3-script-placeholder')) node.remove();
-        node = next;
-      }
-      const temp = document.createElement('div');
-      temp.innerHTML = newHtml;
-      const endComment = node;
-      while (temp.firstChild) {
-        startComment.parentNode.insertBefore(temp.firstChild, endComment);
-      }
-    }
-
-    _removeScript(key, startComment) {
-      let node = startComment.nextSibling;
-      while (node) {
-        const next = node.nextSibling;
-        if (node.nodeType === 8 && node.textContent.trim() === `n3:script:${key}:end`) {
-          node.remove();
-          break;
-        }
-        node.remove();
-        node = next;
-      }
-      startComment.remove();
-    }
-
-    _getIcon(key) {
-      const icons = {
-        'google-analytics': '📊', 'google-tag-manager': '🏷️', 'clarity': '🔍',
-        'meta-pixel': '📘', 'tiktok-pixel': '🎵', 'twitter-pixel': '🐦', 'hotjar': '🔥',
-        'plausible': '📈', 'pinterest-tag': '📌', 'linkedin-insight': '💼',
-        'snapchat-pixel': '👻', 'google-ads': '💰', 'custom-script': '🔧',
-      };
-      return icons[key] || '📜';
-    }
-
-    _getName(key) {
-      const names = {
-        'google-analytics': 'Google Analytics', 'google-tag-manager': 'Tag Manager',
-        'clarity': 'Microsoft Clarity', 'meta-pixel': 'Meta Pixel', 'tiktok-pixel': 'TikTok Pixel',
-        'twitter-pixel': 'X/Twitter Pixel', 'hotjar': 'Hotjar', 'plausible': 'Plausible',
-        'pinterest-tag': 'Pinterest Tag', 'linkedin-insight': 'LinkedIn Insight',
-        'snapchat-pixel': 'Snapchat Pixel', 'google-ads': 'Google Ads', 'custom-script': 'Custom Script',
-      };
-      return names[key] || key;
-    }
-
-    _escHtml(s) {
-      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
   }
 
@@ -2590,10 +2656,10 @@
         ? new N3Cloud(this._cloudCfg.api, this._cloudCfg.site, this._cloudCfg.key)
         : null;
       this.revPanel  = this.cloud ? new N3RevPanel(this.events, this.cloud) : null;
-      this.analytics        = new N3Analytics(this._cloudCfg);
-      this.components       = new N3Components(this.events, this._cloudCfg);
-      this.scriptPlaceholders = new N3ScriptPlaceholders(this.events, N3UI);
-      this._fab             = null;
+      this.analytics  = new N3Analytics(this._cloudCfg);
+      this.components = new N3Components(this.events, this._cloudCfg);
+      this.scripts    = new N3ScriptPlaceholders(this.events);
+      this._fab       = null;
       this._fabOpen   = false;
 
       this._onKeyDown = this._handleKeyDown.bind(this);
@@ -2655,7 +2721,7 @@
           text: this.text, drag: this.drag, controls: this.controls,
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
           analytics: this.analytics, components: this.components,
-          scriptPlaceholders: this.scriptPlaceholders,
+          scripts: this.scripts,
         },
       };
     }
@@ -2733,8 +2799,8 @@
       this.text.enable();
       this._markBlocks();
       this.controls.enable();
+      this.scripts.enable();
       this.toolbar.show();
-      this.scriptPlaceholders.enable();
       document.body.classList.add('n3-editing');
       this._syncEditBtn(true);
       document.addEventListener('click', this._onClickEl = this._handleClick.bind(this), true);
@@ -2748,7 +2814,7 @@
       this.text.disable();
       this._unmarkBlocks();
       this.controls.disable();
-      this.scriptPlaceholders.disable();
+      this.scripts.disable();
       this.toolbar.hide();
       this.panel.close();
       document.body.classList.remove('n3-editing');
