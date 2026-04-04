@@ -28,6 +28,7 @@ const migrateApi      = require('./src/api/migrate');
 const gaApi           = require('./src/api/ga');
 const componentsApi         = require('./src/api/components');
 const integrationsConfigApi = require('./src/api/integrations-config');
+const pagesApi              = require('./src/api/pages');
 
 // Initialize integrations (logs mock-mode notices)
 require('./src/integrations');
@@ -75,6 +76,12 @@ app.use('/api/sites/:id/revisions', (req, res, next) => {
   req.params = { ...req.params, id: req.params.id };
   next();
 }, revisionsApi);
+
+// ── Pages, components, manifest (v2, nested under sites) ─────────────────────
+app.use('/api/sites/:id', (req, res, next) => {
+  req.params = { ...req.params, id: req.params.id };
+  next();
+}, pagesApi);
 
 // ── Billing ───────────────────────────────────────────────────────────────────
 app.use('/api/billing', billingApi);

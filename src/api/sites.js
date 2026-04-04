@@ -17,6 +17,29 @@ const sanitizeHtml = require('sanitize-html');
 const storage      = require('../storage');
 const cache        = require('../cache');
 const { authOrApiKey } = require('./auth');
+const config       = require('../config');
+const gcsFiles     = require('../storage/gcs-files');
+
+// Firestore for domain → siteId mapping (only used when GCS is enabled)
+let _firestoreDb = null;
+function _getFirestore() {
+  if (!_firestoreDb) {
+    const { Firestore } = require('@google-cloud/firestore');
+    _firestoreDb = new Firestore({ projectId: config.gcpProject, ignoreUndefinedProperties: true });
+  }
+  return _firestoreDb;
+}
+
+const GCS_ENABLED = Boolean(process.env.GCS_BUCKET);
+
+/** Derive a URL-safe subdomain slug from a site name. */
+function _subdomain(name) {
+  return String(name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '') || 'site';
+}
 
 const router = express.Router();
 
@@ -40,17 +63,37 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { html = '', css = '', message = '', name } = req.body || {};
-    const id      = uuid();
-    const ownerId = req.authType === 'jwt' && req.user ? req.user.id : null;
-    const site    = await storage.saveSite(id, {
-      html:    _sanitize(html),
+    const id        = uuid();
+    const ownerId   = req.authType === 'jwt' && req.user ? req.user.id : null;
+    const finalName = name ? String(name).slice(0, 200) : 'Untitled Site';
+    const sanitized = _sanitize(html);
+    const subdomain = _subdomain(finalName);
+
+    const site = await storage.saveSite(id, {
+      html:    sanitized,
       css,
       message: String(message).slice(0, 500),
-      name:    name ? String(name).slice(0, 200) : 'Untitled Site',
+      name:    finalName,
       ownerId,
+      subdomain,
     });
+
+    // v2: write decomposed files to GCS + register domain in Firestore
+    if (GCS_ENABLED) {
+      try {
+        await gcsFiles.createSite(id, finalName, ownerId, sanitized);
+        await _getFirestore()
+          .collection('domains')
+          .doc(`${subdomain}.n3ware.com`)
+          .set({ siteId: id, subdomain, type: 'subdomain', createdAt: new Date().toISOString() });
+      } catch (gcsErr) {
+        // Non-fatal: log but don't fail the request — Firestore record is already saved
+        console.error(`[sites] GCS/domain write failed for ${id}:`, gcsErr.message);
+      }
+    }
+
     await cache.onSave(id);
-    res.status(201).json({ site });
+    res.status(201).json({ site: { ...site, subdomain } });
   } catch (err) {
     _error(res, 500, err);
   }
@@ -102,6 +145,13 @@ router.post('/:id/save', async (req, res) => {
     if (name !== undefined) updates.name = String(name).slice(0, 200);
 
     const site = await storage.saveSite(req.params.id, updates);
+
+    // v2: keep GCS page body in sync
+    if (GCS_ENABLED) {
+      gcsFiles.savePage(req.params.id, 'index', updates.html)
+        .catch(e => console.error(`[sites] GCS savePage failed for ${req.params.id}:`, e.message));
+    }
+
     await cache.onSave(req.params.id, _baseUrl(req));
     res.json({ site: _meta(site) });
   } catch (err) {
