@@ -57,9 +57,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'X-API-Key', 'Authorization', 'X-Requested-With'],
 }));
 
-// Handle OPTIONS preflight for all routes before auth middleware runs
-app.options('*', cors());
-
 // ── Raw body (Stripe webhook) — must come before express.json ────────────────
 app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
 
