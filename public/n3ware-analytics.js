@@ -575,15 +575,14 @@
 
       // ── Init N3Chart instances after DOM is ready ─────────────────────────
 
-      // 1. Traffic bar chart
+      // 1. Traffic line chart
       if (data.daily && data.daily.length) {
         this._makeChart('n3-chart-traffic', {
-          type: 'bar',
+          type: 'line',
           data: {
             labels:   data.daily.map(d => d.label || d.date.slice(5)),
-            datasets: [{ data: data.daily.map(d => d.views), backgroundColor: T.accent }],
+            datasets: [{ data: data.daily.map(d => d.views), borderColor: T.accent, backgroundColor: 'rgba(227,19,55,0.15)', fill: true }],
           },
-          options: { indexAxis: 'x', scales: { y: { beginAtZero: true } } },
         });
       }
 
