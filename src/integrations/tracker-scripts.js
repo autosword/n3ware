@@ -173,7 +173,19 @@ const INTEGRATIONS = [
 const INTEGRATIONS_MAP = Object.fromEntries(INTEGRATIONS.map(i => [i.key, i]));
 
 /**
+ * Wrap a script HTML string with n3 comment markers.
+ * Format: <!-- n3:script:KEY:start --> ... <!-- n3:script:KEY:end -->
+ * @param {string} key
+ * @param {string} scriptHtml
+ * @returns {string}
+ */
+function wrapScript(key, scriptHtml) {
+  return `<!-- n3:script:${key}:start -->\n${scriptHtml}\n<!-- n3:script:${key}:end -->`;
+}
+
+/**
  * Generate all enabled script tags for a site's integrations config.
+ * Each script is wrapped with n3 comment markers for editor detection.
  * @param {Object} integrationsConfig  e.g. { 'google-analytics': { enabled: true, measurementId: 'G-XXX' } }
  * @returns {string}  concatenated HTML to inject into <head>
  */
@@ -185,7 +197,7 @@ function generateScripts(integrationsConfig) {
     const integration = INTEGRATIONS_MAP[key];
     if (!integration) continue;
     try {
-      parts.push(integration.generateScript(cfg));
+      parts.push(wrapScript(key, integration.generateScript(cfg)));
     } catch (e) {
       console.warn(`[integrations] generateScript failed for ${key}:`, e.message);
     }
@@ -193,4 +205,4 @@ function generateScripts(integrationsConfig) {
   return parts.join('\n');
 }
 
-module.exports = { INTEGRATIONS, INTEGRATIONS_MAP, generateScripts };
+module.exports = { INTEGRATIONS, INTEGRATIONS_MAP, generateScripts, wrapScript };

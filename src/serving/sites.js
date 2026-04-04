@@ -14,7 +14,7 @@
 const storage        = require('../storage');
 const cache          = require('../cache');
 const config         = require('../config');
-const { generateScripts } = require('../integrations/tracker-scripts');
+const { generateScripts, wrapScript } = require('../integrations/tracker-scripts');
 
 const CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=60';
 
@@ -49,8 +49,11 @@ function serveSites() {
 
 /**
  * Inject tracker scripts into <head> (before </head>).
+ * Scripts are pre-wrapped with <!-- n3:script:KEY:start/end --> markers
+ * by generateScripts() so the editor can show visual placeholders.
+ * wrapScript is also exported from tracker-scripts for use elsewhere.
  * @param {string} html
- * @param {string} scripts  raw HTML from generateScripts()
+ * @param {string} scripts  raw HTML from generateScripts() (already wrapped)
  * @returns {string}
  */
 function _injectTrackers(html, scripts) {

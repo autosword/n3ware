@@ -472,6 +472,8 @@
       clone.querySelectorAll('[data-n3-ui]').forEach(e => e.remove());
       clone.querySelectorAll('#n3ware-styles').forEach(e => e.remove());
       clone.querySelectorAll('.n3-controls,.n3-format-bar,.n3-drop-line,.n3-toast').forEach(e => e.remove());
+      // Strip script placeholder UI elements (keep the actual comment markers + scripts between them)
+      clone.querySelectorAll('.n3-script-placeholder').forEach(e => e.remove());
       clone.querySelectorAll('[data-n3-editable]').forEach(e => {
         e.removeAttribute('data-n3-editable');
         e.removeAttribute('contenteditable');
@@ -1447,14 +1449,16 @@
       });
 
       document.addEventListener('drop', this._onDrop = e => {
-        const html = e.dataTransfer && e.dataTransfer.getData('application/n3-component');
+        const html   = e.dataTransfer && e.dataTransfer.getData('application/n3-component');
         if (!html) return;
         e.preventDefault();
+        const compId = (e.dataTransfer && e.dataTransfer.getData('application/n3-component-id')) || this._draggingId || null;
         const target = this._dropTarget || e.target.closest('[data-n3-block]') || null;
         if (this._dropTarget) { this._dropTarget.classList.remove('n3-comp-drop-target'); this._dropTarget = null; }
-        this._insert(html, target);
+        this._insert(html, target, compId);
         N3UI.toast('Component added', 'success', 2000);
-        this._dragging = null;
+        this._dragging   = null;
+        this._draggingId = null;
       });
     }
 
@@ -1557,14 +1561,17 @@
         if (!comp) return;
 
         item.addEventListener('dragstart', e => {
-          this._dragging = comp.html;
+          this._dragging   = comp.html;
+          this._draggingId = comp.id;
           e.dataTransfer.setData('application/n3-component', comp.html);
+          e.dataTransfer.setData('application/n3-component-id', comp.id);
           e.dataTransfer.effectAllowed = 'copy';
           item.style.opacity = '0.45';
         });
         item.addEventListener('dragend', () => {
           item.style.opacity = '';
-          this._dragging = null;
+          this._dragging   = null;
+          this._draggingId = null;
           if (this._dropTarget) { this._dropTarget.classList.remove('n3-comp-drop-target'); this._dropTarget = null; }
         });
       });
@@ -1576,7 +1583,7 @@
           if (!comp) return;
           // Insert after currently selected block, or at end of body
           const selected = document.querySelector('.n3-selected');
-          this._insert(comp.html, selected);
+          this._insert(comp.html, selected, comp.id);
           N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
         });
       });
@@ -1586,8 +1593,9 @@
      * Parse and insert the component HTML at/after a target block.
      * @param {string} html
      * @param {Element|null} target  — insert after this; null = append to body
+     * @param {string|null} compId  — component id for comment wrapper markers
      */
-    _insert(html, target) {
+    _insert(html, target, compId) {
       // Ensure Tailwind CDN is present when inserting Tailwind components
       if (!document.querySelector('script[src*="tailwindcss"]')) {
         const tw  = document.createElement('script');
@@ -1613,6 +1621,14 @@
         }
       }
 
+      // Wrap with n3:component comment markers if a component ID is provided
+      if (compId) {
+        const startComment = document.createComment(`n3:component:${compId}:start`);
+        const endComment   = document.createComment(`n3:component:${compId}:end`);
+        node.parentNode.insertBefore(startComment, node);
+        node.parentNode.insertBefore(endComment, node.nextSibling);
+      }
+
       // Mark for editing
       node.setAttribute('data-n3-block', '1');
       node.querySelectorAll(SEL.block).forEach(el => {
@@ -1628,6 +1644,174 @@
 
       this._events.emit('component:insert', node);
       node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // N3ScriptPlaceholders — visual UI for injected tracking scripts
+  // Scans for n3:script:KEY:start comment nodes and renders clickable blocks
+  // ═══════════════════════════════════════════════════════════════════════════
+  class N3ScriptPlaceholders {
+    constructor(events, ui) {
+      this._events       = events;
+      this._ui           = ui;
+      this._placeholders = [];
+    }
+
+    enable() {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
+      while (walker.nextNode()) {
+        const match = walker.currentNode.textContent.trim().match(/^n3:script:(.+):start$/);
+        if (match) {
+          this._createPlaceholder(match[1], walker.currentNode);
+        }
+      }
+    }
+
+    disable() {
+      this._placeholders.forEach(p => p.el.remove());
+      this._placeholders = [];
+    }
+
+    _createPlaceholder(key, commentNode) {
+      const el = document.createElement('div');
+      el.className = 'n3-script-placeholder';
+      el.setAttribute('data-n3-script', key);
+      el.setAttribute('data-n3-ui', '1');
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;
+          background:#1A1A1A;border:1px dashed #E31337;border-radius:8px;
+          color:#ccc;font-size:13px;font-family:system-ui;cursor:pointer;
+          margin:8px 0;">
+          <span style="font-size:20px">${this._getIcon(key)}</span>
+          <div>
+            <div style="font-weight:600;color:white">${this._getName(key)}</div>
+            <div style="font-size:11px;color:#888">Click to edit &bull; Script tag</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:4px">
+            <button class="n3-sp-edit" style="background:#E31337;color:white;border:none;
+              padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer">Edit</button>
+            <button class="n3-sp-remove" style="background:#333;color:#ccc;border:none;
+              padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer">Remove</button>
+          </div>
+        </div>
+      `;
+
+      commentNode.parentNode.insertBefore(el, commentNode.nextSibling);
+
+      el.querySelector('.n3-sp-edit').addEventListener('click', () => {
+        this._openEditor(key, commentNode);
+      });
+
+      el.querySelector('.n3-sp-remove').addEventListener('click', () => {
+        if (confirm(`Remove ${this._getName(key)} script?`)) {
+          this._removeScript(key, commentNode);
+          el.remove();
+          this._placeholders = this._placeholders.filter(p => p.el !== el);
+        }
+      });
+
+      this._placeholders.push({ key, el, commentNode });
+    }
+
+    _openEditor(key, startComment) {
+      let content = '';
+      let node = startComment.nextSibling;
+      while (node) {
+        if (node.nodeType === 8 && node.textContent.trim() === `n3:script:${key}:end`) break;
+        if (node.nodeType === 1 && !node.classList.contains('n3-script-placeholder')) content += node.outerHTML;
+        node = node.nextSibling;
+      }
+
+      const modal = document.createElement('div');
+      modal.className = 'n3-script-editor-modal';
+      modal.setAttribute('data-n3-ui', '1');
+      modal.innerHTML = `
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100000;
+          display:flex;align-items:center;justify-content:center;padding:20px">
+          <div style="background:#1A1A1A;border-radius:12px;padding:24px;
+            width:100%;max-width:600px;max-height:80vh;overflow:auto;border:1px solid #333">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <h3 style="color:white;margin:0;font-size:16px">${this._getIcon(key)} ${this._getName(key)}</h3>
+              <button class="n3-se-close" style="background:none;border:none;color:#888;
+                font-size:20px;cursor:pointer">&#215;</button>
+            </div>
+            <textarea class="n3-se-code" style="width:100%;min-height:200px;background:#111;
+              color:#0f0;border:1px solid #333;border-radius:6px;padding:12px;
+              font-family:monospace;font-size:13px;resize:vertical;box-sizing:border-box">${this._escHtml(content)}</textarea>
+            <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+              <button class="n3-se-cancel" style="background:#333;color:#ccc;border:none;
+                padding:8px 16px;border-radius:6px;cursor:pointer">Cancel</button>
+              <button class="n3-se-save" style="background:#E31337;color:white;border:none;
+                padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600">Save</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      modal.querySelector('.n3-se-close').onclick  = () => modal.remove();
+      modal.querySelector('.n3-se-cancel').onclick = () => modal.remove();
+      modal.querySelector('.n3-se-save').onclick   = () => {
+        const newCode = modal.querySelector('.n3-se-code').value;
+        this._updateScript(key, startComment, newCode);
+        modal.remove();
+      };
+    }
+
+    _updateScript(key, startComment, newHtml) {
+      let node = startComment.nextSibling;
+      while (node) {
+        if (node.nodeType === 8 && node.textContent.trim() === `n3:script:${key}:end`) break;
+        const next = node.nextSibling;
+        if (!node.classList || !node.classList.contains('n3-script-placeholder')) node.remove();
+        node = next;
+      }
+      const temp = document.createElement('div');
+      temp.innerHTML = newHtml;
+      const endComment = node;
+      while (temp.firstChild) {
+        startComment.parentNode.insertBefore(temp.firstChild, endComment);
+      }
+    }
+
+    _removeScript(key, startComment) {
+      let node = startComment.nextSibling;
+      while (node) {
+        const next = node.nextSibling;
+        if (node.nodeType === 8 && node.textContent.trim() === `n3:script:${key}:end`) {
+          node.remove();
+          break;
+        }
+        node.remove();
+        node = next;
+      }
+      startComment.remove();
+    }
+
+    _getIcon(key) {
+      const icons = {
+        'google-analytics': '📊', 'google-tag-manager': '🏷️', 'clarity': '🔍',
+        'meta-pixel': '📘', 'tiktok-pixel': '🎵', 'twitter-pixel': '🐦', 'hotjar': '🔥',
+        'plausible': '📈', 'pinterest-tag': '📌', 'linkedin-insight': '💼',
+        'snapchat-pixel': '👻', 'google-ads': '💰', 'custom-script': '🔧',
+      };
+      return icons[key] || '📜';
+    }
+
+    _getName(key) {
+      const names = {
+        'google-analytics': 'Google Analytics', 'google-tag-manager': 'Tag Manager',
+        'clarity': 'Microsoft Clarity', 'meta-pixel': 'Meta Pixel', 'tiktok-pixel': 'TikTok Pixel',
+        'twitter-pixel': 'X/Twitter Pixel', 'hotjar': 'Hotjar', 'plausible': 'Plausible',
+        'pinterest-tag': 'Pinterest Tag', 'linkedin-insight': 'LinkedIn Insight',
+        'snapchat-pixel': 'Snapchat Pixel', 'google-ads': 'Google Ads', 'custom-script': 'Custom Script',
+      };
+      return names[key] || key;
+    }
+
+    _escHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
   }
 
@@ -2406,9 +2590,10 @@
         ? new N3Cloud(this._cloudCfg.api, this._cloudCfg.site, this._cloudCfg.key)
         : null;
       this.revPanel  = this.cloud ? new N3RevPanel(this.events, this.cloud) : null;
-      this.analytics  = new N3Analytics(this._cloudCfg);
-      this.components = new N3Components(this.events, this._cloudCfg);
-      this._fab       = null;
+      this.analytics        = new N3Analytics(this._cloudCfg);
+      this.components       = new N3Components(this.events, this._cloudCfg);
+      this.scriptPlaceholders = new N3ScriptPlaceholders(this.events, N3UI);
+      this._fab             = null;
       this._fabOpen   = false;
 
       this._onKeyDown = this._handleKeyDown.bind(this);
@@ -2470,6 +2655,7 @@
           text: this.text, drag: this.drag, controls: this.controls,
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
           analytics: this.analytics, components: this.components,
+          scriptPlaceholders: this.scriptPlaceholders,
         },
       };
     }
@@ -2548,6 +2734,7 @@
       this._markBlocks();
       this.controls.enable();
       this.toolbar.show();
+      this.scriptPlaceholders.enable();
       document.body.classList.add('n3-editing');
       this._syncEditBtn(true);
       document.addEventListener('click', this._onClickEl = this._handleClick.bind(this), true);
@@ -2561,6 +2748,7 @@
       this.text.disable();
       this._unmarkBlocks();
       this.controls.disable();
+      this.scriptPlaceholders.disable();
       this.toolbar.hide();
       this.panel.close();
       document.body.classList.remove('n3-editing');
