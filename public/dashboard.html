@@ -36,6 +36,7 @@
 <!-- ── AUTH SCREEN ──────────────────────────────────────────────────────────── -->
 <div id="auth-screen" class="min-h-screen flex items-center justify-center px-4">
   <div class="w-full max-w-md">
+    <!-- Logo -->
     <div class="text-center mb-8">
       <div class="inline-flex items-center gap-2 mb-3">
         <div class="w-9 h-9 bg-[#E31337] rounded-xl flex items-center justify-center font-black text-white text-lg">n</div>
@@ -43,26 +44,43 @@
       </div>
       <p class="text-[#888888] text-sm">Visual editing, powered by the cloud</p>
     </div>
-    <div class="flex bg-[#1A1A1A] rounded-xl p-1 mb-6">
-      <button id="tab-login" onclick="switchTab('login')"
-        class="flex-1 py-2 rounded-lg text-sm font-semibold transition bg-[#2A2A2A] text-white">Sign In</button>
-      <button id="tab-register" onclick="switchTab('register')"
-        class="flex-1 py-2 rounded-lg text-sm font-semibold transition text-[#888888]">Create Account</button>
-    </div>
-    <div class="bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-2xl p-8">
-      <form id="auth-form" onsubmit="submitAuth(event)">
+
+    <!-- Step 1: Email input -->
+    <div id="auth-step-email" class="bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-2xl p-8">
+      <h2 class="text-xl font-bold text-[#E5E5E5] mb-2">Sign in to n3ware</h2>
+      <p class="text-[#888888] text-sm mb-6">Enter your email and we'll send you a magic sign-in link.</p>
+      <form id="magic-form" onsubmit="submitMagicLink(event)">
         <div class="mb-4">
-          <label class="block text-sm font-medium text-[#E5E5E5] mb-1.5">Email</label>
-          <input type="email" id="auth-email" required placeholder="you@company.com" class="w-full rounded-xl px-4 py-3 text-sm">
+          <label class="block text-sm font-medium text-[#E5E5E5] mb-1.5">Email address</label>
+          <input type="email" id="auth-email" required placeholder="you@example.com"
+            class="w-full rounded-xl px-4 py-3 text-sm">
         </div>
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-[#E5E5E5] mb-1.5">Password</label>
-          <input type="password" id="auth-password" required placeholder="••••••••" minlength="8" class="w-full rounded-xl px-4 py-3 text-sm">
-        </div>
-        <button type="submit" id="auth-btn"
-          class="w-full bg-[#E31337] hover:bg-[#E31337] text-white font-bold py-3 rounded-xl transition text-sm">Sign In</button>
+        <button type="submit" id="magic-btn"
+          class="w-full bg-[#E31337] text-white font-bold py-3 rounded-xl transition text-sm">
+          Send Magic Link →
+        </button>
         <p id="auth-error" class="text-red-400 text-sm text-center mt-3 hidden"></p>
       </form>
+      <p class="text-[#555555] text-xs text-center mt-5">No password needed. New here? You'll be signed up automatically.</p>
+    </div>
+
+    <!-- Step 2: Check your email -->
+    <div id="auth-step-sent" class="bg-[#1A1A1A]/60 border border-[#2A2A2A] rounded-2xl p-8 hidden">
+      <div class="text-center mb-6">
+        <div class="text-5xl mb-4">✉️</div>
+        <h2 class="text-xl font-bold text-[#E5E5E5] mb-2">Check your email</h2>
+        <p class="text-[#888888] text-sm">We sent a sign-in link to</p>
+        <p id="auth-sent-email" class="text-[#E5E5E5] font-semibold text-sm mt-1"></p>
+      </div>
+      <p class="text-[#666666] text-sm text-center mb-6">Click the link in the email to sign in.<br>It expires in 15 minutes.</p>
+      <button onclick="resendMagicLink()"
+        class="w-full border border-[#2A2A2A] text-[#E5E5E5] font-semibold py-3 rounded-xl transition text-sm hover:border-[#E31337] hover:text-[#E31337] mb-4">
+        Resend Link
+      </button>
+      <p class="text-[#555555] text-xs text-center">Didn't get it? Check your spam folder.</p>
+      <p class="text-center mt-3">
+        <button onclick="showEmailStep()" class="text-[#666666] text-xs hover:text-[#E5E5E5] transition">← Use a different email</button>
+      </p>
     </div>
   </div>
 </div>
@@ -512,42 +530,77 @@ function toast(msg, type = 'info') {
   setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 350); }, 3000);
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
-function switchTab(mode) {
-  S.authMode = mode;
-  const isLogin = mode === 'login';
-  document.getElementById('tab-login').className = `flex-1 py-2 rounded-lg text-sm font-semibold transition ${isLogin ? 'bg-[#2A2A2A] text-white' : 'text-[#888888]'}`;
-  document.getElementById('tab-register').className = `flex-1 py-2 rounded-lg text-sm font-semibold transition ${!isLogin ? 'bg-[#2A2A2A] text-white' : 'text-[#888888]'}`;
-  document.getElementById('auth-btn').textContent = isLogin ? 'Sign In' : 'Create Account';
+// ── Auth — Magic Link ─────────────────────────────────────────────────────────
+
+// Pick up JWT from URL hash set by /api/auth/verify redirect
+(function pickUpMagicToken() {
+  const m = window.location.hash.match(/[#&]token=([^&]+)/);
+  if (m) {
+    S.token = decodeURIComponent(m[1]);
+    localStorage.setItem('n3_token', S.token);
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+  // Pick up auth_error from query string on failed verify
+  const errParam = new URL(window.location.href).searchParams.get('auth_error');
+  if (errParam) {
+    history.replaceState(null, '', window.location.pathname);
+    const errEl = document.getElementById('auth-error');
+    if (errEl) { errEl.textContent = errParam; errEl.classList.remove('hidden'); }
+  }
+})();
+
+function showEmailStep() {
+  document.getElementById('auth-step-email').classList.remove('hidden');
+  document.getElementById('auth-step-sent').classList.add('hidden');
   document.getElementById('auth-error').classList.add('hidden');
 }
-async function submitAuth(e) {
+
+function showSentStep(email) {
+  document.getElementById('auth-step-email').classList.add('hidden');
+  document.getElementById('auth-step-sent').classList.remove('hidden');
+  document.getElementById('auth-sent-email').textContent = email;
+}
+
+async function submitMagicLink(e) {
   e.preventDefault();
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const btn = document.getElementById('auth-btn');
-  const errEl = document.getElementById('auth-error');
+  const email  = document.getElementById('auth-email').value.trim();
+  const btn    = document.getElementById('magic-btn');
+  const errEl  = document.getElementById('auth-error');
   errEl.classList.add('hidden');
   btn.disabled = true;
-  btn.textContent = S.authMode === 'login' ? 'Signing in…' : 'Creating account…';
+  btn.textContent = 'Sending…';
   try {
-    const data = await api('POST', `/api/auth/${S.authMode === 'login' ? 'login' : 'register'}`, { email, password });
-    S.token = data.token; S.user = data.user;
-    localStorage.setItem('n3_token', S.token);
-    showDashboard();
+    const data = await api('POST', '/api/auth/magic', { email });
+    // Dev/mock mode: link returned in response — follow it automatically
+    if (data.magicUrl) {
+      console.log('[magic-link] Dev mode — auto-opening:', data.magicUrl);
+      window.location.href = data.magicUrl;
+      return;
+    }
+    showSentStep(email);
   } catch (err) {
-    errEl.textContent = err.message; errEl.classList.remove('hidden');
-  } finally {
+    errEl.textContent = err.message;
+    errEl.classList.remove('hidden');
     btn.disabled = false;
-    btn.textContent = S.authMode === 'login' ? 'Sign In' : 'Create Account';
+    btn.textContent = 'Send Magic Link →';
   }
 }
+
+async function resendMagicLink() {
+  const email = document.getElementById('auth-sent-email').textContent ||
+                document.getElementById('auth-email').value.trim();
+  if (!email) { showEmailStep(); return; }
+  showEmailStep();
+  document.getElementById('auth-email').value = email;
+  await submitMagicLink({ preventDefault: () => {} });
+}
+
 function logout() {
   S.token = ''; S.user = null; S.sites = [];
   localStorage.removeItem('n3_token');
   document.getElementById('dashboard').classList.add('hidden');
   document.getElementById('auth-screen').classList.remove('hidden');
-  switchTab('login');
+  showEmailStep();
 }
 async function checkAuth() {
   if (!S.token) return showAuth();
@@ -560,6 +613,7 @@ async function checkAuth() {
 function showAuth() {
   document.getElementById('auth-screen').classList.remove('hidden');
   document.getElementById('dashboard').classList.add('hidden');
+  showEmailStep();
 }
 async function showDashboard() {
   document.getElementById('auth-screen').classList.add('hidden');

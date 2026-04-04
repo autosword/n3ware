@@ -241,4 +241,56 @@ async function sendWeeklyReport(email, stats) {
   return _send(email, subject, html);
 }
 
-module.exports = { sendWelcome, sendPasswordReset, sendSitePublished, sendWeeklyReport };
+/**
+ * Send a magic sign-in link email.
+ * @param {string} email
+ * @param {string} magicUrl
+ * @returns {Promise<{ messageId: string, mock?: boolean }>}
+ */
+async function sendMagicLink(email, magicUrl) {
+  const subject = 'Your n3ware sign-in link';
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0A0A0A;font-family:system-ui,-apple-system,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0A0A0A;padding:40px 16px">
+    <tr><td align="center">
+      <table width="480" cellpadding="0" cellspacing="0" style="background:#1A1A1A;border:1px solid #2A2A2A;border-radius:16px;overflow:hidden;max-width:480px;width:100%">
+        <tr><td style="padding:32px 32px 0;text-align:center">
+          <div style="display:inline-block;width:40px;height:40px;background:#E31337;border-radius:10px;text-align:center;line-height:40px;font-weight:900;font-size:18px;color:#fff;vertical-align:middle;margin-right:10px">N3</div>
+          <span style="font-size:22px;font-weight:800;color:#E5E5E5;vertical-align:middle">n3ware</span>
+        </td></tr>
+        <tr><td style="padding:28px 32px 8px;text-align:center">
+          <h1 style="margin:0;font-size:24px;font-weight:700;color:#E5E5E5;letter-spacing:-0.5px">Sign in to n3ware</h1>
+          <p style="margin:12px 0 0;font-size:15px;color:#888888;line-height:1.5">Click the button below to sign in to your account.<br>No password needed.</p>
+        </td></tr>
+        <tr><td style="padding:28px 32px">
+          <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+            <a href="${magicUrl}" style="display:inline-block;background:#E31337;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:14px 40px;border-radius:10px">Sign In to n3ware &rarr;</a>
+          </td></tr></table>
+        </td></tr>
+        <tr><td style="padding:0 32px 24px;text-align:center">
+          <p style="margin:0;font-size:13px;color:#666666">This link expires in <strong style="color:#888888">15 minutes</strong> and can only be used once.</p>
+        </td></tr>
+        <tr><td style="padding:0 32px"><div style="border-top:1px solid #2A2A2A"></div></td></tr>
+        <tr><td style="padding:20px 32px;text-align:center">
+          <p style="margin:0;font-size:12px;color:#555555">If you didn't request this sign-in link, you can safely ignore this email.</p>
+        </td></tr>
+        <tr><td style="padding:16px 32px 28px;text-align:center">
+          <p style="margin:0;font-size:12px;color:#444444">n3ware &middot; South Kingstown, RI</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  if (isMock) {
+    console.log(`\n[magic-link] Sign-in link for ${email}:\n  ${magicUrl}\n`);
+    _logEmail(email, subject, html);
+    return { messageId: `mock_${Date.now()}`, mock: true };
+  }
+  return _send(email, subject, html);
+}
+
+module.exports = { sendWelcome, sendPasswordReset, sendSitePublished, sendWeeklyReport, sendMagicLink };

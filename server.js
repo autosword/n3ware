@@ -18,6 +18,7 @@ const serveSites   = require('./src/serving/sites');
 const sitesApi     = require('./src/api/sites');
 const revisionsApi = require('./src/api/revisions');
 const authRoutes   = require('./src/api/authRoutes');
+const magicAuth    = require('./src/api/magic-auth');
 const templates    = require('./src/api/templates');
 const billingApi   = require('./src/api/billing');
 const domainsApi   = require('./src/api/domains');
@@ -60,6 +61,7 @@ const dataDir = process.env.DATA_DIR
 app.use('/uploads', express.static(path.join(dataDir, 'uploads')));
 
 // ── Auth routes ───────────────────────────────────────────────────────────────
+app.use('/api/auth',      magicAuth);
 app.use('/api/auth',      authRoutes);
 
 // ── Template routes ───────────────────────────────────────────────────────────
