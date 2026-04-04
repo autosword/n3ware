@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>N3Chart Demo — n3ware</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0A0A0A;
+      color: #E5E5E5;
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 32px 24px 48px;
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      text-decoration: none;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      background: #E31337;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      color: #fff;
+      letter-spacing: -1px;
+    }
+    .brand-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: #E5E5E5;
+      letter-spacing: -0.5px;
+    }
+    .brand-name span { color: #E31337; }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #E5E5E5;
+      letter-spacing: -0.5px;
+    }
+    .header p {
+      margin-top: 8px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* ── Charts grid ── */
+    .charts-grid {
+      display: flex;
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .chart-card {
+      flex: 1;
+      background: #1A1A1A;
+      border: 1px solid #2A2A2A;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 0;
+    }
+
+    .chart-card h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 240px;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    /* ── Doughnut legend ── */
+    .legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #999;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .charts-grid {
+        flex-direction: column;
+      }
+      .header h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a class="brand" href="/">
+      <div class="brand-mark">N3</div>
+      <span class="brand-name">n3<span>ware</span></span>
+    </a>
+    <h1>N3Chart Library Demo</h1>
+    <p>Zero-dependency canvas charting — bar, doughnut &amp; line</p>
+  </div>
+
+  <div class="charts-grid">
+
+    <!-- LEFT: Device Breakdown (doughnut) -->
+    <div class="chart-card">
+      <h2>Device Breakdown</h2>
+      <div class="canvas-wrap">
+        <canvas id="chart-device"></canvas>
+      </div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#E31337"></div>
+          <span>Mobile — 65%</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#22C55E"></div>
+          <span>Desktop — 30%</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#EAB308"></div>
+          <span>Tablet — 5%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Daily Visits line chart -->
+    <div class="chart-card">
+      <h2>Daily Visits — Last 14 Days</h2>
+      <div class="canvas-wrap">
+        <canvas id="chart-visits"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap _n3wareModules before loading the chart lib -->
+  <script>window._n3wareModules = window._n3wareModules || {};</script>
+  <script src="./n3ware-charts.js"></script>
+  <script>
+    const { N3Chart } = window._n3wareModules;
+
+    // ── Device Breakdown (doughnut) ─────────────────────────────────────────
+    new N3Chart(document.getElementById('chart-device'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Mobile', 'Desktop', 'Tablet'],
+        datasets: [{
+          data: [65, 30, 5],
+          backgroundColor: ['#E31337', '#22C55E', '#EAB308']
+        }]
+      },
+      options: {
+        centerText:    '65%',
+        centerSubtext: 'Mobile'
+      }
+    });
+
+    // ── Daily Visits (line) ─────────────────────────────────────────────────
+    new N3Chart(document.getElementById('chart-visits'), {
+      type: 'line',
+      data: {
+        labels: ['Sat','Sun','Mon','Tue','Wed','Thu','Fri','Sat','Sun','Mon','Tue','Wed','Thu','Fri'],
+        datasets: [{
+          data: [89, 124, 107, 95, 78, 62, 56, 98, 131, 118, 103, 86, 71, 143],
+          borderColor: '#E31337',
+          backgroundColor: 'rgba(227,19,55,0.12)',
+          fill: true
+        }]
+      }
+    });
+  </script>
+
+</body>
+</html>

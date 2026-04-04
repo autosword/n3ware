@@ -1,6 +1,6 @@
 /**
  * n3ware-charts — Zero-dependency canvas charting library (Chart.js-compatible API).
- * N3Chart: supports bar (vertical/horizontal) and doughnut chart types.
+ * N3Chart: supports bar (vertical/horizontal), doughnut, and line chart types.
  * Registers on window._n3wareModules.
  */
 (function() { 'use strict';
@@ -92,6 +92,7 @@
       ctx.clearRect(0, 0, this._w, this._h);
 
       if (type === 'doughnut') { this._drawDoughnut(pct); return; }
+      if (type === 'line')     { this._drawLine(pct);     return; }
       if (horiz)                { this._drawHBar(pct);     return; }
       this._drawBar(pct);
     }
@@ -283,6 +284,122 @@
       this._cx = cx; this._cy = cy; this._r = r; this._inner = inner;
     }
 
+    // ── Line chart ────────────────────────────────────────────────────────
+    _drawLine(pct) {
+      const { data, options = {} } = this._cfg;
+      const labels  = data.labels || [];
+      const dataset = data.datasets[0] || {};
+      const values  = dataset.data || [];
+      if (!values.length) return;
+
+      const ctx       = this._ctx;
+      const PAD_L     = 40;
+      const PAD_R     = 12;
+      const PAD_T     = 14;
+      const PAD_B     = 28;
+      const chartW    = this._w - PAD_L - PAD_R;
+      const chartH    = this._h - PAD_T - PAD_B;
+      const maxVal    = Math.max(...values, 1);
+      const minVal    = 0;
+      const range     = maxVal - minVal || 1;
+      const n         = values.length;
+      const gridClr   = '#2A2A2A';
+      const txtClr    = '#888888';
+      const gridLines = 4;
+      const lineColor = dataset.borderColor || '#E31337';
+      const fillColor = dataset.backgroundColor || 'rgba(227,19,55,0.12)';
+
+      // Point positions
+      const pts = values.map((v, i) => ({
+        x: PAD_L + (n > 1 ? (i / (n - 1)) * chartW : chartW / 2),
+        y: PAD_T + chartH - ((v - minVal) / range) * chartH
+      }));
+
+      // Grid lines + Y labels
+      ctx.strokeStyle = gridClr;
+      ctx.lineWidth   = 1;
+      ctx.fillStyle   = txtClr;
+      ctx.font        = '10px system-ui,sans-serif';
+      ctx.textAlign   = 'right';
+      for (let i = 0; i <= gridLines; i++) {
+        const y   = PAD_T + chartH - (i / gridLines) * chartH;
+        const val = Math.round(minVal + (i / gridLines) * range);
+        ctx.beginPath();
+        ctx.moveTo(PAD_L, y);
+        ctx.lineTo(PAD_L + chartW, y);
+        ctx.globalAlpha = 0.4;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.fillText(val >= 1000 ? (val / 1000).toFixed(1) + 'k' : val, PAD_L - 4, y + 3);
+      }
+
+      // X labels (show ~7 max to avoid crowding)
+      ctx.fillStyle = txtClr;
+      ctx.textAlign = 'center';
+      ctx.font      = '10px system-ui,sans-serif';
+      const step = Math.max(1, Math.ceil(n / 7));
+      pts.forEach((p, i) => {
+        if (i % step === 0 || i === n - 1) {
+          ctx.fillText(String(labels[i] !== undefined ? labels[i] : '').slice(0, 4), p.x, PAD_T + chartH + 16);
+        }
+      });
+
+      // Animate: clip left-to-right
+      const clipX = PAD_L + pct * chartW + 1;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, clipX, this._h);
+      ctx.clip();
+
+      // Fill area under line
+      if (dataset.fill !== false) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, PAD_T + chartH);
+        ctx.lineTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < n; i++) {
+          const prev = pts[i - 1], curr = pts[i];
+          const cpx1 = prev.x + (curr.x - prev.x) * 0.4;
+          const cpx2 = curr.x - (curr.x - prev.x) * 0.4;
+          ctx.bezierCurveTo(cpx1, prev.y, cpx2, curr.y, curr.x, curr.y);
+        }
+        ctx.lineTo(pts[n - 1].x, PAD_T + chartH);
+        ctx.closePath();
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+      }
+
+      // Line
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < n; i++) {
+        const prev = pts[i - 1], curr = pts[i];
+        const cpx1 = prev.x + (curr.x - prev.x) * 0.4;
+        const cpx2 = curr.x - (curr.x - prev.x) * 0.4;
+        ctx.bezierCurveTo(cpx1, prev.y, cpx2, curr.y, curr.x, curr.y);
+      }
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth   = 2.5;
+      ctx.lineJoin    = 'round';
+      ctx.stroke();
+
+      // Dots
+      pts.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle   = lineColor;
+        ctx.fill();
+        ctx.strokeStyle = '#0A0A0A';
+        ctx.lineWidth   = 1.5;
+        ctx.stroke();
+      });
+
+      ctx.restore();
+
+      // Store for hover
+      this._linePts = pts.map((p, i) => ({ x: p.x, y: p.y, label: labels[i], value: values[i] }));
+      this._lineHoveredIdx = -1;
+    }
+
     // ── Tooltip & hover ────────────────────────────────────────────────────
     _getTooltip() {
       if (!this._tooltip) {
@@ -312,6 +429,17 @@
       const my     = e.clientY - rect.top;
       const type   = this._cfg.type;
       const horiz  = type === 'bar' && this._cfg.options && this._cfg.options.indexAxis === 'y';
+
+      if (type === 'line' && this._linePts) {
+        let closest = null, minDist = 20;
+        this._linePts.forEach(p => {
+          const d = Math.sqrt((mx - p.x) ** 2 + (my - p.y) ** 2);
+          if (d < minDist) { minDist = d; closest = p; }
+        });
+        if (closest) { this._showTooltip(e.clientX, e.clientY, closest.label, closest.value); return; }
+        this._hideTooltip();
+        return;
+      }
 
       if (type === 'doughnut' && this._arcs) {
         const dx   = mx - this._cx;
