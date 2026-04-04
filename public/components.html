@@ -9,7 +9,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: { n3: { red: '#E31837', dark: '#111111', darker: '#0A0A0A', surface: '#1A1A1A', border: '#2A2A2A', text: '#E5E5E5', muted: '#888888' }, brand: '#E31837' },
+          colors: { n3: { red: '#E31337', dark: '#111111', darker: '#0A0A0A', surface: '#1A1A1A', border: '#2A2A2A', text: '#E5E5E5', muted: '#888888' }, brand: '#E31337' },
           fontFamily: { mono: ['JetBrains Mono', 'Fira Code', 'monospace'] }
         }
       }
@@ -21,7 +21,7 @@
     body { font-family: 'Inter', sans-serif; }
 
     .gradient-text {
-      background: linear-gradient(135deg, #E31837 0%, #FF4D6A 60%, #FF8096 100%);
+      background: linear-gradient(135deg, #E31337 0%, #FF4D6A 60%, #FF8096 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -86,7 +86,7 @@
       cursor: pointer; text-align: left; border: none; background: transparent;
     }
     .cat-btn:hover { background: #1A1A1A; color: #E5E5E5; }
-    .cat-btn.active { background: #E31837; color: #fff; }
+    .cat-btn.active { background: #E31337; color: #fff; }
     .cat-btn.active .cat-count { background: rgba(255,255,255,0.2); color: #fff; }
     .cat-count {
       font-size: 11px; font-weight: 600; background: #1A1A1A;
@@ -103,7 +103,7 @@
       background: #111111; cursor: pointer; transition: all 0.15s;
     }
     .mobile-cat-btn:hover { border-color: #666666; color: #E5E5E5; }
-    .mobile-cat-btn.active { background: #E31837; border-color: #E31837; color: #fff; }
+    .mobile-cat-btn.active { background: #E31337; border-color: #E31337; color: #fff; }
 
     @media (max-width: 767px) {
       #sidebar { display: none !important; }
@@ -124,7 +124,7 @@
       width: 100%;
     }
     #search-input::placeholder { color: #444444; }
-    #search-input:focus { border-color: #E31837; }
+    #search-input:focus { border-color: #E31337; }
 
     /* Variant pill */
     .variant-pill {
@@ -132,8 +132,8 @@
       border: 1px solid #2A2A2A; color: #666666;
       background: transparent; cursor: pointer; transition: all 0.15s;
     }
-    .variant-pill:hover { border-color: #E31837; color: #E31837; }
-    .variant-pill.active { border-color: #E31837; color: #E31837; background: rgba(227,24,55,0.1); }
+    .variant-pill:hover { border-color: #E31337; color: #E31337; }
+    .variant-pill.active { border-color: #E31337; color: #E31337; background: rgba(227,24,55,0.1); }
 
     /* Action buttons */
     .action-btn {
@@ -142,8 +142,8 @@
       background: #111111; color: #888888;
     }
     .action-btn:hover { background: #1A1A1A; color: #E5E5E5; border-color: #444444; }
-    .action-btn.primary { background: #E31837; color: #fff; border-color: #E31837; 
-      background: #E31837; color: #fff; border-color: #E31837;
+    .action-btn.primary { background: #E31337; color: #fff; border-color: #E31337; 
+      background: #E31337; color: #fff; border-color: #E31337;
     }
     .action-btn.primary:hover { background: #FF2847; }
 
@@ -158,13 +158,13 @@
   <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-lg border-b border-[#2A2A2A]/70">
     <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="font-black" style="color:#E31837" text-xl tracking-tight">n3ware</span>
+        <span class="font-black" style="color:#E31337" text-xl tracking-tight">n3ware</span>
         <span class="text-xs text-[#888888] bg-[#1A1A1A] px-2 py-0.5 rounded-full">v1.0</span>
       </div>
       <div class="hidden md:flex items-center gap-8 text-sm text-[#888888]">
         <a href="index.html#features"     class="hover:text-white transition-colors">Features</a>
         <a href="index.html#templates"    class="hover:text-white transition-colors">Templates</a>
-        <a href="components.html"         class="text-[#E31837] font-medium">Components</a>
+        <a href="components.html"         class="text-[#E31337] font-medium">Components</a>
         <a href="index.html#get-started"  class="hover:text-white transition-colors">Get Started</a>
         <a href="/brand" class="hover:text-white transition-colors">Brand</a>
       </div>
@@ -178,7 +178,7 @@
   <!-- ─── Page header ──────────────────────────────────────────────────── -->
   <div class="pt-24 pb-12 px-6 text-center relative overflow-hidden">
     <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div class="w-[700px] h-[400px] rounded-full bg-[#E31837]/5 blur-3xl"></div>
+      <div class="w-[700px] h-[400px] rounded-full bg-[#E31337]/5 blur-3xl"></div>
     </div>
     <div class="relative z-10 max-w-3xl mx-auto">
       <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-4">
@@ -232,7 +232,7 @@
         <p class="text-[#555555] text-sm mt-1">Try a different search or category</p>
       </div>
       <div id="loading-state" class="text-center py-24">
-        <div class="inline-block w-8 h-8 border-2 border-[#E31837] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div class="inline-block w-8 h-8 border-2 border-[#E31337] border-t-transparent rounded-full animate-spin mb-4"></div>
         <p class="text-[#888888]">Loading components…</p>
       </div>
     </div>

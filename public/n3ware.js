@@ -20,7 +20,7 @@
 
   // ─── Design tokens ────────────────────────────────────────────────────────
   const T = {
-    accent:     '#E31837',
+    accent:     '#E31337',
     accentDark: '#B91C2C',
     bgPanel:    '#111111',
     border:     '#2A2A2A',
@@ -104,7 +104,7 @@
         `.n3-toolbar-btn.n3-danger:hover{background:rgba(239,68,68,.15);color:#F87171;border-color:rgba(239,68,68,.3)}`,
         `.n3-toolbar-spacer{flex:1}`,
         `.n3-history-count{font-size:11px;color:${T.muted};background:rgba(255,255,255,.06);padding:2px 6px;border-radius:4px}`,
-        `body.n3-editing{margin-top:48px!important}`,
+        `body.n3-editing{}`,
         `[data-n3-editable]:focus{outline:2px solid ${T.accent}!important;outline-offset:2px!important;border-radius:2px}`,
         `[data-n3-editable]{cursor:text!important}`,
         `.n3-hovered{outline:1.5px dashed rgba(59,130,246,.5)!important;outline-offset:1px}`,
@@ -964,6 +964,8 @@
       this._cloud  = !!(opts && opts.cloud);
       /** @type {HTMLElement|null} */
       this._el = null;
+      /** @type {string|null} original body paddingTop before toolbar shown */
+      this._origBodyPad = null;
     }
 
     /** Build and append toolbar to <body>. */
@@ -998,11 +1000,24 @@
     /** Remove toolbar from DOM. */
     unmount() { if (this._el) { this._el.remove(); this._el = null; } }
 
-    /** Slide toolbar into view. */
-    show() { if (this._el) this._el.classList.add('n3-visible'); }
+    /** Slide toolbar into view and push body content down by 48 px. */
+    show() {
+      if (this._el) this._el.classList.add('n3-visible');
+      if (this._origBodyPad === null) {
+        this._origBodyPad = document.body.style.paddingTop;
+        const cur = parseInt(getComputedStyle(document.body).paddingTop) || 0;
+        document.body.style.paddingTop = (cur + 48) + 'px';
+      }
+    }
 
-    /** Hide toolbar. */
-    hide() { if (this._el) this._el.classList.remove('n3-visible'); }
+    /** Slide toolbar out of view and restore original body padding. */
+    hide() {
+      if (this._el) this._el.classList.remove('n3-visible');
+      if (this._origBodyPad !== null) {
+        document.body.style.paddingTop = this._origBodyPad;
+        this._origBodyPad = null;
+      }
+    }
 
     /**
      * Update the undo/redo counter badge.
@@ -1932,6 +1947,17 @@
       if (!this._editMode || N3UI.isEditorEl(e.target)) return;
       const block = e.target.closest('[data-n3-block]');
       if (block) this._activate(block);
+      // Triple-click: select the full text content of the editable element
+      if (e.detail === 3) {
+        const ed = e.target.closest('[data-n3-editable]');
+        if (ed) {
+          const sel = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(ed);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
     }
 
     _handleFocus(e) {
