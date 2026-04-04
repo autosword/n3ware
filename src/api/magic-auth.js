@@ -20,7 +20,9 @@ const router   = express.Router();
 const TOKEN_TTL_MS  = 15 * 60 * 1000; // 15 minutes
 const JWT_TTL       = '7d';
 const EMAIL_RE      = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const BASE_URL      = process.env.BASE_URL || 'https://n3ware.com';
+const BASE_URL      = config.nodeEnv === 'production'
+  ? 'https://n3ware.com'
+  : (process.env.BASE_URL || 'http://localhost:8080');
 const IS_PROD       = config.nodeEnv === 'production';
 
 // ── POST /api/auth/magic ─────────────────────────────────────────────────────
