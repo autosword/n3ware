@@ -1,7 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const { generatePageWithAI, addPageToNav, loadPageTemplate, customizeTemplateWithAI } = require('../integrations/page-generator');
+const { generatePageWithAI, addPageToNav, loadPageTemplate, customizeTemplateWithAI, composePage } = require('../integrations/page-generator');
 
 /**
  * Multi-page management API — v2 architecture.
@@ -138,16 +138,23 @@ router.post('/pages/generate', async (req, res) => {
     if (slug === 'index') return res.status(400).json({ error: 'Cannot generate a page with slug "index"' });
 
     let html;
+    let components = [];
+    try { components = require('../../public/components/components.json'); } catch (_) {}
 
     if (templateId) {
-      // Template-based: load template and customize with AI
+      // Template-based: load template and compose from sections
       const template = loadPageTemplate(templateId);
       if (!template) return res.status(400).json({ error: `Template "${templateId}" not found` });
-      html = await customizeTemplateWithAI(template, String(description), imageUrls, String(name).trim());
+
+      if (template.sections && template.sections.length > 0) {
+        // New composition model: assemble from component refs + custom + ai sections
+        html = await composePage(template, components, String(description), imageUrls, String(name).trim());
+      } else {
+        // Legacy flat html field: customize with AI
+        html = await customizeTemplateWithAI(template, String(description), imageUrls, String(name).trim());
+      }
     } else {
-      // Scratch: generate from description
-      let components = [];
-      try { components = require('../../public/components/components.json'); } catch (_) {}
+      // Scratch: generate entirely from description
       html = await generatePageWithAI(String(description), components, imageUrls, String(name).trim());
     }
 
