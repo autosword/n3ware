@@ -429,6 +429,11 @@
         `.n3-script-ph-btn{background:rgba(255,255,255,.07);border:1px solid ${T.border};color:${T.text};padding:4px 10px;border-radius:5px;cursor:pointer;font:600 11px/1 system-ui,sans-serif;transition:all .12s;touch-action:manipulation;white-space:nowrap}`,
         `.n3-script-ph-btn:hover{background:rgba(255,255,255,.14);border-color:#888}`,
         `.n3-script-ph-btn.n3-danger:hover{background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.4);color:#F87171}`,
+        // ── Save FAB ────────────────────────────────────────────────────────
+        `.n3-save-fab{position:fixed;bottom:24px;right:84px;z-index:99998;background:#22C55E;color:#fff;border:none;padding:12px 20px;border-radius:50px;font:700 14px/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(34,197,94,.4);display:none;align-items:center;gap:6px;transition:background .25s,box-shadow .25s,transform .15s;white-space:nowrap}`,
+        `.n3-save-fab:hover{background:#16A34A;transform:translateY(-1px);box-shadow:0 6px 20px rgba(34,197,94,.5)}`,
+        `.n3-save-fab.n3-save-pulse{animation:n3-save-pulse 2s ease-in-out infinite}`,
+        `@keyframes n3-save-pulse{0%,100%{box-shadow:0 4px 16px rgba(34,197,94,.4)}50%{box-shadow:0 4px 28px rgba(34,197,94,.75)}}`,
         // ── Script code-editor modal ────────────────────────────────────────
         `.n3-script-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999999;display:flex;align-items:center;justify-content:center;animation:n3-fade-in .15s ease}`,
         `.n3-script-modal{background:${T.bgPanel};border:1px solid ${T.border};border-radius:12px;width:min(640px,94vw);max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.65)}`,
@@ -465,6 +470,7 @@
           .n3-fab-toggle{width:40px!important;height:40px!important;font-size:14px!important;touch-action:manipulation}
           .n3-fab-btn{touch-action:manipulation}
           body.n3-editing{padding-top:48px!important;}
+          .n3-save-fab{bottom:20px!important;right:62px!important;padding:10px 14px!important;font-size:13px!important}
         }`,
       ].join('\n');
       document.head.appendChild(s);
@@ -540,7 +546,8 @@
         el.closest('.n3-confirm-overlay')      ||
         el.closest('.n3-toast')                ||
         el.closest('.n3-script-modal-overlay') ||
-        el.closest('.n3-script-ph')
+        el.closest('.n3-script-ph')      ||
+        el.closest('.n3-save-fab')
       ));
     }
   }
@@ -686,6 +693,10 @@
       this._fab     = null;
       this._fabOpen = false;
       this._onKeyDown = this._handleKeyDown.bind(this);
+
+      // v2: dirty tracking for GCS file saves
+      this._dirty = { pages: new Set(), components: new Set() };
+      this._saveBtn = null;
     }
 
     /**
@@ -700,6 +711,7 @@
       if (this.analytics)  this.analytics.mount();
       if (this.components) this.components.mount();
       this._buildControlPanel();
+      this._buildSaveBtn();
       this._wireEvents();
       document.addEventListener('keydown', this._onKeyDown);
     }
@@ -830,6 +842,8 @@
     }
 
     _enter() {
+      this._dirty.pages.clear();
+      this._dirty.components.clear();
       if (this.analytics && this.analytics.isOpen()) this.analytics.close();
       if (this.text)     this.text.enable();
       this._markBlocks();
@@ -845,6 +859,9 @@
     }
 
     _exit() {
+      const hasDirty = this._dirty.pages.size > 0 || this._dirty.components.size > 0;
+      if (hasDirty && !confirm('You have unsaved changes. Exit without saving?')) return;
+      if (this._saveBtn) this._saveBtn.style.display = 'none';
       this._deactivate();
       if (this.text)     this.text.disable();
       this._unmarkBlocks();
@@ -888,7 +905,10 @@
       if (this.text)  this.text.hideToolbar();
     }
 
-    _snapshot() { this.history.push(document.body.innerHTML); }
+    _snapshot() {
+      this.history.push(document.body.innerHTML);
+      if (this._editMode) this._showSaveButton();
+    }
 
     _restore(snapshot) {
       if (!snapshot) return;
@@ -948,6 +968,7 @@
         }
       });
       this.events.on('drag:drop', ({ dragged, el: target, above }) => {
+        this._markDirty(dragged);
         this._snapshot();
         if (above) target.parentNode.insertBefore(dragged, target);
         else       target.parentNode.insertBefore(dragged, target.nextSibling);
@@ -955,6 +976,7 @@
         N3UI.toast('Reordered', 'info', 1200);
       });
       this.events.on('style:change', () => {
+        if (this._activeEl) this._markDirty(this._activeEl);
         clearTimeout(this._styleTimer);
         this._styleTimer = setTimeout(() => this._snapshot(), 400);
       });
@@ -991,6 +1013,7 @@
 
     _handleInput(e) {
       if (!this._editMode || !e.target.closest('[data-n3-editable]')) return;
+      this._markDirty(e.target);
       clearTimeout(this._inputTimer);
       this._inputTimer = setTimeout(() => this._snapshot(), 600);
     }
@@ -1025,6 +1048,130 @@
       const s = this.history.redo();
       if (s) { this._restore(s); N3UI.toast('Redo', 'info', 1200); }
       else N3UI.toast('Nothing to redo', 'info');
+    }
+
+    // ── v2 Save FAB ───────────────────────────────────────────────────────────
+
+    _buildSaveBtn() {
+      if (!this._cloudCfg) return; // only when cloud-configured
+      const btn = document.createElement('button');
+      btn.className = 'n3-save-fab';
+      btn.setAttribute('data-n3-ui', '1');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save';
+      btn.addEventListener('click', e => { e.stopPropagation(); this._handleSave(); });
+      document.body.appendChild(btn);
+      this._saveBtn = btn;
+    }
+
+    _showSaveButton() {
+      if (!this._saveBtn) return;
+      this._saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save';
+      this._saveBtn.style.cssText = '';
+      this._saveBtn.style.background = '#22C55E';
+      this._saveBtn.style.display = 'flex';
+      this._saveBtn.classList.add('n3-save-pulse');
+    }
+
+    _markDirty(el) {
+      if (!el) return;
+      // Walk up to find containing semantic region
+      const header = el.closest('header');
+      const nav    = el.closest('nav');
+      const footer = el.closest('footer');
+      if (header) { this._dirty.components.add('header'); return; }
+      if (nav)    { this._dirty.components.add('nav');    return; }
+      if (footer) { this._dirty.components.add('footer'); return; }
+      // Default: page body (current page slug is always 'index' for v2 single-page sites)
+      this._dirty.pages.add('index');
+    }
+
+    _extractComponentHtml(name) {
+      // Try comment-marker delimited extraction first (n3:component:NAME:start/end)
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
+      let startNode = null;
+      while (walker.nextNode()) {
+        if (walker.currentNode.textContent.trim() === `n3:component:${name}:start`) {
+          startNode = walker.currentNode;
+          break;
+        }
+      }
+      if (startNode) {
+        let html = '';
+        let node = startNode.nextSibling;
+        while (node) {
+          if (node.nodeType === 8 && node.textContent.trim() === `n3:component:${name}:end`) break;
+          if (node.nodeType === 1) html += node.outerHTML;
+          node = node.nextSibling;
+        }
+        if (html) return html;
+      }
+      // Fallback: grab the tag directly by element type
+      const tagMap = { header: 'header', nav: 'nav', footer: 'footer' };
+      const el = document.querySelector(tagMap[name]);
+      return el ? el.outerHTML : null;
+    }
+
+    async _handleSave() {
+      if (!this._cloudCfg || !this._saveBtn) return;
+      const hasWork = this._dirty.pages.size > 0 || this._dirty.components.size > 0;
+      if (!hasWork) return;
+
+      this._saveBtn.classList.remove('n3-save-pulse');
+      this._saveBtn.innerHTML = '⏳ Saving…';
+      this._saveBtn.style.background = '#666';
+
+      const { api, site, key } = this._cloudCfg;
+      const headers = { 'Content-Type': 'application/json' };
+      if (key) headers['Authorization'] = `Bearer ${key}`;
+
+      const promises = [];
+
+      for (const slug of this._dirty.pages) {
+        const main = document.querySelector('main');
+        const html = main ? main.innerHTML : document.body.innerHTML;
+        promises.push(
+          fetch(`${api}/sites/${site}/pages/${slug}`, {
+            method: 'PUT', headers, body: JSON.stringify({ html }),
+          })
+        );
+      }
+
+      for (const name of this._dirty.components) {
+        const html = this._extractComponentHtml(name);
+        if (html) {
+          promises.push(
+            fetch(`${api}/sites/${site}/components/${name}`, {
+              method: 'PUT', headers, body: JSON.stringify({ html }),
+            })
+          );
+        }
+      }
+
+      try {
+        const results = await Promise.all(promises);
+        const allOk = results.every(r => r.ok);
+        if (!allOk) throw new Error('One or more saves failed');
+
+        this._dirty.pages.clear();
+        this._dirty.components.clear();
+        this._saveBtn.innerHTML = '✓ Saved';
+        this._saveBtn.style.background = '#16A34A';
+        N3UI.toast('Changes saved to cloud', 'success');
+        setTimeout(() => {
+          if (this._saveBtn) this._saveBtn.style.display = 'none';
+        }, 2000);
+      } catch (err) {
+        this._saveBtn.innerHTML = '✕ Failed';
+        this._saveBtn.style.background = '#DC2626';
+        N3UI.toast('Save failed: ' + err.message, 'error', 4000);
+        setTimeout(() => {
+          if (this._saveBtn) {
+            this._saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save';
+            this._saveBtn.style.background = '#22C55E';
+            this._saveBtn.classList.add('n3-save-pulse');
+          }
+        }, 3000);
+      }
     }
 
     _duplicate(el) {

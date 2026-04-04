@@ -24,6 +24,7 @@
 
 const express  = require('express');
 const storage  = require('../storage');
+const cache    = require('../cache');
 const gcsFiles = require('../storage/gcs-files');
 const { authOrApiKey } = require('./auth');
 
@@ -87,6 +88,7 @@ router.put('/pages/:slug', async (req, res) => {
     if (html === undefined) return res.status(400).json({ error: '`html` is required' });
 
     await gcsFiles.savePage(req.params.id, slug, html, title);
+    cache.onSave(req.params.id).catch(() => {});
     res.json({ saved: true, slug });
   } catch (err) { _error(res, err); }
 });
@@ -146,6 +148,7 @@ router.put('/components/:name', async (req, res) => {
     if (html === undefined) return res.status(400).json({ error: '`html` is required' });
 
     await gcsFiles.saveComponent(req.params.id, name, html);
+    cache.onSave(req.params.id).catch(() => {});
     res.json({ saved: true, name });
   } catch (err) { _error(res, err); }
 });
