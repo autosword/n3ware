@@ -452,7 +452,7 @@
           .n3-toolbar-btn{padding:4px 8px;min-height:44px;touch-action:manipulation}
           .n3-toolbar-logo{margin-right:4px}
           .n3-style-panel{width:100%!important;height:40vh!important;top:auto!important;bottom:0!important;border-left:none!important;border-top:1px solid ${T.border}!important;border-radius:12px 12px 0 0!important;}
-          .n3-format-bar{overflow-x:auto;flex-wrap:nowrap;max-width:calc(100vw - 16px);position:relative}
+          .n3-format-bar{overflow-x:auto;flex-wrap:nowrap;max-width:calc(100vw - 16px)}
           .n3-format-bar::after{content:'';position:absolute;right:0;top:0;bottom:0;width:36px;background:linear-gradient(to right,rgba(17,17,17,0),rgba(17,17,17,.95));pointer-events:none;border-radius:0 8px 8px 0}
           .n3-fmt-btn{min-width:36px;height:40px;touch-action:manipulation}
           .n3-fmt-select{height:40px;font-size:14px;touch-action:manipulation}
