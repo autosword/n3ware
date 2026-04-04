@@ -31,6 +31,20 @@
 (function (global) {
   'use strict';
 
+  // ─── JWT from URL hash (#auth=TOKEN) ─────────────────────────────────────
+  // The dashboard appends #auth=JWT when opening a live site for editing so
+  // the authenticated user's token is available without touching the server.
+  (function () {
+    try {
+      const m = window.location.hash.match(/[#&]auth=([^&]+)/);
+      if (m) {
+        sessionStorage.setItem('n3_auth', decodeURIComponent(m[1]));
+        // Remove the hash so the token isn't in browser history after navigation
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    } catch (_) {}
+  })();
+
   // ─── Base URL detection ───────────────────────────────────────────────────
   // Captured synchronously so it's available in async callbacks.
   /** @type {string} Base URL of the directory containing n3ware.js */
@@ -1122,7 +1136,12 @@
 
       const { api, site, key } = this._cloudCfg;
       const headers = { 'Content-Type': 'application/json' };
-      if (key) headers['Authorization'] = `Bearer ${key}`;
+      const jwt = sessionStorage.getItem('n3_auth');
+      if (jwt) {
+        headers['Authorization'] = 'Bearer ' + jwt;
+      } else if (key) {
+        headers['X-API-Key'] = key;
+      }
 
       const promises = [];
 

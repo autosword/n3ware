@@ -34,7 +34,7 @@ function serveSites() {
       if (!site) return res.status(404).send(_notFoundPage(siteId));
 
       const trackerScripts = generateScripts(site.integrations || {});
-      const html = _injectEditor(_injectTrackers(site.html, trackerScripts), siteId);
+      const html = _injectEditor(_injectTrackers(site.html, trackerScripts), siteId, site.apiKey);
       res.set('Content-Type', 'text/html; charset=utf-8');
       res.set('Cache-Control', CACHE_CONTROL);
       res.set('X-Site-Id', siteId);
@@ -72,12 +72,13 @@ function _injectTrackers(html, scripts) {
  * @param {string} siteId
  * @returns {string} modified HTML
  */
-function _injectEditor(html, siteId) {
+function _injectEditor(html, siteId, siteApiKey) {
   const tag =
     `\n<!-- n3ware editor -->\n` +
     `<script src="${config.n3wareScriptUrl}" ` +
     `data-n3-site="${_esc(siteId)}" ` +
     `data-n3-api="/api" ` +
+    (siteApiKey ? `data-n3-key="${_esc(siteApiKey)}" ` : '') +
     `></script>`;
 
   if (html.includes('</body>')) {

@@ -118,7 +118,7 @@ function _decompose(html) {
  * @param {string} templateHtml  Full HTML of the starting template
  * @returns {Promise<object>}    The site manifest
  */
-async function createSite(siteId, name, ownerId, templateHtml = '') {
+async function createSite(siteId, name, ownerId, templateHtml = '', apiKey = '') {
   const now = new Date().toISOString();
   const parts = _decompose(templateHtml);
 
@@ -126,6 +126,7 @@ async function createSite(siteId, name, ownerId, templateHtml = '') {
     id: siteId,
     name,
     ownerId: ownerId || null,
+    apiKey:  apiKey  || null,
     theme: {
       primaryColor: '#3B82F6',
       fontFamily:   'sans-serif',

@@ -101,11 +101,15 @@ function authOrApiKey(req, res, next) {
   if (!provided) {
     return res.status(401).json({ error: 'Authentication required (Bearer token or X-API-Key)' });
   }
-  if (!_timingSafeEqual(provided, config.masterApiKey)) {
-    return res.status(403).json({ error: 'Invalid API key' });
+  if (_timingSafeEqual(provided, config.masterApiKey)) {
+    req.user     = null;
+    req.authType = 'apikey';
+    return next();
   }
-  req.user     = null;
-  req.authType = 'apikey';
+  // Not the master key — could be a site-scoped API key; let route handlers verify
+  req.user           = null;
+  req.authType       = 'sitekey';
+  req.providedApiKey = provided;
   next();
 }
 
