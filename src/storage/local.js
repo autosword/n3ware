@@ -55,7 +55,7 @@ class LocalStorage {
    * @param {{html:string, css?:string, message?:string}} data
    * @returns {object} saved site record
    */
-  saveSite(id, { html, css = '', message = '', name, ownerId } = {}) {
+  saveSite(id, { html, css = '', message = '', name, ownerId, apiKey } = {}) {
     const now = new Date().toISOString();
     const existing = this.getSite(id);
     const site = {
@@ -65,6 +65,7 @@ class LocalStorage {
       message,
       name:      name !== undefined ? name : (existing ? existing.name : 'Untitled Site'),
       ownerId:   ownerId !== undefined ? ownerId : (existing ? existing.ownerId : null),
+      apiKey:    apiKey  !== undefined ? apiKey  : (existing ? existing.apiKey  : null),
       createdAt: existing ? existing.createdAt : now,
       updatedAt: now,
     };

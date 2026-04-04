@@ -1122,7 +1122,7 @@
 
       const { api, site, key } = this._cloudCfg;
       const headers = { 'Content-Type': 'application/json' };
-      if (key) headers['Authorization'] = `Bearer ${key}`;
+      if (key) headers['X-API-Key'] = key;
 
       const promises = [];
 

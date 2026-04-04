@@ -1,5 +1,7 @@
 'use strict';
 
+const crypto = require('crypto');
+
 /**
  * Multi-page management API — v2 architecture.
  *
@@ -28,6 +30,8 @@ const cache    = require('../cache');
 const gcsFiles = require('../storage/gcs-files');
 const { authOrApiKey } = require('./auth');
 
+const GCS_ENABLED = Boolean(process.env.GCS_BUCKET);
+
 const router = express.Router({ mergeParams: true });
 
 router.use(authOrApiKey);
@@ -40,7 +44,21 @@ async function _requireSite(req, res) {
   if (req.authType === 'jwt' && req.user && site.ownerId && site.ownerId !== req.user.id) {
     res.status(403).json({ error: 'Forbidden' }); return null;
   }
+  if (req.authType === 'sitekey') {
+    if (!site.apiKey || !_timingSafeEqual(req.providedApiKey, site.apiKey)) {
+      res.status(403).json({ error: 'Invalid site API key' }); return null;
+    }
+  }
   return site;
+}
+
+function _timingSafeEqual(a, b) {
+  try {
+    const ba = Buffer.from(String(a));
+    const bb = Buffer.from(String(b));
+    if (ba.length !== bb.length) { crypto.timingSafeEqual(ba, ba); return false; }
+    return crypto.timingSafeEqual(ba, bb);
+  } catch { return false; }
 }
 
 function _slugParam(req, res) {
@@ -87,7 +105,12 @@ router.put('/pages/:slug', async (req, res) => {
     const { html, title } = req.body || {};
     if (html === undefined) return res.status(400).json({ error: '`html` is required' });
 
-    await gcsFiles.savePage(req.params.id, slug, html, title);
+    if (GCS_ENABLED) {
+      await gcsFiles.savePage(req.params.id, slug, html, title);
+    } else if (slug === 'index') {
+      // Local mode: persist page body in the site record
+      await storage.saveSite(req.params.id, { html });
+    }
     cache.onSave(req.params.id).catch(() => {});
     res.json({ saved: true, slug });
   } catch (err) { _error(res, err); }

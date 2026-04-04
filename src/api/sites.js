@@ -11,6 +11,7 @@
  * GET    /api/sites/:id/html     — get raw site HTML
  */
 
+const crypto       = require('crypto');
 const express      = require('express');
 const { v4: uuid } = require('uuid');
 const sanitizeHtml = require('sanitize-html');
@@ -68,6 +69,7 @@ router.post('/', async (req, res) => {
     const finalName = name ? String(name).slice(0, 200) : 'Untitled Site';
     const sanitized = _sanitize(html);
     const subdomain = _subdomain(finalName);
+    const apiKey    = crypto.randomBytes(32).toString('hex');
 
     const site = await storage.saveSite(id, {
       html:    sanitized,
@@ -76,12 +78,13 @@ router.post('/', async (req, res) => {
       name:    finalName,
       ownerId,
       subdomain,
+      apiKey,
     });
 
     // v2: write decomposed files to GCS + register domain in Firestore
     if (GCS_ENABLED) {
       try {
-        await gcsFiles.createSite(id, finalName, ownerId, sanitized);
+        await gcsFiles.createSite(id, finalName, ownerId, sanitized, apiKey);
         await _getFirestore()
           .collection('domains')
           .doc(`${subdomain}.n3ware.com`)
@@ -175,11 +178,21 @@ router.delete('/:id', async (req, res) => {
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-/** API key auth can read/write all. JWT users can only access their own sites. */
+/** API key auth can read/write all. JWT users can only access their own sites. Site-scoped key only for matching site. */
 function _canRead(req, site) {
   if (req.authType === 'apikey') return true;
+  if (req.authType === 'sitekey') return site.apiKey && _timingSafeEqual(req.providedApiKey, site.apiKey);
   if (!site.ownerId) return true; // legacy site (no owner)
   return req.user && req.user.id === site.ownerId;
+}
+
+function _timingSafeEqual(a, b) {
+  try {
+    const ba = Buffer.from(String(a));
+    const bb = Buffer.from(String(b));
+    if (ba.length !== bb.length) { crypto.timingSafeEqual(ba, ba); return false; }
+    return crypto.timingSafeEqual(ba, bb);
+  } catch { return false; }
 }
 
 function _canWrite(req, site) {

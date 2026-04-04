@@ -14,6 +14,7 @@ type SiteManifest struct {
 	ID      string `json:"id"`
 	Name    string `json:"name"`
 	OwnerId string `json:"ownerId"`
+	APIKey  string `json:"apiKey"`
 	Theme   struct {
 		PrimaryColor string `json:"primaryColor"`
 		FontFamily   string `json:"fontFamily"`
@@ -128,10 +129,17 @@ func (a *Assembler) assemble(r *http.Request, siteId, pagePath string) (string, 
 		headScripts.WriteString(s + "\n")
 	}
 
-	// 6. Build body scripts block
+	// 6. Build body scripts block (includes n3ware editor)
 	var bodyScripts strings.Builder
 	for _, s := range manifest.BodyScripts {
 		bodyScripts.WriteString(s + "\n")
+	}
+	// Inject n3ware editor with site API key for in-browser editing
+	if manifest.APIKey != "" {
+		bodyScripts.WriteString(fmt.Sprintf(
+			"\n<!-- n3ware editor -->\n<script src=\"https://n3ware.com/n3ware.js\" data-n3-api=\"https://n3ware.com/api\" data-n3-site=\"%s\" data-n3-key=\"%s\"></script>\n",
+			escapeHTML(manifest.ID), escapeHTML(manifest.APIKey),
+		))
 	}
 
 	// 7. Assemble full document
