@@ -197,7 +197,7 @@
         `.n3-fab-btn.n3-active{background:${T.accent};border-color:${T.accent};box-shadow:0 0 0 3px rgba(59,130,246,.3)}`,
         `.n3-fab-btn.n3-editing{background:#EF4444;border-color:#EF4444}`,
         // ── Analytics overlay ────────────────────────────────────────────────
-        `.n3-analytics-overlay{position:fixed;bottom:0;left:0;right:0;z-index:999995;background:rgba(15,23,42,.97);border-top:1px solid ${T.border};transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:50vh;overflow-y:auto;font:13px/1.5 system-ui,sans-serif;color:${T.text};backdrop-filter:blur(8px)}`,
+        `.n3-analytics-overlay{position:fixed;bottom:0;left:0;right:0;z-index:999995;background:rgba(10,10,15,.98);border-top:1px solid ${T.border};transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:78vh;overflow-y:auto;font:13px/1.5 system-ui,sans-serif;color:${T.text};backdrop-filter:blur(12px)}`,
         `.n3-analytics-overlay.n3-open{transform:translateY(0)}`,
         `.n3-an-header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid ${T.border};background:${T.bgPanel};position:sticky;top:0;z-index:1}`,
         `.n3-an-tabs{display:flex;gap:4px;flex:1}`,
@@ -235,6 +235,25 @@
         `.n3-an-top-path{color:${T.muted};truncate:true;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:70%}`,
         `.n3-an-top-count{color:${T.text};font-weight:600;flex-shrink:0}`,
         `.n3-an-connect-prompt{display:flex;align-items:center;gap:8px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:10px 14px;font-size:12px;color:${T.muted};width:100%}`,
+        // ── Analytics — rich section styles ─────────────────────────────────
+        `.n3-an-stat-change{font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:5px;letter-spacing:.02em}`,
+        `.n3-an-stat-change.n3-up{color:#22C55E;background:rgba(34,197,94,.14)}`,
+        `.n3-an-stat-change.n3-dn{color:#F87171;background:rgba(248,113,113,.14)}`,
+        `.n3-an-events{display:flex;flex-direction:column;gap:5px;width:100%}`,
+        `.n3-an-event{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid ${T.border};border-radius:8px;padding:9px 12px;transition:background .1s}`,
+        `.n3-an-event:hover{background:rgba(255,255,255,.06)}`,
+        `.n3-an-event-icon{font-size:17px;width:26px;text-align:center;flex-shrink:0;line-height:1}`,
+        `.n3-an-event-label{flex:1;font-size:12px;color:${T.text}}`,
+        `.n3-an-event-count{font-size:17px;font-weight:700;color:${T.text};flex-shrink:0;min-width:28px;text-align:right}`,
+        `.n3-an-event-trend{font-size:11px;font-weight:700;flex-shrink:0;min-width:38px;text-align:right}`,
+        `.n3-an-trend-up{color:#22C55E}`,
+        `.n3-an-trend-dn{color:#F87171}`,
+        `.n3-an-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}`,
+        `.n3-an-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}`,
+        `.n3-an-bar-label{font-size:11px;color:${T.muted};width:88px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}`,
+        `.n3-an-bar-track{flex:1;height:5px;background:${T.border};border-radius:3px;overflow:hidden}`,
+        `.n3-an-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}`,
+        `.n3-an-bar-val{font-size:11px;color:${T.muted};width:32px;text-align:right;flex-shrink:0}`,
         // ── Components panel ────────────────────────────────────────────────────
         `.n3-comp-panel{position:fixed;top:0;left:0;bottom:0;z-index:999996;background:#0B1120;border-right:1px solid ${T.border};width:264px;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;font:13px/1.5 system-ui,sans-serif;color:${T.text};box-shadow:4px 0 24px rgba(0,0,0,.4)}`,
         `.n3-comp-panel.n3-comp-open{transform:translateX(0)}`,
@@ -273,10 +292,15 @@
           .n3-toolbar-btn{padding:4px 8px;min-height:44px;touch-action:manipulation}
           .n3-toolbar-logo{margin-right:4px}
           .n3-style-panel{width:100%!important;height:40vh!important;top:auto!important;bottom:0!important;border-left:none!important;border-top:1px solid ${T.border}!important;border-radius:12px 12px 0 0!important;}
-          .n3-format-bar{overflow-x:auto;flex-wrap:nowrap;max-width:calc(100vw - 16px);}
+          .n3-format-bar{overflow-x:auto;flex-wrap:nowrap;max-width:calc(100vw - 16px);position:relative}
+          .n3-format-bar::after{content:'';position:absolute;right:0;top:0;bottom:0;width:36px;background:linear-gradient(to right,rgba(17,17,17,0),rgba(17,17,17,.95));pointer-events:none;border-radius:0 8px 8px 0}
           .n3-fmt-btn{min-width:36px;height:40px;touch-action:manipulation}
           .n3-fmt-select{height:40px;font-size:14px;touch-action:manipulation}
-          .n3-ctrl-btn{width:36px!important;height:36px!important;touch-action:manipulation}
+          .n3-type-label{display:none!important}
+          .n3-ctrl-btn{width:32px!important;height:32px!important;touch-action:manipulation}
+          .n3-controls{gap:2px!important;padding:3px 4px!important;flex-wrap:nowrap}
+          .n3-analytics-overlay{max-height:100dvh!important;border-radius:0!important}
+          .n3-an-2col{grid-template-columns:1fr!important}
           .n3-fab{bottom:16px!important;right:12px!important;}
           .n3-fab-toggle{width:40px!important;height:40px!important;font-size:14px!important;touch-action:manipulation}
           .n3-fab-btn{touch-action:manipulation}
@@ -1619,7 +1643,7 @@
       this._el       = null;
       this._open     = false;
       this._tab      = 'page';
-      this._period   = '7d';
+      this._period   = '14d';
       this._cache    = {};
       this._cacheTtl = 5 * 60 * 1000;
     }
@@ -1670,9 +1694,9 @@
           <button class="n3-an-tab" data-tab="all">All Pages</button>
         </div>
         <div class="n3-an-periods">
-          <button class="n3-an-period n3-an-active" data-period="7d">7d</button>
+          <button class="n3-an-period" data-period="7d">7d</button>
+          <button class="n3-an-period n3-an-active" data-period="14d">14d</button>
           <button class="n3-an-period" data-period="30d">30d</button>
-          <button class="n3-an-period" data-period="90d">90d</button>
         </div>
         <button class="n3-an-close" title="Close">✕</button>
       </div>
@@ -1706,7 +1730,7 @@
     }
 
     async _fetch() {
-      if (!this._cfg) return this._empty();
+      if (!this._cfg) return this._demoData(this._period);
       const { api, site, key } = this._cfg;
       const h = key ? { 'X-API-Key': key } : {};
       const periodQ = `period=${this._period}`;
@@ -1736,87 +1760,217 @@
       return { views: stats.views || 0, uniqueVisitors: stats.uniqueVisitors || 0, avgDuration: null, bounceRate: null, daily: (daily.daily || []).slice(-14), sources: [], devices: {}, topPages: stats.topPages || [], realtime: null, gaConnected: false };
     }
 
+    _demoData(period) {
+      const numDays = period === '7d' ? 7 : period === '30d' ? 30 : 14;
+      const daily = [];
+      const now = new Date();
+      const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      for (let i = numDays - 1; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dow = d.getDay();
+        const isWeekend = dow === 0 || dow === 5 || dow === 6;
+        const base = isWeekend ? 118 : 72;
+        const jitter = Math.floor(Math.sin(i * 13.7) * 18 + Math.cos(i * 7.3) * 12);
+        const views = Math.max(base + jitter, 30);
+        const dayLabel = DAY_LABELS[dow];
+        daily.push({ date: d.toISOString().slice(0, 10), views, label: dayLabel });
+      }
+      const totalViews = daily.reduce((s, d) => s + d.views, 0);
+      const prevViews = Math.round(totalViews * 0.87);
+      const totalVisitors = Math.round(totalViews * 0.33);
+      const prevVisitors  = Math.round(prevViews  * 0.33);
+      const scale = totalViews / 1247; // normalize to 14-day ~1247
+      return {
+        views:          totalViews,
+        viewsPrev:      prevViews,
+        uniqueVisitors: totalVisitors,
+        visitorsPrev:   prevVisitors,
+        avgDuration:    154,
+        bounceRate:     38,
+        realtime:       3,
+        daily,
+        sources: [
+          { source: 'Google Maps',   sessions: Math.round(420 * scale) },
+          { source: 'Google Search', sessions: Math.round(298 * scale) },
+          { source: 'Direct',        sessions: Math.round(242 * scale) },
+          { source: 'Instagram',     sessions: Math.round(124 * scale) },
+          { source: 'Yelp',          sessions: Math.round(63  * scale) },
+          { source: 'Other',         sessions: Math.round(62  * scale) },
+        ],
+        devices: {
+          mobile:  Math.round(totalViews * 0.65),
+          desktop: Math.round(totalViews * 0.30),
+          tablet:  Math.round(totalViews * 0.05),
+        },
+        topPages: [
+          { path: '/',             views: Math.round(totalViews * 0.40), avgTime: 185 },
+          { path: '/menu',         views: Math.round(totalViews * 0.28), avgTime: 142 },
+          { path: '/reservations', views: Math.round(totalViews * 0.16), avgTime: 203 },
+          { path: '/about',        views: Math.round(totalViews * 0.09), avgTime: 98  },
+          { path: '/our-chef',     views: Math.round(totalViews * 0.07), avgTime: 76  },
+        ],
+        events: [
+          { icon: '📞', label: 'Phone Number Tapped',        count: Math.round(47 * scale), prev: Math.round(39 * scale), trend: 1  },
+          { icon: '📅', label: 'Reservation Button Clicked', count: Math.round(23 * scale), prev: Math.round(18 * scale), trend: 1  },
+          { icon: '🍽',  label: 'Menu Viewed',                count: Math.round(89 * scale), prev: Math.round(94 * scale), trend: -1 },
+          { icon: '🗺',  label: 'Directions Clicked',          count: Math.round(31 * scale), prev: Math.round(24 * scale), trend: 1  },
+          { icon: '✉',  label: 'Contact Form Submitted',      count: Math.round(8  * scale), prev: Math.round(5  * scale), trend: 1  },
+        ],
+        referrers: [
+          { domain: 'maps.google.com', visits: Math.round(420 * scale) },
+          { domain: 'google.com',      visits: Math.round(298 * scale) },
+          { domain: 'instagram.com',   visits: Math.round(124 * scale) },
+          { domain: 'yelp.com',        visits: Math.round(63  * scale) },
+          { domain: 'facebook.com',    visits: Math.round(48  * scale) },
+        ],
+        cities: [
+          { city: 'South Kingstown', count: Math.round(totalVisitors * 0.28) },
+          { city: 'Narragansett',    count: Math.round(totalVisitors * 0.18) },
+          { city: 'Wakefield',       count: Math.round(totalVisitors * 0.14) },
+          { city: 'Providence',      count: Math.round(totalVisitors * 0.12) },
+          { city: 'Westerly',        count: Math.round(totalVisitors * 0.09) },
+          { city: 'Newport',         count: Math.round(totalVisitors * 0.07) },
+        ],
+        gaConnected: false,
+      };
+    }
+
     _empty() { return { views: 0, uniqueVisitors: 0, avgDuration: null, bounceRate: null, daily: [], sources: [], devices: {}, topPages: [], realtime: null, gaConnected: false }; }
 
     _render(data) {
       const body = this._el.querySelector('.n3-an-body');
 
-      // Stat cards
+      // % change badge helper
+      const changeBadge = (curr, prev) => {
+        if (prev == null || prev === 0) return '';
+        const p = Math.round((curr - prev) / prev * 100);
+        const cls = p >= 0 ? 'n3-up' : 'n3-dn';
+        const arrow = p >= 0 ? '↑' : '↓';
+        return `<span class="n3-an-stat-change ${cls}">${arrow}${Math.abs(p)}%</span>`;
+      };
+
+      // ── Stat cards ────────────────────────────────────────────────────────
+      const viewsBadge    = changeBadge(data.views, data.viewsPrev);
+      const visitorsBadge = changeBadge(data.uniqueVisitors, data.visitorsPrev);
       const statsHtml = `<div class="n3-an-stats">
-        <div class="n3-an-stat"><span class="n3-an-stat-val">${_fmtNum(data.views)}</span><span class="n3-an-stat-label">Views</span></div>
-        <div class="n3-an-stat"><span class="n3-an-stat-val">${_fmtNum(data.uniqueVisitors)}</span><span class="n3-an-stat-label">Visitors</span></div>
+        <div class="n3-an-stat">
+          <span class="n3-an-stat-val">${_fmtNum(data.views)}${viewsBadge}</span>
+          <span class="n3-an-stat-label">Page Views</span>
+        </div>
+        <div class="n3-an-stat">
+          <span class="n3-an-stat-val">${_fmtNum(data.uniqueVisitors)}${visitorsBadge}</span>
+          <span class="n3-an-stat-label">Visitors</span>
+        </div>
         ${data.avgDuration != null ? `<div class="n3-an-stat"><span class="n3-an-stat-val">${_fmtDur(data.avgDuration)}</span><span class="n3-an-stat-label">Avg Time</span></div>` : ''}
         ${data.bounceRate  != null ? `<div class="n3-an-stat"><span class="n3-an-stat-val">${Math.round(data.bounceRate)}%</span><span class="n3-an-stat-label">Bounce</span></div>` : ''}
-        ${data.realtime    != null ? `<div class="n3-an-stat"><span class="n3-an-stat-val"><span class="n3-an-pulse"></span>${data.realtime}</span><span class="n3-an-stat-label">Live Now</span></div>` : ''}
+        ${data.realtime    != null ? `<div class="n3-an-stat"><span class="n3-an-stat-val"><span class="n3-an-pulse"></span> ${data.realtime}</span><span class="n3-an-stat-label">Right Now</span></div>` : ''}
       </div>`;
 
-      // SVG bar chart (14 days)
+      // ── Bar chart ─────────────────────────────────────────────────────────
       let chartHtml = '';
       if (data.daily && data.daily.length) {
-        const days = data.daily.slice(-14);
-        const max  = Math.max(...days.map(d => d.views), 1);
-        const W    = days.length * 14;
-        const bars = days.map((d, i) => {
-          const h = Math.max(Math.round((d.views / max) * 80), 2);
-          return `<rect x="${i * 14 + 1}" y="${100 - h}" width="10" height="${h}" fill="${T.accent}" rx="2" opacity=".9"><title>${d.date}: ${d.views} views</title></rect>`;
+        const days  = data.daily;
+        const maxV  = Math.max(...days.map(d => d.views), 1);
+        const BW    = 14;
+        const GAP   = 3;
+        const CH    = 64;
+        const W     = days.length * (BW + GAP);
+        const bars  = days.map((d, i) => {
+          const bh    = Math.max(Math.round((d.views / maxV) * CH), 2);
+          const xPos  = i * (BW + GAP);
+          const dayLbl = d.label || d.date.slice(5);
+          return `<rect x="${xPos}" y="${CH - bh}" width="${BW}" height="${bh}" fill="${T.accent}" rx="2" opacity=".88"><title>${d.date}: ${d.views} views</title></rect><text x="${xPos + BW / 2}" y="${CH + 11}" text-anchor="middle" font-size="7" fill="${T.muted}">${dayLbl}</text>`;
         }).join('');
-        chartHtml = `<div class="n3-an-chart-wrap"><p class="n3-an-chart-title">Daily Views (${days.length}d)</p><svg class="n3-an-chart" viewBox="0 0 ${W} 100" preserveAspectRatio="none" height="56">${bars}</svg></div>`;
+        chartHtml = `<div class="n3-an-chart-wrap"><p class="n3-an-chart-title">Daily Traffic — ${days.length}-Day View</p><svg viewBox="0 0 ${W} ${CH + 14}" width="100%" height="84" style="overflow:visible">${bars}</svg></div>`;
       }
 
-      // Traffic sources donut
+      // ── Customer Actions (events) — money section ─────────────────────────
+      let eventsHtml = '';
+      if (data.events && data.events.length) {
+        const evRows = data.events.map(ev => {
+          const trendCls   = ev.trend >= 0 ? 'n3-an-trend-up' : 'n3-an-trend-dn';
+          const trendArrow = ev.trend >= 0 ? '↑' : '↓';
+          const trendPct   = ev.prev ? Math.abs(Math.round((ev.count - ev.prev) / ev.prev * 100)) : 0;
+          return `<div class="n3-an-event"><span class="n3-an-event-icon">${ev.icon}</span><span class="n3-an-event-label">${_esc(ev.label)}</span><span class="n3-an-event-count">${ev.count}</span><span class="n3-an-event-trend ${trendCls}">${trendArrow}${trendPct}%</span></div>`;
+        }).join('');
+        eventsHtml = `<div class="n3-an-section"><p class="n3-an-section-title">⚡ Customer Actions</p><div class="n3-an-events">${evRows}</div></div>`;
+      }
+
+      // ── Traffic Sources ───────────────────────────────────────────────────
       let sourcesHtml = '';
       if (data.sources && data.sources.length) {
-        const total  = data.sources.reduce((s, x) => s + (x.sessions || 0), 0) || 1;
-        const colors = [T.accent, '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-        let   offset = 0;
-        const slices = data.sources.slice(0, 5).map((src, i) => {
-          const deg   = (src.sessions || 0) / total * 360;
-          const slice = _svgArc(32, 32, 28, offset, offset + deg, colors[i % colors.length]);
-          offset += deg;
-          return `<g>${slice}<title>${_esc(src.source || src.medium)}: ${src.sessions}</title></g>`;
+        const maxSrc = Math.max(...data.sources.map(s => s.sessions), 1);
+        const srcColors = [T.accent, '#10B981', '#F59E0B', '#8B5CF6', '#06B6D4', T.muted];
+        const srcRows = data.sources.map((s, i) => {
+          const pctW = Math.round((s.sessions / maxSrc) * 100);
+          const col  = srcColors[i % srcColors.length];
+          return `<div class="n3-an-bar-row"><span class="n3-an-bar-label">${_esc(s.source)}</span><div class="n3-an-bar-track"><div class="n3-an-bar-fill" style="width:${pctW}%;background:${col}"></div></div><span class="n3-an-bar-val">${_fmtNum(s.sessions)}</span></div>`;
         }).join('');
-        const legend = data.sources.slice(0, 5).map((src, i) =>
-          `<div class="n3-an-legend-item"><span class="n3-an-legend-dot" style="background:${colors[i % colors.length]}"></span><span>${_esc(src.source || src.medium || 'Other')}</span><span class="n3-an-legend-val">${_fmtNum(src.sessions || 0)}</span></div>`
-        ).join('');
-        sourcesHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Traffic Sources</p><div class="n3-an-sources"><svg class="n3-an-donut" viewBox="0 0 64 64" width="72" height="72">${slices}</svg><div class="n3-an-legend">${legend}</div></div></div>`;
+        sourcesHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Traffic Sources</p>${srcRows}</div>`;
       }
 
-      // Device breakdown
+      // ── Devices ───────────────────────────────────────────────────────────
       let devHtml = '';
       if (data.devices && (data.devices.mobile || data.devices.desktop)) {
-        const { mobile = 0, desktop = 0, tablet = 0 } = data.devices;
+        const mobile  = data.devices.mobile  || 0;
+        const desktop = data.devices.desktop || 0;
+        const tablet  = data.devices.tablet  || 0;
         const tot = mobile + desktop + tablet || 1;
         const mP = Math.round(mobile  / tot * 100);
         const dP = Math.round(desktop / tot * 100);
         const tP = 100 - mP - dP;
-        devHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Devices</p>
-          <div class="n3-an-device-bar">
-            ${mP ? `<div class="n3-an-device-seg" style="width:${mP}%;background:${T.accent}" title="Mobile ${mP}%"></div>` : ''}
-            ${dP ? `<div class="n3-an-device-seg" style="width:${dP}%;background:#10B981"   title="Desktop ${dP}%"></div>` : ''}
-            ${tP ? `<div class="n3-an-device-seg" style="width:${tP}%;background:#F59E0B"   title="Tablet ${tP}%"></div>` : ''}
-          </div>
-          <div class="n3-an-device-labels">
-            ${mP ? `<span style="color:${T.accent}">📱 ${mP}%</span>` : ''}
-            ${dP ? `<span style="color:#10B981">🖥 ${dP}%</span>` : ''}
-            ${tP ? `<span style="color:#F59E0B">⬜ ${tP}%</span>` : ''}
-          </div></div>`;
+        const devBarMob = mP ? `<div class="n3-an-device-seg" style="width:${mP}%;background:${T.accent}" title="Mobile ${mP}%"></div>` : '';
+        const devBarDesk = dP ? `<div class="n3-an-device-seg" style="width:${dP}%;background:#10B981" title="Desktop ${dP}%"></div>` : '';
+        const devBarTab = tP ? `<div class="n3-an-device-seg" style="width:${tP}%;background:#F59E0B" title="Tablet ${tP}%"></div>` : '';
+        const devLblMob  = mP ? `<span style="color:${T.accent}">📱 ${mP}% Mobile</span>` : '';
+        const devLblDesk = dP ? `<span style="color:#10B981">🖥 ${dP}% Desktop</span>` : '';
+        const devLblTab  = tP ? `<span style="color:#F59E0B">⬜ ${tP}% Tablet</span>` : '';
+        devHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Devices</p><div class="n3-an-device-bar">${devBarMob}${devBarDesk}${devBarTab}</div><div class="n3-an-device-labels">${devLblMob}${devLblDesk}${devLblTab}</div></div>`;
       }
 
-      // Top pages
+      // ── Top Pages ─────────────────────────────────────────────────────────
       let topHtml = '';
       if (data.topPages && data.topPages.length) {
-        const items = data.topPages.slice(0, 5).map(p =>
-          `<div class="n3-an-top-item"><span class="n3-an-top-path">${_esc(p.path)}</span><span class="n3-an-top-count">${_fmtNum(p.views || p.count || 0)}</span></div>`
-        ).join('');
-        topHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Top Pages</p>${items}</div>`;
+        const maxPV  = Math.max(...data.topPages.map(p => p.views || p.count || 0), 1);
+        const pgRows = data.topPages.map(p => {
+          const v = p.views || p.count || 0;
+          const w = Math.round(v / maxPV * 100);
+          const avgT = p.avgTime ? ` <span style="color:${T.muted};font-size:10px">${_fmtDur(p.avgTime)}</span>` : '';
+          return `<div class="n3-an-bar-row"><span class="n3-an-bar-label">${_esc(p.path)}${avgT}</span><div class="n3-an-bar-track"><div class="n3-an-bar-fill" style="width:${w}%;background:${T.accent}"></div></div><span class="n3-an-bar-val">${_fmtNum(v)}</span></div>`;
+        }).join('');
+        topHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Top Pages</p>${pgRows}</div>`;
       }
 
-      // GA4 connect prompt
-      const connectHtml = !data.gaConnected && this._cfg
-        ? `<div class="n3-an-connect-prompt"><span>📊</span><span>Connect Google Analytics for richer insights — available in dashboard settings</span></div>` : '';
+      // ── Referrers + Cities (2-col on desktop) ─────────────────────────────
+      let refHtml = '';
+      if (data.referrers && data.referrers.length) {
+        const maxRef = Math.max(...data.referrers.map(r => r.visits), 1);
+        const refRows = data.referrers.map(r => {
+          const w = Math.round(r.visits / maxRef * 100);
+          return `<div class="n3-an-bar-row"><span class="n3-an-bar-label">${_esc(r.domain)}</span><div class="n3-an-bar-track"><div class="n3-an-bar-fill" style="width:${w}%;background:#10B981"></div></div><span class="n3-an-bar-val">${_fmtNum(r.visits)}</span></div>`;
+        }).join('');
+        refHtml = `<div class="n3-an-section"><p class="n3-an-section-title">Referrers</p>${refRows}</div>`;
+      }
 
-      const renderedHtml = statsHtml + chartHtml + sourcesHtml + devHtml + topHtml + connectHtml;
-      body.innerHTML = renderedHtml;
+      let citiesHtml = '';
+      if (data.cities && data.cities.length) {
+        const maxC   = Math.max(...data.cities.map(c => c.count), 1);
+        const cRows  = data.cities.map(c => {
+          const w = Math.round(c.count / maxC * 100);
+          return `<div class="n3-an-bar-row"><span class="n3-an-bar-label">${_esc(c.city)}</span><div class="n3-an-bar-track"><div class="n3-an-bar-fill" style="width:${w}%;background:#8B5CF6"></div></div><span class="n3-an-bar-val">${c.count}</span></div>`;
+        }).join('');
+        citiesHtml = `<div class="n3-an-section"><p class="n3-an-section-title">📍 Top Cities</p>${cRows}</div>`;
+      }
+
+      const geoBlock = (refHtml || citiesHtml)
+        ? `<div class="n3-an-2col">${refHtml}${citiesHtml}</div>` : '';
+
+      const connectHtml = !data.gaConnected && this._cfg
+        ? `<div class="n3-an-connect-prompt"><span>📊</span><span>Connect Google Analytics for real-time data — available in dashboard settings</span></div>` : '';
+
+      const allHtml = statsHtml + chartHtml + eventsHtml + sourcesHtml + devHtml + topHtml + geoBlock + connectHtml;
+      body.innerHTML = allHtml;
     }
   }
 
@@ -2010,6 +2164,9 @@
       this.panel.close();
       document.body.classList.remove('n3-editing');
       this._syncEditBtn(false);
+      // Collapse FAB back to closed state on exit
+      this._fabOpen = false;
+      if (this._fab) this._fab.classList.remove('n3-expanded');
       document.removeEventListener('click', this._onClickEl, true);
       document.removeEventListener('focus', this._onFocus,   true);
       document.removeEventListener('input', this._onInput);
