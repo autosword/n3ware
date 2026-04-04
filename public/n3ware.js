@@ -509,7 +509,8 @@
       this._events = events;
       /** @type {HTMLElement|null} */
       this._bar = null;
-      this._onSelChange = this._updateFormatState.bind(this);
+      this._onSelChange  = this._updateFormatState.bind(this);
+      this._onDocMouseDown = this._handleDocMouseDown.bind(this);
     }
 
     /** Mark all text-selector elements as contentEditable. */
@@ -543,6 +544,8 @@
       this._positionBar(el);
       this._updateFormatState();
       document.addEventListener('selectionchange', this._onSelChange);
+      // Hide bar when user clicks outside both the bar and any editable element.
+      document.addEventListener('mousedown', this._onDocMouseDown, true);
     }
 
     /** Remove the formatting toolbar. */
@@ -551,7 +554,18 @@
         this._bar.remove();
         this._bar = null;
         document.removeEventListener('selectionchange', this._onSelChange);
+        document.removeEventListener('mousedown', this._onDocMouseDown, true);
       }
+    }
+
+    // ── Private ──────────────────────────────────────────────────────────────
+
+    _handleDocMouseDown(e) {
+      if (!this._bar) return;
+      // If click is inside the format bar or inside a contentEditable element, keep bar visible.
+      if (this._bar.contains(e.target)) return;
+      if (e.target.closest('[data-n3-editable]')) return;
+      this.hideToolbar();
     }
 
     /**
@@ -618,11 +632,18 @@
 
     _positionBar(el) {
       if (!this._bar) return;
-      const rect = el.getBoundingClientRect();
-      let top = rect.top + window.scrollY - 46 - 8;
-      if (top < 56) top = rect.bottom + window.scrollY + 8;
-      const left = Math.max(8, Math.min(rect.left + window.scrollX, window.innerWidth - (this._bar.offsetWidth || 300) - 16));
-      this._bar.style.top = top + 'px';
+      const rect    = el.getBoundingClientRect();
+      const barH    = this._bar.offsetHeight || 46;
+      const barW    = this._bar.offsetWidth  || 300;
+      // Format bar is position:fixed — coords are viewport-relative, no scrollY needed.
+      let top = rect.top - barH - 8;
+      // If bar would go off-screen above (including below the toolbar), flip it below the element.
+      if (top < 56) top = rect.bottom + 8;
+      // Clamp to bottom of viewport with a margin.
+      if (top + barH > window.innerHeight - 8) top = window.innerHeight - barH - 8;
+      // Clamp left so bar stays within viewport.
+      const left = Math.max(8, Math.min(rect.left, window.innerWidth - barW - 16));
+      this._bar.style.top  = top  + 'px';
       this._bar.style.left = left + 'px';
     }
 
@@ -697,8 +718,9 @@
         if (dist < bestDist) { bestDist = dist; best = { el: sib, above: y < rect.top + rect.height / 2, rect }; }
       });
       if (best) {
+        // Drop line is position:fixed — coords are viewport-relative, no scrollY needed.
         const ly = best.above ? best.rect.top - 2 : best.rect.bottom + 1;
-        this._dropLine.style.top   = (ly + window.scrollY) + 'px';
+        this._dropLine.style.top   = ly + 'px';
         this._dropLine.style.left  = best.rect.left + 'px';
         this._dropLine.style.width = best.rect.width + 'px';
         this._dropTarget = best;
@@ -1006,7 +1028,10 @@
       if (this._origBodyPad === null) {
         this._origBodyPad = document.body.style.paddingTop;
         const cur = parseInt(getComputedStyle(document.body).paddingTop) || 0;
+        // Save scroll position before padding change to prevent jump.
+        const scrollY = window.scrollY;
         document.body.style.paddingTop = (cur + 48) + 'px';
+        window.scrollTo({ top: scrollY + 48, behavior: 'instant' });
       }
     }
 
@@ -1014,7 +1039,10 @@
     hide() {
       if (this._el) this._el.classList.remove('n3-visible');
       if (this._origBodyPad !== null) {
+        const scrollY = window.scrollY;
         document.body.style.paddingTop = this._origBodyPad;
+        // Restore scroll, compensating for the 48px padding we removed.
+        window.scrollTo({ top: Math.max(0, scrollY - 48), behavior: 'instant' });
         this._origBodyPad = null;
       }
     }
@@ -1898,7 +1926,7 @@
       document.querySelectorAll('[data-n3-ui]').forEach(e => e.remove());
       this.toolbar.mount();
       this.panel.mount();
-      this._buildEditButton();
+      this._buildControlPanel();
       if (this._editMode) {
         this._markBlocks();
         this.text.enable();
@@ -1946,7 +1974,12 @@
     _handleClick(e) {
       if (!this._editMode || N3UI.isEditorEl(e.target)) return;
       const block = e.target.closest('[data-n3-block]');
-      if (block) this._activate(block);
+      if (block) {
+        this._activate(block);
+      } else {
+        // Clicked outside any editable block — deactivate selection and hide format bar.
+        this._deactivate();
+      }
       // Triple-click: select the full text content of the editable element
       if (e.detail === 3) {
         const ed = e.target.closest('[data-n3-editable]');
