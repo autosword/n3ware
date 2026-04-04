@@ -185,7 +185,10 @@ function generateScripts(integrationsConfig) {
     const integration = INTEGRATIONS_MAP[key];
     if (!integration) continue;
     try {
-      parts.push(integration.generateScript(cfg));
+      const script = integration.generateScript(cfg);
+      parts.push(
+        `<!-- n3:script:${key}:start -->\n${script}\n<!-- n3:script:${key}:end -->`
+      );
     } catch (e) {
       console.warn(`[integrations] generateScript failed for ${key}:`, e.message);
     }

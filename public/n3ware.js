@@ -282,6 +282,14 @@
         `.n3-comp-add{flex-shrink:0;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:${T.accent};width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s;padding:0}`,
         `.n3-comp-add:hover{background:rgba(59,130,246,.28);border-color:rgba(59,130,246,.5);transform:scale(1.1)}`,
         `.n3-comp-drop-target{outline:2px dashed ${T.accent}!important;outline-offset:3px;background:rgba(59,130,246,.06)!important}`,
+        // ── Script placeholders ──────────────────────────────────────────────
+        `.n3-script-placeholder{display:flex;align-items:center;gap:10px;background:rgba(59,130,246,.07);border:1.5px dashed rgba(59,130,246,.4);border-radius:8px;padding:10px 14px;margin:6px 0;font:600 12px/1.4 system-ui,sans-serif;color:${T.accent};pointer-events:all}`,
+        `.n3-sp-icon{font-size:16px;flex-shrink:0}`,
+        `.n3-sp-name{flex:1;color:${T.text};font-weight:600;font-size:12px}`,
+        `.n3-sp-edit{background:rgba(59,130,246,.18);border:1px solid rgba(59,130,246,.4);color:${T.accent};padding:4px 10px;border-radius:5px;cursor:pointer;font:600 11px/1 system-ui;transition:all .12s}`,
+        `.n3-sp-edit:hover{background:rgba(59,130,246,.32)}`,
+        `.n3-sp-remove{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#F87171;padding:4px 10px;border-radius:5px;cursor:pointer;font:600 11px/1 system-ui;transition:all .12s}`,
+        `.n3-sp-remove:hover{background:rgba(239,68,68,.22)}`,
         // ── Mobile / narrow viewport overrides ──────────────────────────────
         `@media(max-width:767px){
           .n3-mob-hide{display:none!important}
@@ -1596,20 +1604,32 @@
         document.head.appendChild(tw);
       }
 
+      const compId       = 'c' + Date.now();
+      const startComment = document.createComment(` n3:component:${compId}:start `);
+      const endComment   = document.createComment(` n3:component:${compId}:end `);
+
       const tmp      = document.createElement('div');
       const safeHtml = html.trim();
       tmp.innerHTML  = safeHtml;
       const node = tmp.firstElementChild || tmp;
 
       if (target) {
-        target.parentNode.insertBefore(node, target.nextSibling);
+        const ref = target.nextSibling;
+        target.parentNode.insertBefore(endComment, ref);
+        target.parentNode.insertBefore(node, endComment);
+        target.parentNode.insertBefore(startComment, node);
       } else {
         const blocks = document.querySelectorAll('[data-n3-block]');
         if (blocks.length) {
           const last = blocks[blocks.length - 1];
-          last.parentNode.insertBefore(node, last.nextSibling);
+          const ref  = last.nextSibling;
+          last.parentNode.insertBefore(endComment, ref);
+          last.parentNode.insertBefore(node, endComment);
+          last.parentNode.insertBefore(startComment, node);
         } else {
+          document.body.appendChild(startComment);
           document.body.appendChild(node);
+          document.body.appendChild(endComment);
         }
       }
 
@@ -1628,6 +1648,140 @@
 
       this._events.emit('component:insert', node);
       node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // N3ScriptPlaceholders — visual cards for n3:script comment blocks in edit mode
+  // ═══════════════════════════════════════════════════════════════════════════
+  class N3ScriptPlaceholders {
+    /** @param {N3Events} events */
+    constructor(events) {
+      this._events      = events;
+      this._placeholders = [];
+    }
+
+    /** Scan for n3:script comments and insert placeholder cards. */
+    enable() { this._scan(); }
+
+    /** Remove all placeholder cards. */
+    disable() { this._removePlaceholders(); }
+
+    _scan() {
+      const walker = document.createTreeWalker(
+        document.documentElement,
+        NodeFilter.SHOW_COMMENT,
+        null
+      );
+      const starts = [];
+      let node;
+      while ((node = walker.nextNode())) {
+        const m = node.nodeValue.trim().match(/^n3:script:([^:]+):start$/);
+        if (m) starts.push({ node, key: m[1] });
+      }
+      starts.forEach(({ node, key }) => this._insertPlaceholder(node, key));
+    }
+
+    _insertPlaceholder(startComment, key) {
+      const label = key.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const div   = document.createElement('div');
+      div.className = 'n3-script-placeholder';
+      div.setAttribute('data-n3-ui', '1');
+      div.dataset.scriptKey = key;
+      div.innerHTML =
+        `<span class="n3-sp-icon">⚡</span>` +
+        `<span class="n3-sp-name">${label}</span>` +
+        `<button class="n3-sp-edit">Edit</button>` +
+        `<button class="n3-sp-remove">Remove</button>`;
+      startComment.parentNode.insertBefore(div, startComment.nextSibling);
+      div.querySelector('.n3-sp-edit').addEventListener('click', e => {
+        e.stopPropagation(); this._openEditor(startComment, key);
+      });
+      div.querySelector('.n3-sp-remove').addEventListener('click', e => {
+        e.stopPropagation(); this._removeScript(startComment, key, div);
+      });
+      this._placeholders.push(div);
+    }
+
+    _openEditor(startComment, key) {
+      let scriptContent = '';
+      let node = startComment.nextSibling;
+      while (node) {
+        if (node.nodeType === Node.COMMENT_NODE &&
+            node.nodeValue.trim() === `n3:script:${key}:end`) break;
+        if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SCRIPT') {
+          scriptContent = node.outerHTML;
+        }
+        node = node.nextSibling;
+      }
+      const overlay = document.createElement('div');
+      overlay.setAttribute('data-n3-ui', '1');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999999;display:flex;align-items:center;justify-content:center';
+      const modal = document.createElement('div');
+      modal.style.cssText = 'background:#1e293b;border-radius:12px;padding:24px;width:560px;max-width:90vw;color:#f1f5f9;box-shadow:0 20px 60px rgba(0,0,0,.6)';
+      modal.innerHTML =
+        `<h3 style="margin:0 0 16px;font:700 15px/1 system-ui">Edit Script: ${key}</h3>` +
+        `<textarea style="width:100%;height:180px;background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;box-sizing:border-box;resize:vertical;outline:none">${scriptContent}</textarea>` +
+        `<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">` +
+          `<button class="n3-sp-modal-cancel" style="padding:7px 14px;border:1px solid #475569;border-radius:6px;background:transparent;color:#94a3b8;cursor:pointer;font:600 12px/1 system-ui">Cancel</button>` +
+          `<button class="n3-sp-modal-save" style="padding:7px 14px;background:#3b82f6;border:none;border-radius:6px;color:#fff;cursor:pointer;font:600 12px/1 system-ui">Save</button>` +
+        `</div>`;
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      modal.querySelector('.n3-sp-modal-cancel').addEventListener('click', () => overlay.remove());
+      modal.querySelector('.n3-sp-modal-save').addEventListener('click', () => {
+        this._updateScript(startComment, key, modal.querySelector('textarea').value.trim());
+        overlay.remove();
+      });
+    }
+
+    _updateScript(startComment, key, newScriptHtml) {
+      // Remove existing script nodes between start and end (skip placeholder)
+      let node = startComment.nextSibling;
+      const toRemove = [];
+      while (node) {
+        if (node.nodeType === Node.COMMENT_NODE &&
+            node.nodeValue.trim() === `n3:script:${key}:end`) break;
+        if (!node.dataset || !node.dataset.n3Ui) toRemove.push(node);
+        node = node.nextSibling;
+      }
+      toRemove.forEach(n => n.remove());
+      // Insert new script before the end comment
+      if (newScriptHtml) {
+        let endNode = startComment.nextSibling;
+        while (endNode) {
+          if (endNode.nodeType === Node.COMMENT_NODE &&
+              endNode.nodeValue.trim() === `n3:script:${key}:end`) break;
+          endNode = endNode.nextSibling;
+        }
+        const tmp  = document.createElement('div');
+        tmp.innerHTML = newScriptHtml;
+        const first = tmp.firstElementChild;
+        if (first && endNode) startComment.parentNode.insertBefore(first, endNode);
+        else if (first)       startComment.parentNode.appendChild(first);
+      }
+      N3UI.toast('Script updated', 'success');
+    }
+
+    _removeScript(startComment, key, placeholder) {
+      const toRemove = [startComment, placeholder];
+      let node = placeholder.nextSibling;
+      while (node) {
+        const next  = node.nextSibling;
+        const isEnd = node.nodeType === Node.COMMENT_NODE &&
+                      node.nodeValue.trim() === `n3:script:${key}:end`;
+        toRemove.push(node);
+        if (isEnd) break;
+        node = next;
+      }
+      toRemove.forEach(n => { if (n.parentNode) n.parentNode.removeChild(n); });
+      this._placeholders = this._placeholders.filter(p => p !== placeholder);
+      N3UI.toast('Script removed', 'info');
+    }
+
+    _removePlaceholders() {
+      this._placeholders.forEach(p => { if (p.parentNode) p.parentNode.removeChild(p); });
+      this._placeholders = [];
     }
   }
 
@@ -2406,9 +2560,10 @@
         ? new N3Cloud(this._cloudCfg.api, this._cloudCfg.site, this._cloudCfg.key)
         : null;
       this.revPanel  = this.cloud ? new N3RevPanel(this.events, this.cloud) : null;
-      this.analytics  = new N3Analytics(this._cloudCfg);
-      this.components = new N3Components(this.events, this._cloudCfg);
-      this._fab       = null;
+      this.analytics        = new N3Analytics(this._cloudCfg);
+      this.components       = new N3Components(this.events, this._cloudCfg);
+      this.scriptPlaceholders = new N3ScriptPlaceholders(this.events);
+      this._fab             = null;
       this._fabOpen   = false;
 
       this._onKeyDown = this._handleKeyDown.bind(this);
@@ -2548,6 +2703,7 @@
       this._markBlocks();
       this.controls.enable();
       this.toolbar.show();
+      this.scriptPlaceholders.enable();
       document.body.classList.add('n3-editing');
       this._syncEditBtn(true);
       document.addEventListener('click', this._onClickEl = this._handleClick.bind(this), true);
@@ -2563,6 +2719,7 @@
       this.controls.disable();
       this.toolbar.hide();
       this.panel.close();
+      this.scriptPlaceholders.disable();
       document.body.classList.remove('n3-editing');
       this._syncEditBtn(false);
       // Collapse FAB back to closed state on exit
