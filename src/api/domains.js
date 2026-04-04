@@ -3,8 +3,9 @@
 /**
  * Domain management API routes.
  *
- * GET    /api/domains/search              — search domain availability
- * POST   /api/domains/register            — register a domain
+ * GET    /api/domains/search              — search domain availability across TLDs
+ * POST   /api/domains/register            — register a domain via Cloudflare Registrar
+ * GET    /api/domains                     — list registered domains in this CF account
  * POST   /api/domains/sites/:siteId/connect   — connect custom domain to a site
  * DELETE /api/domains/sites/:siteId/connect   — disconnect custom domain from a site
  * GET    /api/domains/sites/:siteId/verify    — verify DNS configuration
@@ -17,19 +18,13 @@ const { authOrApiKey } = require('./auth');
 
 const router = express.Router();
 
-// Apply auth to all routes in this router.
 router.use(authOrApiKey);
 
-// ---------------------------------------------------------------------------
-// GET /search — search for domain availability
-// ---------------------------------------------------------------------------
+// ── GET /search ──────────────────────────────────────────────────────────────
 router.get('/search', async (req, res) => {
   try {
-    const q = (req.query.q || '').trim();
-    if (!q) {
-      return res.status(400).json({ error: 'Query parameter "q" is required' });
-    }
-
+    const q = (req.query.q || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30);
+    if (!q) return res.status(400).json({ error: 'Missing or invalid query — use alphanumeric characters only' });
     const results = await cloudflare.searchDomains(q);
     res.json({ results });
   } catch (err) {
@@ -37,47 +32,81 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// ---------------------------------------------------------------------------
-// POST /register — register a domain
-// ---------------------------------------------------------------------------
+// ── POST /register ────────────────────────────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
-    const { domain, contactInfo } = req.body || {};
-    if (!domain) {
+    const { domain, years = 1, siteId } = req.body || {};
+    if (!domain || typeof domain !== 'string') {
       return res.status(400).json({ error: '"domain" is required' });
     }
 
-    const result = await cloudflare.registerDomain(domain, contactInfo || {});
-    res.status(201).json({ domain: result });
+    const result = await cloudflare.registerDomain(domain, years, {
+      first_name:         'n3ware',
+      last_name:          'Customer',
+      email:              req.user?.email || 'hello@n3ware.com',
+      phone:              '+1.4015555555',
+      address:            '123 Main St',
+      city:               'South Kingstown',
+      state_or_province:  'RI',
+      postal_code:        '02879',
+      country:            'US',
+    });
+
+    if (!result.success) {
+      return res.status(500).json({ error: result.error || 'Registration failed' });
+    }
+
+    // Link to site and configure DNS if siteId provided
+    if (siteId && result.zoneId) {
+      try {
+        const site = await storage.getSite(siteId);
+        if (site) {
+          await storage.saveSite(siteId, { ...site, customDomain: domain, zoneId: result.zoneId });
+        }
+        // Create CNAME records pointing to assembler
+        const dnsTarget = 'assembler.n3ware.com';
+        await Promise.all([
+          cloudflare.addDnsRecord(result.zoneId, { type: 'CNAME', name: '@',   content: dnsTarget, proxied: true }),
+          cloudflare.addDnsRecord(result.zoneId, { type: 'CNAME', name: 'www', content: dnsTarget, proxied: true }),
+        ]);
+      } catch (linkErr) {
+        console.warn('[domains/register] site link failed:', linkErr.message);
+      }
+    }
+
+    if (result.mockMode) {
+      result.note = 'MOCK MODE — no real domain registered. Set CLOUDFLARE_API_TOKEN to enable real registrations.';
+    }
+
+    res.status(201).json({ success: true, ...result });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ---------------------------------------------------------------------------
-// POST /sites/:siteId/connect — attach a custom domain to a site
-// ---------------------------------------------------------------------------
+// ── GET / ─────────────────────────────────────────────────────────────────────
+router.get('/', async (req, res) => {
+  try {
+    const domains = await cloudflare.listMyDomains();
+    res.json({ domains });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /sites/:siteId/connect ───────────────────────────────────────────────
 router.post('/sites/:siteId/connect', async (req, res) => {
   try {
     const { siteId } = req.params;
     const { domain }  = req.body || {};
-
-    if (!domain) {
-      return res.status(400).json({ error: '"domain" is required' });
-    }
+    if (!domain) return res.status(400).json({ error: '"domain" is required' });
 
     const site = await storage.getSite(siteId);
-    if (!site) {
-      return res.status(404).json({ error: `Site "${siteId}" not found` });
-    }
+    if (!site) return res.status(404).json({ error: `Site "${siteId}" not found` });
 
-    // Create a Cloudflare zone for the domain (or retrieve existing).
     let zone = await cloudflare.getZone(domain);
-    if (!zone) {
-      zone = await cloudflare.createZone(domain);
-    }
+    if (!zone) zone = await cloudflare.createZone(domain);
 
-    // Persist the custom domain on the site record.
     const updatedSite = { ...site, customDomain: domain, zoneId: zone.id };
     await storage.saveSite(siteId, updatedSite);
 
@@ -87,17 +116,12 @@ router.post('/sites/:siteId/connect', async (req, res) => {
   }
 });
 
-// ---------------------------------------------------------------------------
-// DELETE /sites/:siteId/connect — remove the custom domain from a site
-// ---------------------------------------------------------------------------
+// ── DELETE /sites/:siteId/connect ─────────────────────────────────────────────
 router.delete('/sites/:siteId/connect', async (req, res) => {
   try {
     const { siteId } = req.params;
-
     const site = await storage.getSite(siteId);
-    if (!site) {
-      return res.status(404).json({ error: `Site "${siteId}" not found` });
-    }
+    if (!site) return res.status(404).json({ error: `Site "${siteId}" not found` });
 
     const updatedSite = { ...site };
     delete updatedSite.customDomain;
@@ -110,27 +134,17 @@ router.delete('/sites/:siteId/connect', async (req, res) => {
   }
 });
 
-// ---------------------------------------------------------------------------
-// GET /sites/:siteId/verify — verify DNS configuration
-// ---------------------------------------------------------------------------
+// ── GET /sites/:siteId/verify ─────────────────────────────────────────────────
 router.get('/sites/:siteId/verify', async (req, res) => {
   try {
     const { siteId } = req.params;
-
     const site = await storage.getSite(siteId);
-    if (!site) {
-      return res.status(404).json({ error: `Site "${siteId}" not found` });
-    }
+    if (!site) return res.status(404).json({ error: `Site "${siteId}" not found` });
+    if (!site.customDomain) return res.status(400).json({ error: 'No custom domain configured for this site' });
 
-    if (!site.customDomain) {
-      return res.status(400).json({ error: 'No custom domain is configured for this site' });
-    }
-
-    // The expected CNAME target for n3ware-hosted sites.
-    const expected = `${siteId}.n3ware.com`;
-
+    const expected = 'assembler.n3ware.com';
     let resolvedCname = null;
-    let verified      = false;
+    let verified = false;
 
     try {
       const dns    = require('dns').promises;
@@ -138,17 +152,10 @@ router.get('/sites/:siteId/verify', async (req, res) => {
       resolvedCname = cnames[0] || null;
       verified = resolvedCname === expected || (resolvedCname && resolvedCname.endsWith('.n3ware.com'));
     } catch {
-      // DNS resolution failed — domain not yet propagated or misconfigured.
-      verified      = false;
-      resolvedCname = null;
+      verified = false;
     }
 
-    res.json({
-      verified,
-      domain:   site.customDomain,
-      cname:    resolvedCname,
-      expected,
-    });
+    res.json({ verified, domain: site.customDomain, cname: resolvedCname, expected });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
