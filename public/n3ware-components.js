@@ -270,7 +270,7 @@
 
     async _load() {
       try {
-        const res = await fetch(`${this._apiBase}/api/components`);
+        const res = await fetch(`${this._apiBase}/components`);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         this._components = await res.json();
         this._loaded     = true;
