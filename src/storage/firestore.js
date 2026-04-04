@@ -16,7 +16,7 @@ const MAX_REVISIONS = 50;
 
 class FirestoreStorage {
   constructor(projectId = config.gcpProject) {
-    this._db = new Firestore({ projectId });
+    this._db = new Firestore({ projectId, ignoreUndefinedProperties: true });
     this._sites = this._db.collection('sites');
   }
 
@@ -74,14 +74,16 @@ class FirestoreStorage {
    * @returns {Promise<object[]>}
    */
   async listSites(filter = {}) {
-    // Avoid selecting 'id' — it conflicts with Firestore's document ID property
-    // and causes INVALID_ARGUMENT. Use d.id directly instead.
-    let query = this._sites.select('name', 'message', 'ownerId', 'createdAt', 'updatedAt');
-    if (filter.ownerId) {
-      query = query.where('ownerId', '==', filter.ownerId);
-    }
+    // Do NOT use .select() with 'id' — it is not a valid Firestore field path
+    // for field masks and causes INVALID_ARGUMENT. Use d.id from the snapshot.
+    let query = filter.ownerId
+      ? this._sites.where('ownerId', '==', filter.ownerId)
+      : this._sites;
     const snap = await query.get();
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snap.docs.map(d => {
+      const { html: _html, ...meta } = d.data(); // exclude html from list
+      return { id: d.id, ...meta };
+    });
   }
 
   // ── Revisions ─────────────────────────────────────────────────────────────
@@ -103,13 +105,17 @@ class FirestoreStorage {
    * @returns {Promise<object[]>}
    */
   async listRevisions(siteId) {
+    // Do NOT use .select('id', ...) — 'id' is not a valid Firestore field path
+    // for field masks and causes INVALID_ARGUMENT. Exclude html manually instead.
     const snap = await this._sites.doc(siteId)
       .collection('revisions')
-      .select('id', 'siteId', 'message', 'createdAt')
       .orderBy('createdAt', 'desc')
       .limit(MAX_REVISIONS)
       .get();
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snap.docs.map(d => {
+      const { html: _html, ...meta } = d.data(); // exclude html — can be large
+      return { id: d.id, ...meta };
+    });
   }
 
   /**
