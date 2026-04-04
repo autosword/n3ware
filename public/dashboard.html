@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>n3ware — Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     * { box-sizing: border-box; }
     body { background: #0A0A0A; color: #E5E5E5; font-family: system-ui, -apple-system, sans-serif; }
@@ -357,8 +358,6 @@
     <div class="flex gap-1 px-6 pt-4 border-b border-[#2A2A2A] pb-0">
       <button onclick="switchSettingsTab('general')" id="stab-general"
         class="tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-[#2A2A2A]">General</button>
-      <button onclick="switchSettingsTab('domain')" id="stab-domain"
-        class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-[#888888] hover:text-white">Domain</button>
       <button onclick="switchSettingsTab('files')" id="stab-files"
         class="tab-btn text-sm font-semibold px-4 py-2 rounded-t-lg text-[#888888] hover:text-white">Files</button>
       <button onclick="switchSettingsTab('ga')" id="stab-ga"
@@ -418,87 +417,6 @@
         <h3 class="text-sm font-bold text-red-400 mb-1">Danger Zone</h3>
         <p class="text-xs text-[#888888] mb-4">Deleting this site is permanent. All revisions will be lost.</p>
         <button onclick="confirmDeleteSite()" class="text-sm bg-red-900/40 hover:bg-red-900/70 text-red-400 border border-red-900/50 px-5 py-2 rounded-lg transition">Delete This Site</button>
-      </div>
-    </div>
-
-    <!-- Domain tab -->
-    <div id="settings-domain" class="settings-tab p-6 space-y-5">
-
-      <!-- Sub-tabs: Buy / Connect -->
-      <div class="flex gap-1 bg-[#0A0A0A] rounded-xl p-1">
-        <button onclick="switchDomainSubTab('buy')" id="dtab-buy"
-          class="flex-1 text-xs font-semibold py-2 rounded-lg bg-[#2A2A2A] text-white transition">Buy a Domain</button>
-        <button onclick="switchDomainSubTab('connect')" id="dtab-connect"
-          class="flex-1 text-xs font-semibold py-2 rounded-lg text-[#888888] hover:text-white transition">Connect Existing</button>
-      </div>
-
-      <!-- ── Buy a domain ── -->
-      <div id="domain-buy-panel">
-        <p class="text-xs text-[#888888] mb-3">Search across 7 popular TLDs — registered at Cloudflare's at-cost pricing.</p>
-        <div class="flex gap-2 mb-4">
-          <input id="domain-search-input" type="text" placeholder="yourname" autocomplete="off"
-            class="flex-1 rounded-xl px-4 py-3 text-sm bg-[#0A0A0A] border border-[#333] text-white placeholder-[#555] focus:outline-none focus:border-[#E31137]"
-            onkeydown="if(event.key==='Enter') domainSearch()">
-          <button onclick="domainSearch()"
-            class="bg-[#E31137] hover:bg-[#c8102e] text-white font-semibold px-5 py-3 rounded-xl text-sm transition">Search</button>
-        </div>
-
-        <!-- Results -->
-        <div id="domain-search-results" class="space-y-2 hidden"></div>
-        <div id="domain-search-spinner" class="hidden text-center py-6">
-          <div class="w-8 h-8 border-2 border-[#333] border-t-[#E31137] rounded-full animate-spin mx-auto mb-2"></div>
-          <p class="text-xs text-[#666]">Checking availability…</p>
-        </div>
-        <div id="domain-search-empty" class="hidden text-center py-8">
-          <p class="text-[#666] text-sm">Enter a name above to search for available domains.</p>
-        </div>
-      </div>
-
-      <!-- ── Connect existing ── -->
-      <div id="domain-connect-panel" class="hidden space-y-4">
-        <p class="text-xs text-[#888888]">Already own a domain? Enter it below and follow the DNS instructions to point it at your n3ware site.</p>
-
-        <!-- Connected badge -->
-        <div id="domain-connected2" class="hidden">
-          <div class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
-            <div>
-              <p id="domain-name-display2" class="text-sm font-semibold text-emerald-400"></p>
-              <p class="text-xs text-[#888888]">Domain connected</p>
-            </div>
-            <button onclick="disconnectDomain()" class="text-xs text-red-400 hover:text-red-300 transition">Disconnect</button>
-          </div>
-        </div>
-
-        <!-- Connect form -->
-        <div id="domain-form2">
-          <input type="text" id="settings-domain2" placeholder="mybusiness.com"
-            class="w-full rounded-xl px-4 py-3 text-sm bg-[#0A0A0A] border border-[#333] text-white placeholder-[#555] focus:outline-none focus:border-[#E31137] mb-3">
-          <button onclick="connectDomain2()"
-            class="text-sm bg-[#2A2A2A] hover:bg-[#444] text-white px-4 py-2 rounded-lg transition">Connect Domain</button>
-        </div>
-
-        <!-- DNS instructions -->
-        <div id="domain-dns-instructions" class="hidden bg-[#0A0A0A] border border-[#2A2A2A] rounded-xl p-4 space-y-3">
-          <p class="text-xs font-semibold text-[#E5E5E5]">Add these DNS records at your registrar:</p>
-          <div class="space-y-2">
-            <div class="flex items-center gap-2 font-mono text-xs">
-              <span class="bg-[#2A2A2A] text-[#E31137] px-2 py-1 rounded">CNAME</span>
-              <span class="text-[#E5E5E5]">@</span>
-              <span class="text-[#666]">→</span>
-              <span class="text-emerald-400">assembler.n3ware.com</span>
-            </div>
-            <div class="flex items-center gap-2 font-mono text-xs">
-              <span class="bg-[#2A2A2A] text-[#E31137] px-2 py-1 rounded">CNAME</span>
-              <span class="text-[#E5E5E5]">www</span>
-              <span class="text-[#666]">→</span>
-              <span class="text-emerald-400">assembler.n3ware.com</span>
-            </div>
-          </div>
-          <p class="text-xs text-[#666]">DNS changes can take up to 48 hours to propagate.</p>
-          <button onclick="verifyDomain()"
-            class="text-xs bg-[#E31137] hover:bg-[#c8102e] text-white px-3 py-2 rounded-lg transition">Verify Connection</button>
-          <p id="domain-verify-result" class="text-xs hidden"></p>
-        </div>
       </div>
     </div>
 
@@ -827,12 +745,12 @@ function renderTemplateGrid() {
   const container = document.getElementById('template-grid');
   if (!S.templates.length) { container.innerHTML = '<p class="text-[#888888] text-sm">Loading…</p>'; return; }
   const cats = [...new Set(S.templates.map(t => t.category))];
-  const icons = { blank:'⬜', portfolio:'🎨', business:'💼', restaurant:'🍽️', realtor:'🏠', lawncare:'🌿', handyman:'🔧', salon:'✂️', petcare:'🐾' };
+  const tplIcons = { blank:'file-text', portfolio:'image', business:'briefcase', restaurant:'utensils', realtor:'home', lawncare:'sparkles', handyman:'wrench', salon:'star', petcare:'star' };
   const catHtml = cats.map(cat => {
     const items = S.templates.filter(t => t.category === cat);
     const cards = items.map(t => `
       <div class="template-card rounded-xl p-3 text-center" data-name="${esc(t.name)}" onclick="selectTemplate('${esc(t.name)}')">
-        <div class="text-2xl mb-1">${icons[t.name] || '📄'}</div>
+        <div class="flex items-center justify-center mb-1"><i data-lucide="${tplIcons[t.name] || 'file-text'}" class="w-6 h-6"></i></div>
         <p class="text-xs font-semibold text-white">${esc(t.label)}</p>
       </div>`).join('');
     return `<div class="mb-4">
@@ -841,6 +759,7 @@ function renderTemplateGrid() {
     </div>`;
   }).join('');
   container.innerHTML = catHtml;
+  if (window.lucide) lucide.createIcons();
   if (S.templates.length) selectTemplate(S.templates[0].name);
 }
 let selectedTemplate = 'blank';
@@ -1108,7 +1027,7 @@ function renderAnalytics(stats, daily) {
 
 // ── Settings modal ────────────────────────────────────────────────────────────
 function switchSettingsTab(tab) {
-  ['general','domain','files','ga','integrations'].forEach(t => {
+  ['general','files','ga','integrations'].forEach(t => {
     document.getElementById(`settings-${t}`).classList.toggle('active', t === tab);
     document.getElementById(`stab-${t}`).className = t === tab
       ? 'tab-btn active text-sm font-semibold px-4 py-2 rounded-t-lg text-white bg-[#2A2A2A]'
@@ -1117,29 +1036,6 @@ function switchSettingsTab(tab) {
   if (tab === 'files')        loadFiles();
   if (tab === 'ga')           loadGATab();
   if (tab === 'integrations') loadSettingsIntegrations();
-  if (tab === 'domain')       initDomainTab();
-}
-
-function initDomainTab() {
-  // Reset search state
-  document.getElementById('domain-search-input').value = '';
-  document.getElementById('domain-search-results').classList.add('hidden');
-  document.getElementById('domain-search-spinner').classList.add('hidden');
-  document.getElementById('domain-search-empty').classList.remove('hidden');
-  // Sync connected domain state in the Connect sub-tab
-  const site = S.sites.find(s => s.id === S.activeSite);
-  if (site && site.customDomain) {
-    document.getElementById('domain-name-display2').textContent = site.customDomain;
-    document.getElementById('domain-connected2').classList.remove('hidden');
-    document.getElementById('domain-form2').classList.add('hidden');
-  } else {
-    document.getElementById('domain-connected2').classList.add('hidden');
-    document.getElementById('domain-form2').classList.remove('hidden');
-    document.getElementById('settings-domain2').value = '';
-  }
-  document.getElementById('domain-dns-instructions').classList.add('hidden');
-  document.getElementById('domain-verify-result').classList.add('hidden');
-  switchDomainSubTab('buy');
 }
 function openSettings(siteId) {
   const site = S.sites.find(s => s.id === siteId);
@@ -1466,19 +1362,19 @@ async function startCheckout(planId) {
 
 // All integration definitions (mirrors tracker-scripts.js, client-side copy)
 const ALL_INTEGRATIONS = [
-  { key:'google-analytics',  name:'Google Analytics (GA4)',  category:'analytics',   icon:'📊', description:'Track visitors, page views, and conversions',           fields:[{name:'measurementId', label:'Measurement ID',   placeholder:'G-XXXXXXXXXX',                    type:'id',   required:true }] },
-  { key:'google-tag-manager',name:'Google Tag Manager',      category:'analytics',   icon:'🏷️', description:'Manage all your tags in one place',                    fields:[{name:'containerId',   label:'Container ID',     placeholder:'GTM-XXXXXXX',                     type:'id',   required:true }] },
-  { key:'clarity',           name:'Microsoft Clarity',       category:'analytics',   icon:'🔍', description:'Heatmaps, session recordings, and user behavior',       fields:[{name:'projectId',     label:'Project ID',       placeholder:'abc123xyz',                       type:'id',   required:true }] },
-  { key:'plausible',         name:'Plausible Analytics',     category:'analytics',   icon:'📈', description:'Privacy-friendly analytics, no cookies',               fields:[{name:'domain',        label:'Domain',           placeholder:'yourdomain.com',                   type:'id',   required:true }] },
-  { key:'hotjar',            name:'Hotjar',                   category:'analytics',   icon:'🔥', description:'Heatmaps, recordings, and user feedback',              fields:[{name:'siteId',        label:'Site ID',          placeholder:'1234567',                         type:'id',   required:true }] },
-  { key:'meta-pixel',        name:'Meta (Facebook) Pixel',   category:'social',      icon:'📘', description:'Track conversions from Facebook & Instagram ads',      fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'123456789012345',                 type:'id',   required:true }] },
-  { key:'tiktok-pixel',      name:'TikTok Pixel',            category:'social',      icon:'🎵', description:'Track conversions from TikTok ads',                    fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'CXXXXXXXXXXXXXXXXX',              type:'id',   required:true }] },
-  { key:'twitter-pixel',     name:'X (Twitter) Pixel',       category:'social',      icon:'🐦', description:'Track conversions from X/Twitter ads',                 fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'xxxxx',                           type:'id',   required:true }] },
-  { key:'pinterest-tag',     name:'Pinterest Tag',            category:'social',      icon:'📌', description:'Track conversions from Pinterest ads',                 fields:[{name:'tagId',         label:'Tag ID',           placeholder:'1234567890123',                   type:'id',   required:true }] },
-  { key:'linkedin-insight',  name:'LinkedIn Insight Tag',    category:'social',      icon:'💼', description:'Track conversions from LinkedIn ads',                  fields:[{name:'partnerId',     label:'Partner ID',       placeholder:'123456',                          type:'id',   required:true }] },
-  { key:'snapchat-pixel',    name:'Snapchat Pixel',          category:'social',      icon:'👻', description:'Track conversions from Snapchat ads',                  fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', type:'id', required:true }] },
-  { key:'google-ads',        name:'Google Ads Conversion',   category:'advertising', icon:'💰', description:'Track Google Ads conversions',                         fields:[{name:'conversionId',  label:'Conversion ID',    placeholder:'AW-123456789',                    type:'id',   required:true }, {name:'conversionLabel', label:'Conversion Label (optional)', placeholder:'AbCdEfGh', type:'id', required:false}] },
-  { key:'custom-script',     name:'Custom Script',           category:'other',       icon:'🔧', description:'Paste any custom script tag',                          fields:[{name:'code',          label:'Script Code',      placeholder:'\x3cscript>...<\/script>',            type:'code', required:true }] },
+  { key:'google-analytics',  name:'Google Analytics (GA4)',  category:'analytics',   icon:'📊', lucideIcon:'chart-bar',    description:'Track visitors, page views, and conversions',           fields:[{name:'measurementId', label:'Measurement ID',   placeholder:'G-XXXXXXXXXX',                    type:'id',   required:true }] },
+  { key:'google-tag-manager',name:'Google Tag Manager',      category:'analytics',   icon:'🏷️', lucideIcon:'tag',          description:'Manage all your tags in one place',                    fields:[{name:'containerId',   label:'Container ID',     placeholder:'GTM-XXXXXXX',                     type:'id',   required:true }] },
+  { key:'clarity',           name:'Microsoft Clarity',       category:'analytics',   icon:'🔍', lucideIcon:'search',       description:'Heatmaps, session recordings, and user behavior',       fields:[{name:'projectId',     label:'Project ID',       placeholder:'abc123xyz',                       type:'id',   required:true }] },
+  { key:'plausible',         name:'Plausible Analytics',     category:'analytics',   icon:'📈', lucideIcon:'trending-up',  description:'Privacy-friendly analytics, no cookies',               fields:[{name:'domain',        label:'Domain',           placeholder:'yourdomain.com',                   type:'id',   required:true }] },
+  { key:'hotjar',            name:'Hotjar',                   category:'analytics',   icon:'🔥', lucideIcon:'flame',        description:'Heatmaps, recordings, and user feedback',              fields:[{name:'siteId',        label:'Site ID',          placeholder:'1234567',                         type:'id',   required:true }] },
+  { key:'meta-pixel',        name:'Meta (Facebook) Pixel',   category:'social',      icon:'📘', lucideIcon:'facebook',     description:'Track conversions from Facebook & Instagram ads',      fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'123456789012345',                 type:'id',   required:true }] },
+  { key:'tiktok-pixel',      name:'TikTok Pixel',            category:'social',      icon:'🎵', lucideIcon:'music',        description:'Track conversions from TikTok ads',                    fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'CXXXXXXXXXXXXXXXXX',              type:'id',   required:true }] },
+  { key:'twitter-pixel',     name:'X (Twitter) Pixel',       category:'social',      icon:'🐦', lucideIcon:'twitter',      description:'Track conversions from X/Twitter ads',                 fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'xxxxx',                           type:'id',   required:true }] },
+  { key:'pinterest-tag',     name:'Pinterest Tag',            category:'social',      icon:'📌', lucideIcon:'pin',          description:'Track conversions from Pinterest ads',                 fields:[{name:'tagId',         label:'Tag ID',           placeholder:'1234567890123',                   type:'id',   required:true }] },
+  { key:'linkedin-insight',  name:'LinkedIn Insight Tag',    category:'social',      icon:'💼', lucideIcon:'briefcase',    description:'Track conversions from LinkedIn ads',                  fields:[{name:'partnerId',     label:'Partner ID',       placeholder:'123456',                          type:'id',   required:true }] },
+  { key:'snapchat-pixel',    name:'Snapchat Pixel',          category:'social',      icon:'👻', lucideIcon:'ghost',        description:'Track conversions from Snapchat ads',                  fields:[{name:'pixelId',       label:'Pixel ID',         placeholder:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', type:'id', required:true }] },
+  { key:'google-ads',        name:'Google Ads Conversion',   category:'advertising', icon:'💰', lucideIcon:'dollar-sign',  description:'Track Google Ads conversions',                         fields:[{name:'conversionId',  label:'Conversion ID',    placeholder:'AW-123456789',                    type:'id',   required:true }, {name:'conversionLabel', label:'Conversion Label (optional)', placeholder:'AbCdEfGh', type:'id', required:false}] },
+  { key:'custom-script',     name:'Custom Script',           category:'other',       icon:'🔧', lucideIcon:'code',         description:'Paste any custom script tag',                          fields:[{name:'code',          label:'Script Code',      placeholder:'\x3cscript>...<\/script>',            type:'code', required:true }] },
 ];
 
 const INTEG_STATE = { siteId: null, config: {}, cat: 'all' };
@@ -1560,7 +1456,7 @@ function renderIntegrationsGrid(containerId, config, cat, compact) {
     return `<div class="bg-[#1A1A1A] border ${active ? 'border-emerald-600/40' : 'border-[#2A2A2A]'} rounded-2xl p-4 flex flex-col gap-3">
       <div class="flex items-start justify-between gap-3">
         <div class="flex items-center gap-2 min-w-0">
-          <span class="text-xl flex-shrink-0">${integ.icon}</span>
+          <i data-lucide="${integ.lucideIcon}" class="w-5 h-5 flex-shrink-0"></i>
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <p class="text-sm font-semibold text-[#E5E5E5]">${esc(integ.name)}</p>
@@ -1587,6 +1483,7 @@ function renderIntegrationsGrid(containerId, config, cat, compact) {
       </div>
     </div>`;
   }).join('');
+  if (window.lucide) lucide.createIcons();
 }
 
 function toggleIntegration(containerId, key, checked) {
@@ -1642,179 +1539,7 @@ document.addEventListener('keydown', e => {
 });
 
 checkAuth();
-
-// ── Domain purchase flow ──────────────────────────────────────────────────────
-
-let _domainPurchaseTarget = null; // { domain, price }
-
-function switchDomainSubTab(tab) {
-  const isBuy = tab === 'buy';
-  document.getElementById('domain-buy-panel').classList.toggle('hidden', !isBuy);
-  document.getElementById('domain-connect-panel').classList.toggle('hidden', isBuy);
-  const buyBtn = document.getElementById('dtab-buy');
-  const conBtn = document.getElementById('dtab-connect');
-  buyBtn.className = `flex-1 text-xs font-semibold py-2 rounded-lg transition ${isBuy ? 'bg-[#2A2A2A] text-white' : 'text-[#888888] hover:text-white'}`;
-  conBtn.className = `flex-1 text-xs font-semibold py-2 rounded-lg transition ${!isBuy ? 'bg-[#2A2A2A] text-white' : 'text-[#888888] hover:text-white'}`;
-}
-
-async function domainSearch() {
-  const q = (document.getElementById('domain-search-input').value || '').toLowerCase().replace(/[^a-z0-9-]/g, '').trim();
-  if (!q) { toast('Enter a domain name to search', 'error'); return; }
-
-  const spinner = document.getElementById('domain-search-spinner');
-  const results = document.getElementById('domain-search-results');
-  const empty   = document.getElementById('domain-search-empty');
-  spinner.classList.remove('hidden');
-  results.classList.add('hidden');
-  empty.classList.add('hidden');
-
-  try {
-    const data = await api('GET', `/api/domains/search?q=${encodeURIComponent(q)}`);
-    spinner.classList.add('hidden');
-    results.innerHTML = '';
-
-    if (!data.results || data.results.length === 0) {
-      empty.classList.remove('hidden');
-      return;
-    }
-
-    data.results.forEach(r => {
-      const row = document.createElement('div');
-      row.className = 'flex items-center justify-between bg-[#0A0A0A] border border-[#2A2A2A] rounded-xl px-4 py-3';
-      row.innerHTML = `
-        <div class="flex items-center gap-3">
-          <span class="text-${r.available ? 'emerald-400' : '[#555]'} text-lg">${r.available ? '✓' : '✕'}</span>
-          <div>
-            <p class="text-sm font-semibold ${r.available ? 'text-white' : 'text-[#555] line-through'}">${r.domain}</p>
-            <p class="text-xs text-[#666]">${r.available ? 'Available' : 'Taken'}</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="text-sm font-bold ${r.available ? 'text-white' : 'text-[#444]'}">$${r.price.toFixed(2)}<span class="text-[#666] font-normal text-xs">/yr</span></span>
-          ${r.available ? `<button onclick="openPurchaseModal('${r.domain}',${r.price})"
-            class="bg-[#E31137] hover:bg-[#c8102e] text-white text-xs font-bold px-4 py-2 rounded-lg transition">Buy</button>` : ''}
-        </div>`;
-      results.appendChild(row);
-    });
-
-    results.classList.remove('hidden');
-  } catch (err) {
-    spinner.classList.add('hidden');
-    toast(err.message || 'Search failed', 'error');
-  }
-}
-
-function openPurchaseModal(domain, price) {
-  _domainPurchaseTarget = { domain, price };
-  document.getElementById('dm-domain').textContent = domain;
-  document.getElementById('dm-price').textContent  = `$${Number(price).toFixed(2)}/year`;
-  document.getElementById('dm-btn').textContent    = `Confirm — $${Number(price).toFixed(2)}`;
-  document.getElementById('dm-btn').disabled       = false;
-  document.getElementById('dm-success').classList.add('hidden');
-  document.getElementById('dm-error').classList.add('hidden');
-  document.getElementById('domain-purchase-modal').classList.add('open');
-}
-
-function closePurchaseModal() {
-  document.getElementById('domain-purchase-modal').classList.remove('open');
-  _domainPurchaseTarget = null;
-}
-
-async function confirmPurchase() {
-  if (!_domainPurchaseTarget) return;
-  const { domain } = _domainPurchaseTarget;
-  const btn = document.getElementById('dm-btn');
-  btn.disabled     = true;
-  btn.textContent  = 'Registering…';
-  document.getElementById('dm-error').classList.add('hidden');
-
-  try {
-    const body = { domain, years: 1 };
-    if (S.activeSite) body.siteId = S.activeSite;
-    const result = await api('POST', '/api/domains/register', body);
-
-    // Update site card badge if linked
-    if (S.activeSite) {
-      const idx = S.sites.findIndex(s => s.id === S.activeSite);
-      if (idx !== -1) S.sites[idx].customDomain = domain;
-      renderSites();
-    }
-
-    const successEl = document.getElementById('dm-success');
-    document.getElementById('dm-success-domain').textContent = domain;
-    if (result.mockMode) {
-      document.getElementById('dm-success-note').textContent = 'Mock mode — no real charge. Set up Cloudflare Registrar token to enable real purchases.';
-    } else {
-      document.getElementById('dm-success-note').textContent = `Expires ${new Date(result.expiresAt).toLocaleDateString()}. DNS auto-configured.`;
-    }
-    successEl.classList.remove('hidden');
-    btn.textContent = '✓ Done — Close';
-    btn.onclick = closePurchaseModal;
-    btn.disabled = false;
-    toast(`${domain} registered!`, 'success');
-  } catch (err) {
-    document.getElementById('dm-error').textContent = err.message || 'Registration failed';
-    document.getElementById('dm-error').classList.remove('hidden');
-    btn.textContent = `Confirm — $${Number(_domainPurchaseTarget.price).toFixed(2)}`;
-    btn.disabled = false;
-  }
-}
-
-async function connectDomain2() {
-  const domain = (document.getElementById('settings-domain2').value || '').trim();
-  if (!domain) return;
-  try {
-    await api('POST', `/api/domains/sites/${S.activeSite}/connect`, { domain });
-    const idx = S.sites.findIndex(s => s.id === S.activeSite);
-    if (idx !== -1) S.sites[idx].customDomain = domain;
-    document.getElementById('domain-name-display2').textContent = domain;
-    document.getElementById('domain-connected2').classList.remove('hidden');
-    document.getElementById('domain-form2').classList.add('hidden');
-    document.getElementById('domain-dns-instructions').classList.remove('hidden');
-    renderSites();
-    toast('Domain connected', 'success');
-  } catch (err) {
-    toast(err.message || 'Connect failed', 'error');
-  }
-}
 </script>
-
-<!-- Domain purchase modal -->
-<div id="domain-purchase-modal" class="modal-bg fixed inset-0 z-[60] flex items-center justify-center p-4"
-     style="background:rgba(0,0,0,0.85)" onclick="if(event.target===this)closePurchaseModal()">
-  <div class="modal-card bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl w-full max-w-md shadow-2xl p-8" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-lg font-bold text-white">Register Domain</h2>
-      <button onclick="closePurchaseModal()" class="text-[#666] hover:text-white text-xl leading-none">✕</button>
-    </div>
-
-    <div class="bg-[#0A0A0A] border border-[#2A2A2A] rounded-xl px-4 py-3 mb-6">
-      <p id="dm-domain" class="text-white font-bold text-lg mb-1"></p>
-      <p id="dm-price" class="text-[#888] text-sm"></p>
-    </div>
-
-    <ul class="space-y-2 mb-6 text-sm text-[#AAAAAA]">
-      <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> 1 year registration</li>
-      <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> Auto-renew enabled</li>
-      <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> WHOIS privacy protection</li>
-      <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> DNS automatically configured</li>
-      <li class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✓</span> Free SSL certificate</li>
-    </ul>
-
-    <div id="dm-success" class="hidden bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3 mb-4">
-      <p class="text-emerald-400 font-semibold text-sm mb-1">✓ <span id="dm-success-domain"></span> registered!</p>
-      <p id="dm-success-note" class="text-[#888] text-xs"></p>
-    </div>
-
-    <p id="dm-error" class="hidden text-red-400 text-sm mb-4 bg-red-900/20 border border-red-900/40 rounded-xl px-4 py-3"></p>
-
-    <button id="dm-btn" onclick="confirmPurchase()"
-      class="w-full bg-[#E31137] hover:bg-[#c8102e] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-base transition">
-      Confirm Purchase
-    </button>
-    <p class="text-center text-xs text-[#555] mt-3">Processed via Cloudflare Registrar at cost. No markup.</p>
-  </div>
-</div>
-
+<script>if(window.lucide) lucide.createIcons();</script>
 </body>
 </html>

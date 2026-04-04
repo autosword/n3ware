@@ -20,6 +20,7 @@ const INTEGRATIONS = [
     name: 'Google Analytics (GA4)',
     category: 'analytics',
     icon: '📊',
+    lucideIcon: 'chart-bar',
     description: 'Track visitors, page views, and conversions',
     fields: [{ name: 'measurementId', label: 'Measurement ID', placeholder: 'G-XXXXXXXXXX', type: 'id', required: true }],
     generateScript(c) {
@@ -31,6 +32,7 @@ const INTEGRATIONS = [
     name: 'Google Tag Manager',
     category: 'analytics',
     icon: '🏷️',
+    lucideIcon: 'tag',
     description: 'Manage all your tags in one place',
     fields: [{ name: 'containerId', label: 'Container ID', placeholder: 'GTM-XXXXXXX', type: 'id', required: true }],
     generateScript(c) {
@@ -42,6 +44,7 @@ const INTEGRATIONS = [
     name: 'Microsoft Clarity',
     category: 'analytics',
     icon: '🔍',
+    lucideIcon: 'search',
     description: 'Heatmaps, session recordings, and user behavior insights',
     fields: [{ name: 'projectId', label: 'Project ID', placeholder: 'abc123xyz', type: 'id', required: true }],
     generateScript(c) {
@@ -53,6 +56,7 @@ const INTEGRATIONS = [
     name: 'Plausible Analytics',
     category: 'analytics',
     icon: '📈',
+    lucideIcon: 'trending-up',
     description: 'Privacy-friendly analytics, no cookies',
     fields: [{ name: 'domain', label: 'Domain', placeholder: 'yourdomain.com', type: 'id', required: true }],
     generateScript(c) {
@@ -64,6 +68,7 @@ const INTEGRATIONS = [
     name: 'Hotjar',
     category: 'analytics',
     icon: '🔥',
+    lucideIcon: 'flame',
     description: 'Heatmaps, recordings, and user feedback',
     fields: [{ name: 'siteId', label: 'Site ID', placeholder: '1234567', type: 'id', required: true }],
     generateScript(c) {
@@ -77,6 +82,7 @@ const INTEGRATIONS = [
     name: 'Meta (Facebook) Pixel',
     category: 'social',
     icon: '📘',
+    lucideIcon: 'facebook',
     description: 'Track conversions from Facebook & Instagram ads',
     fields: [{ name: 'pixelId', label: 'Pixel ID', placeholder: '123456789012345', type: 'id', required: true }],
     generateScript(c) {
@@ -88,6 +94,7 @@ const INTEGRATIONS = [
     name: 'TikTok Pixel',
     category: 'social',
     icon: '🎵',
+    lucideIcon: 'music',
     description: 'Track conversions from TikTok ads',
     fields: [{ name: 'pixelId', label: 'Pixel ID', placeholder: 'CXXXXXXXXXXXXXXXXX', type: 'id', required: true }],
     generateScript(c) {
@@ -99,6 +106,7 @@ const INTEGRATIONS = [
     name: 'X (Twitter) Pixel',
     category: 'social',
     icon: '🐦',
+    lucideIcon: 'twitter',
     description: 'Track conversions from X/Twitter ads',
     fields: [{ name: 'pixelId', label: 'Pixel ID', placeholder: 'xxxxx', type: 'id', required: true }],
     generateScript(c) {
@@ -110,6 +118,7 @@ const INTEGRATIONS = [
     name: 'Pinterest Tag',
     category: 'social',
     icon: '📌',
+    lucideIcon: 'pin',
     description: 'Track conversions from Pinterest ads',
     fields: [{ name: 'tagId', label: 'Tag ID', placeholder: '1234567890123', type: 'id', required: true }],
     generateScript(c) {
@@ -121,6 +130,7 @@ const INTEGRATIONS = [
     name: 'LinkedIn Insight Tag',
     category: 'social',
     icon: '💼',
+    lucideIcon: 'briefcase',
     description: 'Track conversions from LinkedIn ads',
     fields: [{ name: 'partnerId', label: 'Partner ID', placeholder: '123456', type: 'id', required: true }],
     generateScript(c) {
@@ -132,6 +142,7 @@ const INTEGRATIONS = [
     name: 'Snapchat Pixel',
     category: 'social',
     icon: '👻',
+    lucideIcon: 'ghost',
     description: 'Track conversions from Snapchat ads',
     fields: [{ name: 'pixelId', label: 'Pixel ID', placeholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', type: 'id', required: true }],
     generateScript(c) {
@@ -145,6 +156,7 @@ const INTEGRATIONS = [
     name: 'Google Ads Conversion',
     category: 'advertising',
     icon: '💰',
+    lucideIcon: 'dollar-sign',
     description: 'Track Google Ads conversions',
     fields: [
       { name: 'conversionId',    label: 'Conversion ID',              placeholder: 'AW-123456789', type: 'id', required: true  },
@@ -161,6 +173,7 @@ const INTEGRATIONS = [
     name: 'Custom Script',
     category: 'other',
     icon: '🔧',
+    lucideIcon: 'code',
     description: 'Paste any custom script tag',
     fields: [{ name: 'code', label: 'Script Code', placeholder: '<script>...</script>', type: 'code', required: true }],
     generateScript(c) {
