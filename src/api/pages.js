@@ -1,7 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const { generatePageWithAI, addPageToNav } = require('../integrations/page-generator');
+const { generatePageWithAI, addPageToNav, loadPageTemplate, customizeTemplateWithAI } = require('../integrations/page-generator');
 
 /**
  * Multi-page management API — v2 architecture.
@@ -15,6 +15,9 @@ const { generatePageWithAI, addPageToNav } = require('../integrations/page-gener
  *   DELETE /api/sites/:id/pages/:slug                 — remove page
  *   GET    /api/sites/:id/pages/:slug/versions        — list GCS versions
  *   POST   /api/sites/:id/pages/:slug/rollback        — restore a version
+ *
+ * Generate (AI):
+ *   POST   /api/sites/:id/pages/generate              — AI-generate a new page
  *
  * Components (shared header/nav/footer):
  *   GET    /api/sites/:id/components/:name            — get component HTML
@@ -121,24 +124,32 @@ router.put('/pages/:slug', async (req, res) => {
 });
 
 // POST /api/sites/:id/pages/generate — AI page generation
+// NOTE: must be defined before /pages/:slug to avoid Express treating "generate" as a slug
 router.post('/pages/generate', async (req, res) => {
   try {
     if (!await _requireSite(req, res)) return;
     if (!GCS_ENABLED) return res.status(503).json({ error: 'GCS not configured — page generation requires GCS storage' });
 
-    const { name, description = '', imageUrls = [] } = req.body || {};
+    const { name, description = '', imageUrls = [], templateId } = req.body || {};
     if (!name || !String(name).trim()) return res.status(400).json({ error: '`name` is required' });
 
     const slug = String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     if (!slug) return res.status(400).json({ error: 'Page name could not be converted to a valid slug' });
     if (slug === 'index') return res.status(400).json({ error: 'Cannot generate a page with slug "index"' });
 
-    // Load component library for the AI prompt
-    let components = [];
-    try { components = require('../../public/components/components.json'); } catch (_) {}
+    let html;
 
-    // Generate HTML with Claude (or mock fallback)
-    const html = await generatePageWithAI(String(description), components, imageUrls, String(name).trim());
+    if (templateId) {
+      // Template-based: load template and customize with AI
+      const template = loadPageTemplate(templateId);
+      if (!template) return res.status(400).json({ error: `Template "${templateId}" not found` });
+      html = await customizeTemplateWithAI(template, String(description), imageUrls, String(name).trim());
+    } else {
+      // Scratch: generate from description
+      let components = [];
+      try { components = require('../../public/components/components.json'); } catch (_) {}
+      html = await generatePageWithAI(String(description), components, imageUrls, String(name).trim());
+    }
 
     // Write page to GCS + update manifest
     await gcsFiles.savePage(req.params.id, slug, html, String(name).trim());

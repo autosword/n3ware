@@ -829,6 +829,7 @@
 
       actions.appendChild(analyticsBtn);
       actions.appendChild(compBtn);
+
       if (this._cloudCfg) {
         const PLUS = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
         const pageBtn = document.createElement('button');
@@ -839,6 +840,7 @@
         actions.appendChild(pageBtn);
         this._pageFabBtn = pageBtn;
       }
+
       actions.appendChild(editBtn);
       this._editFabBtn      = editBtn;
       this._analyticsFabBtn = analyticsBtn;
@@ -870,24 +872,76 @@
     _openPageCreator() {
       if (!this._cloudCfg) return;
       if (!this._pageCreatorEl) this._buildPageCreator();
+      this._selectedTemplate = undefined;
+      this._pcImages = [];
+      this._pcDone   = false;
+      this._pcGoToStep1();
+      this._pageCreatorEl.style.display = 'flex';
+    }
+
+    _pcGoToStep1() {
       const el = this._pageCreatorEl;
-      el.querySelector('#n3pc-name').value = '';
+      el.querySelector('#n3pc-step1').style.display = 'block';
+      el.querySelector('#n3pc-step2').style.display = 'none';
+    }
+
+    _pcGoToStep2(template) {
+      this._selectedTemplate = template || null;
+      const el = this._pageCreatorEl;
+      el.querySelector('#n3pc-step1').style.display = 'none';
+
+      // Reset step 2 state
+      const nameInput = el.querySelector('#n3pc-name');
       el.querySelector('#n3pc-slug-preview').textContent = '';
-      el.querySelector('#n3pc-desc').value = '';
       el.querySelector('#n3pc-thumbs').innerHTML = '';
       el.querySelector('#n3pc-form-body').style.display = 'block';
       el.querySelector('#n3pc-spinner').style.display = 'none';
       el.querySelector('#n3pc-success').style.display = 'none';
       el.querySelector('#n3pc-generate-btn').disabled = false;
       el.querySelector('#n3pc-generate-btn').style.display = 'block';
-      el.querySelector('#n3pc-generate-btn').textContent = '🤖 Generate Page with AI';
-      this._pcImages = [];
-      this._pcDone   = false;
-      el.style.display = 'flex';
-      setTimeout(() => el.querySelector('#n3pc-name').focus(), 80);
+
+      // Update heading + badge
+      const badge = el.querySelector('#n3pc-template-badge');
+      if (template) {
+        el.querySelector('#n3pc-step2-title').textContent = `Customize: ${template.name}`;
+        badge.textContent = `${template.icon} ${template.name}`;
+        badge.style.display = 'inline-block';
+        nameInput.value = template.defaultName || '';
+        el.querySelector('#n3pc-desc').value = template.defaultPrompt || '';
+        const slug = this._toSlug(nameInput.value);
+        const sp = el.querySelector('#n3pc-slug-preview');
+        sp.textContent = slug ? `URL slug: /${slug}` : '';
+        sp.style.color = slug ? '#E31137' : '#555';
+        el.querySelector('#n3pc-generate-btn').textContent = '🤖 Customize with AI';
+      } else {
+        el.querySelector('#n3pc-step2-title').textContent = 'Create New Page';
+        badge.style.display = 'none';
+        nameInput.value = '';
+        el.querySelector('#n3pc-desc').value = '';
+        el.querySelector('#n3pc-generate-btn').textContent = '🤖 Generate Page with AI';
+      }
+
+      el.querySelector('#n3pc-step2').style.display = 'block';
+      setTimeout(() => nameInput.focus(), 80);
     }
 
     _buildPageCreator() {
+      // Template metadata (mirrors page-templates.json, subset for UI)
+      const TEMPLATES = [
+        { id: 'about-team',    name: 'About & Team',  icon: '👥', description: 'Company story, mission & team',  defaultName: 'About Us',    defaultSlug: 'about',        defaultPrompt: 'A professional About Us page with our company story, mission, values, and team members.' },
+        { id: 'services',      name: 'Services',       icon: '🛠️', description: 'Showcase your services',         defaultName: 'Services',    defaultSlug: 'services',     defaultPrompt: 'A services page listing all the services we offer with descriptions and a CTA.' },
+        { id: 'pricing',       name: 'Pricing',        icon: '💰', description: 'Tiered plans with feature lists', defaultName: 'Pricing',     defaultSlug: 'pricing',      defaultPrompt: 'A pricing page with 3 tiers, feature comparison, and a bold CTA.' },
+        { id: 'contact',       name: 'Contact',        icon: '📬', description: 'Contact form + map + hours',     defaultName: 'Contact Us',  defaultSlug: 'contact',      defaultPrompt: 'A contact page with a form, phone/email, address, hours of operation, and a map embed.' },
+        { id: 'faq',           name: 'FAQ',            icon: '❓', description: 'Accordion Q&A section',          defaultName: 'FAQ',         defaultSlug: 'faq',          defaultPrompt: 'A FAQ page with an accordion-style list of common questions and detailed answers.' },
+        { id: 'portfolio',     name: 'Portfolio',      icon: '🖼️', description: 'Project / work showcase grid',   defaultName: 'Portfolio',   defaultSlug: 'portfolio',    defaultPrompt: 'A portfolio page with a filterable grid of projects, descriptions, and links.' },
+        { id: 'testimonials',  name: 'Testimonials',   icon: '⭐', description: 'Customer reviews & quotes',      defaultName: 'Reviews',     defaultSlug: 'testimonials', defaultPrompt: 'A testimonials page with customer quotes, star ratings, and photos.' },
+        { id: 'locations',     name: 'Locations',      icon: '📍', description: 'Multi-location cards + maps',    defaultName: 'Locations',   defaultSlug: 'locations',    defaultPrompt: 'A locations page with each location\'s address, hours, phone number, and map link.' },
+        { id: 'blog',          name: 'Blog',           icon: '📝', description: 'Article listing with previews',  defaultName: 'Blog',        defaultSlug: 'blog',         defaultPrompt: 'A blog index page with article cards, categories, and a newsletter signup.' },
+        { id: 'menu',          name: 'Menu',           icon: '🍽️', description: 'Restaurant / café menu layout',  defaultName: 'Menu',        defaultSlug: 'menu',         defaultPrompt: 'A restaurant menu page with sections for appetizers, mains, desserts, drinks, and prices.' },
+        { id: 'booking',       name: 'Booking',        icon: '📅', description: 'Appointment / reservation CTA',  defaultName: 'Book Now',    defaultSlug: 'booking',      defaultPrompt: 'A booking page with service options, availability info, and a prominent booking CTA.' },
+        { id: 'landing',       name: 'Landing Page',   icon: '🚀', description: 'High-conversion promo page',     defaultName: 'Special Offer', defaultSlug: 'landing',   defaultPrompt: 'A high-conversion landing page with a hero, benefits, social proof, and a strong CTA.' },
+      ];
+
       const el = document.createElement('div');
       el.setAttribute('data-n3-ui', '1');
       Object.assign(el.style, {
@@ -901,58 +955,103 @@
       Object.assign(card.style, {
         background: '#1A1A1A', color: '#fff',
         borderRadius: '16px', border: '1px solid #2a2a2a',
-        width: '100%', maxWidth: '580px', maxHeight: '90vh',
+        width: '100%', maxWidth: '680px', maxHeight: '90vh',
         overflowY: 'auto', padding: '32px',
         position: 'relative', boxSizing: 'border-box', margin: '16px',
       });
 
       card.innerHTML = `
         <button id="n3pc-close" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1" title="Close">✕</button>
-        <h2 style="margin:0 0 24px;font-size:21px;font-weight:700;color:#fff">Create New Page</h2>
 
-        <div id="n3pc-form-body">
-          <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Name <span style="color:#E31137">*</span></label>
-          <input id="n3pc-name" type="text" placeholder="e.g. Our Menu" autocomplete="off"
-            style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:15px;outline:none;margin-bottom:4px">
-          <div id="n3pc-slug-preview" style="font-size:12px;color:#555;margin-bottom:18px;min-height:16px"></div>
-
-          <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Description</label>
-          <textarea id="n3pc-desc" rows="5" placeholder="Describe what this page should contain — style, sections, key content, tone…"
-            style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;resize:vertical;margin-bottom:20px;font-family:inherit"></textarea>
-
-          <label style="display:block;margin-bottom:8px;font-size:13px;color:#aaa;font-weight:500">Upload Images <span style="color:#555">(optional)</span></label>
-          <div id="n3pc-dropzone" style="background:#0A0A0A;border:2px dashed #333;border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color 0.2s">
-            <div style="font-size:26px;margin-bottom:6px">📷</div>
-            <div style="color:#666;font-size:14px">Drop images here or <span style="color:#E31137">click to browse</span></div>
-            <div style="color:#444;font-size:12px;margin-top:4px">JPG, PNG, WebP · max 5 MB each</div>
-            <input id="n3pc-file-input" type="file" accept="image/*" multiple style="display:none">
+        <!-- Step 1: Template picker -->
+        <div id="n3pc-step1">
+          <h2 style="margin:0 0 6px;font-size:21px;font-weight:700;color:#fff">Create New Page</h2>
+          <p style="margin:0 0 24px;color:#888;font-size:14px">Choose a starting point</p>
+          <div id="n3pc-tpl-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+            <button class="n3pc-tpl-card" data-tpl="__scratch__" style="background:#0A0A0A;border:1px solid #333;border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;color:#fff;transition:border-color 0.15s">
+              <div style="font-size:22px;margin-bottom:6px">✏️</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:3px">From Scratch</div>
+              <div style="font-size:11px;color:#666">AI writes everything</div>
+            </button>
+            ${TEMPLATES.map(t => `
+            <button class="n3pc-tpl-card" data-tpl="${t.id}" style="background:#0A0A0A;border:1px solid #333;border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;color:#fff;transition:border-color 0.15s">
+              <div style="font-size:22px;margin-bottom:6px">${t.icon}</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:3px">${t.name}</div>
+              <div style="font-size:11px;color:#666">${t.description}</div>
+            </button>`).join('')}
           </div>
-          <div id="n3pc-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
         </div>
 
-        <div id="n3pc-spinner" style="display:none;text-align:center;padding:48px 20px">
-          <div style="width:64px;height:64px;border:4px solid #2a2a2a;border-top-color:#E31137;border-radius:50%;animation:n3-spin 1s linear infinite;margin:0 auto 24px"></div>
-          <h3 style="color:#fff;font-size:20px;font-weight:700;margin:0 0 10px">Creating your page…</h3>
-          <p id="n3pc-spin-status" style="color:#888;font-size:14px;margin:0;min-height:20px">Picking the best components…</p>
-        </div>
+        <!-- Step 2: Form -->
+        <div id="n3pc-step2" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
+            <button id="n3pc-back" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px" title="Back">←</button>
+            <h2 id="n3pc-step2-title" style="margin:0;font-size:21px;font-weight:700;color:#fff">Create New Page</h2>
+          </div>
+          <div id="n3pc-template-badge" style="display:none;background:#1e1e1e;border:1px solid #333;border-radius:8px;padding:6px 12px;font-size:12px;color:#aaa;margin-bottom:20px"></div>
 
-        <div id="n3pc-success" style="display:none;background:#0c2318;border:1px solid #1a5c38;border-radius:10px;padding:14px 16px;margin-bottom:18px">
-          <div style="color:#4ade80;font-size:14px;font-weight:600;margin-bottom:6px">✓ Page created!</div>
-          <div id="n3pc-success-msg" style="font-size:13px;color:#86efac"></div>
-        </div>
+          <div id="n3pc-form-body">
+            <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Page Name <span style="color:#E31137">*</span></label>
+            <input id="n3pc-name" type="text" placeholder="e.g. Our Menu" autocomplete="off"
+              style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:15px;outline:none;margin-bottom:4px">
+            <div id="n3pc-slug-preview" style="font-size:12px;color:#555;margin-bottom:18px;min-height:16px"></div>
 
-        <button id="n3pc-generate-btn"
-          style="width:100%;background:#E31137;color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:opacity 0.2s">
-          🤖 Generate Page with AI
-        </button>`;
+            <label style="display:block;margin-bottom:6px;font-size:13px;color:#aaa;font-weight:500">Description <span style="color:#555">(optional)</span></label>
+            <textarea id="n3pc-desc" rows="4" placeholder="Describe your business context, key content, tone…"
+              style="width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #333;border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;resize:vertical;margin-bottom:20px;font-family:inherit"></textarea>
+
+            <label style="display:block;margin-bottom:8px;font-size:13px;color:#aaa;font-weight:500">Upload Images <span style="color:#555">(optional)</span></label>
+            <div id="n3pc-dropzone" style="background:#0A0A0A;border:2px dashed #333;border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color 0.2s">
+              <div style="font-size:26px;margin-bottom:6px">📷</div>
+              <div style="color:#666;font-size:14px">Drop images here or <span style="color:#E31137">click to browse</span></div>
+              <div style="color:#444;font-size:12px;margin-top:4px">JPG, PNG, WebP · max 5 MB each</div>
+              <input id="n3pc-file-input" type="file" accept="image/*" multiple style="display:none">
+            </div>
+            <div id="n3pc-thumbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+          </div>
+
+          <div id="n3pc-spinner" style="display:none;text-align:center;padding:48px 20px">
+            <div style="width:64px;height:64px;border:4px solid #2a2a2a;border-top-color:#E31137;border-radius:50%;animation:n3-spin 1s linear infinite;margin:0 auto 24px"></div>
+            <h3 style="color:#fff;font-size:20px;font-weight:700;margin:0 0 10px">Creating your page…</h3>
+            <p id="n3pc-spin-status" style="color:#888;font-size:14px;margin:0;min-height:20px">Picking the best components…</p>
+          </div>
+
+          <div id="n3pc-success" style="display:none;background:#0c2318;border:1px solid #1a5c38;border-radius:10px;padding:14px 16px;margin-bottom:18px">
+            <div style="color:#4ade80;font-size:14px;font-weight:600;margin-bottom:6px">✓ Page created!</div>
+            <div id="n3pc-success-msg" style="font-size:13px;color:#86efac"></div>
+          </div>
+
+          <button id="n3pc-generate-btn"
+            style="width:100%;background:#E31137;color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:opacity 0.2s">
+            🤖 Generate Page with AI
+          </button>
+        </div>`;
 
       el.appendChild(card);
 
-      // Close
+      // Close / backdrop
       card.querySelector('#n3pc-close').addEventListener('click', () => { el.style.display = 'none'; });
       el.addEventListener('click', e => { if (e.target === el) el.style.display = 'none'; });
 
-      // Slug preview from name input
+      // Back button
+      card.querySelector('#n3pc-back').addEventListener('click', () => this._pcGoToStep1());
+
+      // Template cards (step 1)
+      card.querySelectorAll('.n3pc-tpl-card').forEach(btn => {
+        btn.addEventListener('mouseenter', () => { btn.style.borderColor = '#E31137'; });
+        btn.addEventListener('mouseleave', () => { btn.style.borderColor = '#333'; });
+        btn.addEventListener('click', () => {
+          const tplId = btn.dataset.tpl;
+          if (tplId === '__scratch__') {
+            this._pcGoToStep2(null);
+          } else {
+            const tpl = TEMPLATES.find(t => t.id === tplId);
+            this._pcGoToStep2(tpl || null);
+          }
+        });
+      });
+
+      // Slug preview
       const nameInput   = card.querySelector('#n3pc-name');
       const slugPreview = card.querySelector('#n3pc-slug-preview');
       nameInput.addEventListener('input', () => {
@@ -1085,10 +1184,12 @@
           }
         }
 
-        // 2. Generate page with AI
+        // 2. Generate page with AI (pass templateId if a template was selected)
+        const body = { name: nameVal, description, imageUrls };
+        if (this._selectedTemplate) body.templateId = this._selectedTemplate.id;
         const genRes = await fetch(`${api}/sites/${site}/pages/generate`, {
           method: 'POST', headers: jsonHeaders, credentials: 'include',
-          body: JSON.stringify({ name: nameVal, description, imageUrls }),
+          body: JSON.stringify(body),
         });
         if (!genRes.ok) {
           const e = await genRes.json().catch(() => ({}));
@@ -1113,7 +1214,7 @@
         formBody.style.display  = 'block';
         genBtn.style.display    = 'block';
         genBtn.disabled         = false;
-        genBtn.textContent      = '🤖 Generate Page with AI';
+        genBtn.textContent      = this._selectedTemplate ? '🤖 Customize with AI' : '🤖 Generate Page with AI';
         N3UI.toast(`Error: ${err.message}`, 'error');
       }
     }

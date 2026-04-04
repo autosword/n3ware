@@ -6,6 +6,7 @@
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
+const path      = require('path');
 
 /**
  * Generate a page body using Claude (or fall back to mock if no API key).
@@ -71,6 +72,80 @@ Requirements:
 }
 
 /**
+ * Load a page template by id.
+ * @param {string} templateId
+ * @returns {object|null}
+ */
+function loadPageTemplate(templateId) {
+  try {
+    const templates = require('../../public/templates/pages/page-templates.json');
+    return templates.find(t => t.id === templateId) || null;
+  } catch (err) {
+    console.error('[page-generator] Failed to load templates:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Customize a template using Claude — swap placeholder content for the user's
+ * actual business info while keeping the structural layout intact.
+ *
+ * @param {object}   template     Full template object (from loadPageTemplate)
+ * @param {string}   description  User's description / business context
+ * @param {string[]} imageUrls    Optional uploaded images to weave in
+ * @param {string}   pageName     Final page title chosen by the user
+ * @returns {Promise<string>}     Customized HTML body
+ */
+async function customizeTemplateWithAI(template, description, imageUrls, pageName) {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+
+  if (!anthropicKey) {
+    console.warn('[page-generator] ANTHROPIC_API_KEY not set — using template html as-is');
+    return template.html;
+  }
+
+  const imageInstructions = imageUrls && imageUrls.length
+    ? `Replace placeholder images with these uploaded images where suitable:\n${imageUrls.map((url, i) => `- Image ${i + 1}: ${url}`).join('\n')}`
+    : '';
+
+  const systemPrompt = `You are a web page customizer for n3ware. You receive a pre-built HTML template and must customize its content (text, images, links) to match the user's business while preserving the visual structure and Tailwind CSS classes exactly.
+
+Rules:
+- Keep all Tailwind utility classes, HTML structure, and layout intact
+- Replace placeholder text and dummy content with realistic content based on the user's description
+- Replace placeholder images with real ones from Unsplash or the user's uploaded images
+- Update headings, body copy, CTAs, and labels to match the business context
+- Return ONLY the HTML (no markdown, no code fences, no explanation)
+${template.aiInstructions ? '\nTemplate-specific guidance:\n' + template.aiInstructions : ''}`;
+
+  const userPrompt = `Page name: "${pageName}"
+
+Business/page description:
+${description}
+${imageInstructions ? '\n' + imageInstructions : ''}
+
+HTML template to customize:
+${template.html}`;
+
+  try {
+    const client = new Anthropic({ apiKey: anthropicKey });
+    const message = await client.messages.create({
+      model:      'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system:     systemPrompt,
+      messages:   [{ role: 'user', content: userPrompt }],
+    });
+    const text = message.content?.[0]?.text;
+    if (!text) throw new Error('Empty response from Claude');
+    return text;
+  } catch (err) {
+    console.error('[page-generator] customizeTemplateWithAI error:', err.message);
+    // Fall back to the raw template html
+    return template.html;
+  }
+}
+
+/**
  * Fallback mock page used when no API key is configured.
  */
 function generateMockPage(name, description, imageUrls) {
@@ -122,4 +197,4 @@ function addPageToNav(navHtml, slug, name) {
   return navHtml + `\n${linkHtml}`;
 }
 
-module.exports = { generatePageWithAI, generateMockPage, addPageToNav };
+module.exports = { generatePageWithAI, generateMockPage, addPageToNav, loadPageTemplate, customizeTemplateWithAI };
