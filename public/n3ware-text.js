@@ -167,17 +167,13 @@
 
     _positionBar(el) {
       if (!this._bar) return;
-      const rect    = el.getBoundingClientRect();
-      const barH    = this._bar.offsetHeight || 46;
-      const barW    = this._bar.offsetWidth  || 300;
-      // Format bar is position:fixed — coords are viewport-relative, no scrollY needed.
-      let top = rect.top - barH - 8;
-      // If bar would go off-screen above (including below the toolbar), flip it below the element.
-      if (top < 56) top = rect.bottom + 8;
-      // Clamp to bottom of viewport with a margin.
-      if (top + barH > window.innerHeight - 8) top = window.innerHeight - barH - 8;
-      // Clamp left so bar stays within viewport.
-      const left = Math.max(8, Math.min(rect.left, window.innerWidth - barW - 16));
+      const rect = el.getBoundingClientRect();
+      const barH = this._bar.offsetHeight || 46;
+      const barW = this._bar.offsetWidth  || 300;
+      // position:fixed — getBoundingClientRect() already returns viewport-relative coords.
+      // Clamp above element; 52px minimum keeps bar below the n3ware toolbar.
+      const top  = Math.max(52, Math.min(rect.top - barH - 8, window.innerHeight - barH - 8));
+      const left = Math.max(8, Math.min(rect.left, window.innerWidth - barW - 8));
       this._bar.style.top  = top  + 'px';
       this._bar.style.left = left + 'px';
     }

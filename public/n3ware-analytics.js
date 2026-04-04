@@ -247,7 +247,9 @@
       this._el.setAttribute('data-n3-ui', '1');
       const skelHtml = this._skeleton();
       this._el.innerHTML = skelHtml;
-      this._el.querySelector('.n3-an-close').addEventListener('click', () => this.close());
+      const closeBtn = this._el.querySelector('.n3-an-close');
+      closeBtn.addEventListener('click', () => this.close());
+      closeBtn.addEventListener('touchend', e => { e.preventDefault(); this.close(); });
       this._el.querySelector('.n3-an-tabs').addEventListener('click', e => {
         const tab = e.target.closest('[data-tab]');
         if (tab) this._switchTab(tab.dataset.tab);

@@ -830,6 +830,7 @@
     }
 
     _enter() {
+      if (this.analytics && this.analytics.isOpen()) this.analytics.close();
       if (this.text)     this.text.enable();
       this._markBlocks();
       if (this.controls) this.controls.enable();
