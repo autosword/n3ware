@@ -371,6 +371,7 @@
         // Defer preview injection slightly to not block paint
         requestAnimationFrame(() => injectPreview(card, comp));
       });
+      if (window.lucide) lucide.createIcons();
     }
 
     // ── Card builder ───────────────────────────────────────────────────────
@@ -399,6 +400,7 @@
       const row1 = document.createElement('div');
       row1.className = 'flex items-center gap-2 flex-wrap';
       row1.innerHTML = `
+        ${comp.lucideIcon ? `<i data-lucide="${comp.lucideIcon}" class="w-4 h-4 flex-shrink-0 text-[#888888]"></i>` : ''}
         <span class="font-bold text-white text-sm">${escHtml(comp.name || 'Unnamed')}</span>
         <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${bClass}">${escHtml(comp.category || 'Other')}</span>
       `;

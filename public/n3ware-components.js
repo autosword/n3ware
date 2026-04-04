@@ -316,7 +316,7 @@
         `<div>
           <div class="n3-comp-group-hdr">${cat}</div>
           ${comps.map(c => `<div class="n3-comp-item" data-comp-id="${c.id}" draggable="true">
-            <span class="n3-comp-thumb">${c.thumbnail || '🧩'}</span>
+            <span class="n3-comp-thumb" style="display:inline-flex;align-items:center">${((window._n3wareModules||{}).icon||function(){return''})(c.lucideIcon||'layout-grid',{size:16})}</span>
             <div class="n3-comp-info">
               <div class="n3-comp-name">${c.name}</div>
               <div class="n3-comp-badge">${c.description ? c.description.substring(0, 38) + (c.description.length > 38 ? '…' : '') : ''}</div>
