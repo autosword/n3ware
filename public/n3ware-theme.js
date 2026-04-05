@@ -116,15 +116,23 @@
     toggle() { this._open ? this.close() : this.open(); }
 
     open() {
+      if (this._open) return;
       if (!this._panel) this._buildPanel();
       this._refreshInputs();
-      this._panel.classList.add('n3-theme-open');
-      this._open = true;
+      // Force the browser to commit the closed (translateX(-100%)) state before
+      // adding the open class, so the transition actually fires on first call.
+      this._panel.classList.remove('n3-theme-open');
+      void this._panel.offsetHeight; // reflow
+      requestAnimationFrame(() => {
+        this._panel.classList.add('n3-theme-open');
+        this._open = true;
+      });
     }
 
     close() {
-      if (this._panel) this._panel.classList.remove('n3-theme-open');
+      if (!this._open) return;
       this._open = false;
+      if (this._panel) this._panel.classList.remove('n3-theme-open');
     }
 
     isOpen() { return this._open; }

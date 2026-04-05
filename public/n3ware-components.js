@@ -250,9 +250,14 @@
     /** Open the component panel and load components if not yet loaded. */
     open() {
       if (!this._el) return;
-      this._el.classList.add('n3-comp-open');
-      this._open = true;
-      if (!this._loaded) this._load();
+      // Force browser to commit closed state before adding open class so transition fires on first call.
+      this._el.classList.remove('n3-comp-open');
+      void this._el.offsetHeight; // reflow
+      requestAnimationFrame(() => {
+        this._el.classList.add('n3-comp-open');
+        this._open = true;
+        if (!this._loaded) this._load();
+      });
     }
 
     /** Close the component panel. */
