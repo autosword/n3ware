@@ -365,12 +365,22 @@
         if (ok) this._events.emit('controls:delete', el);
       });
 
+      const _ic = (n) => { const f = (window._n3wareModules || {}).icon; return f ? f(n, { size: 14 }) : ''; };
+
       // "Edit Nav" button — only on primary navs (skip sub-navs)
       if (el.tagName === 'NAV' && !el.hasAttribute('data-n3-sub-nav')) {
-        const _ic = (n) => { const f = (window._n3wareModules || {}).icon; return f ? f(n, { size: 14 }) : '☰'; };
-        const navBtn = N3UI.btn(_ic('menu'), 'n3-ctrl-btn', 'Edit Nav');
+        const navBtn = N3UI.btn(_ic('menu') || '☰', 'n3-ctrl-btn', 'Edit Nav');
         navBtn.addEventListener('click', e => { e.stopPropagation(); this._events.emit('controls:edit-nav', el); });
         overlay.append(typeLabel, dragBtn, upBtn, downBtn, dupBtn, navBtn, delBtn);
+      } else if (el.tagName === 'IMG') {
+        // "Replace image" button — only on img elements
+        const imgBtn = N3UI.btn(_ic('image') || '🖼', 'n3-ctrl-btn', 'Replace image');
+        imgBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          const imageEditor = window.n3ware && window.n3ware._modules && window.n3ware._modules.image;
+          if (imageEditor) imageEditor.open(el);
+        });
+        overlay.append(typeLabel, dragBtn, upBtn, downBtn, dupBtn, imgBtn, delBtn);
       } else {
         overlay.append(typeLabel, dragBtn, upBtn, downBtn, dupBtn, delBtn);
       }

@@ -78,6 +78,7 @@
     'n3ware-nav-panel.js',
     'n3ware-nav.js',
     'n3ware-sub-nav.js',
+    'n3ware-image.js',
   ];
 
   /**
@@ -649,7 +650,8 @@
         el.closest('.n3-script-modal-overlay') ||
         el.closest('.n3-script-ph')      ||
         el.closest('.n3-save-fab')       ||
-        el.closest('.n3-theme-panel')
+        el.closest('.n3-theme-panel')    ||
+        el.closest('.n3-img-backdrop')
       ));
     }
   }
@@ -803,6 +805,9 @@
       // Sub-nav scroll-spy
       this.subNav = M.N3SubNav ? new M.N3SubNav(this.events) : null;
 
+      // Image replacement modal
+      this.image = M.N3ImageEditor ? new M.N3ImageEditor(this.events, this._cloudCfg) : null;
+
       this._fab     = null;
       this._fabOpen = false;
       this._onKeyDown = this._handleKeyDown.bind(this);
@@ -826,6 +831,7 @@
       if (this.theme)      this.theme.mount();
       if (this.nav)        this.nav.mount();
       if (this.subNav)     this.subNav.mount();
+      if (this.image)      this.image.mount();
       this._buildControlPanel();
       this._buildSaveBtn();
       this._wireEvents();
@@ -887,6 +893,7 @@
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
           analytics: this.analytics, components: this.components,
           scripts: this.scripts, theme: this.theme, nav: this.nav, subNav: this.subNav,
+          image: this.image,
         },
       };
     }
