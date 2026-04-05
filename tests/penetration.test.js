@@ -116,7 +116,7 @@ const ROUTES = [
   { method: 'GET',  path: '/api/uploads/:id/upload-url',               auth: 'required' },
 
   // ── Analytics ────────────────────────────────────────────────────────────
-  { method: 'POST', path: '/api/analytics/:id/track',                  auth: 'public'   },
+  { method: 'POST', path: '/api/analytics/:id/track',  auth: 'public',  skipInjection: 'write-only tracking endpoint — accepts any siteId by design, 200 is correct' },
   { method: 'GET',  path: '/api/analytics/:id',                        auth: 'required' },
   { method: 'GET',  path: '/api/analytics/:id/daily',                  auth: 'required' },
 
@@ -293,12 +293,16 @@ async function runInputAttacks(route, resolvedPath) {
   const { method } = route;
 
   // 8. Injection payloads
+  const SQL_INJ   = `'; DROP TABLE users; --`;
+  const NOSQL_INJ = `{"$ne":null}`;
+  if (route.skipInjection) {
+    recordSkip(method, resolvedPath, 'injection (sql)',   route.skipInjection);
+    recordSkip(method, resolvedPath, 'injection (nosql)', route.skipInjection);
+  } else {
   // Strategy: only inject into URL if the route template actually has a path param.
   // For parameterless routes, the substitution is a no-op and a 200 is expected
   // normal behavior — testing injection there produces false positives.
   const hasPathParam = route.path.includes(':');
-  const SQL_INJ   = `'; DROP TABLE users; --`;
-  const NOSQL_INJ = `{"$ne":null}`;
 
   if (hasPathParam) {
     // Substitute into URL path param positions
@@ -346,6 +350,7 @@ async function runInputAttacks(route, resolvedPath) {
       }
     }
   }
+  } // end skipInjection else
 
   // 9. Oversized payload (only for POST/PUT/PATCH)
   if (['POST', 'PUT', 'PATCH'].includes(method)) {
