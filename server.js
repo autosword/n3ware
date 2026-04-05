@@ -28,6 +28,7 @@ const analyticsApi = require('./src/api/analytics-routes');
 const migrateApi      = require('./src/api/migrate');
 const gaApi           = require('./src/api/ga');
 const componentsApi         = require('./src/api/components');
+const componentCustomizeApi = require('./src/api/component-customize');
 const integrationsConfigApi = require('./src/api/integrations-config');
 const pagesApi              = require('./src/api/pages');
 const pageTemplatesApi      = require('./src/api/page-templates');
@@ -117,6 +118,7 @@ app.use('/api/sites',        gaApi);  // nested: /api/sites/:id/ga/*
 
 // ── Component library ─────────────────────────────────────────────────────────
 app.use('/api/components', componentsApi);
+app.use('/api/components', componentCustomizeApi);
 
 // ── Page templates ────────────────────────────────────────────────────────────
 app.use('/api/page-templates', pageTemplatesApi);

@@ -173,6 +173,9 @@
       this._category     = 'all';
       this._dragging     = null;   // html string while dragging
       this._dropTarget   = null;   // highlighted block element
+      // Customize modal state
+      this._custModal    = null;   // backdrop element while modal is open
+      this._custImages   = [];     // [{file, objectUrl}] pending uploads
       // Placement mode state
       this._placing      = null;   // { comp, html } while in placement mode
       this._placeCursor  = null;   // floating cursor element
@@ -409,8 +412,8 @@
         const zone = this._placeZones[this._activeZone];
         this._exitPlacementMode(false);
         if (zone) {
-          this._insertAtZone(comp.html, zone);
-          N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
+          const node = this._insertAtZone(comp.html, zone);
+          this._showCustomizeModal(node, comp);
         }
       }, true); // capture so we beat other click handlers
 
@@ -533,9 +536,9 @@
      */
     _insertAtZone(html, zone) {
       if (zone.ref) {
-        this._insert(html, zone.before ? zone.ref : zone.ref, zone.before);
+        return this._insert(html, zone.before ? zone.ref : zone.ref, zone.before);
       } else {
-        this._insert(html, null, false);
+        return this._insert(html, null, false);
       }
     }
 
@@ -592,6 +595,188 @@
 
       this._events.emit('component:insert', node);
       node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return node;
+    }
+
+    // ── Customize modal ───────────────────────────────────────────────────────
+
+    /**
+     * Show the AI customization modal anchored after a freshly-inserted node.
+     * @param {Element} componentEl  The inserted component element
+     * @param {object}  comp         Component descriptor from the library
+     */
+    _showCustomizeModal(componentEl, comp) {
+      if (this._custModal) return; // already open
+      this._custImages = [];
+      const iconFn = (window._n3wareModules||{}).icon;
+      const ic = n => iconFn ? iconFn(n, {size: 16}) : '';
+
+      // Backdrop
+      const backdrop = document.createElement('div');
+      backdrop.className = 'n3-cust-backdrop';
+      backdrop.setAttribute('data-n3-ui', '1');
+
+      const modal = document.createElement('div');
+      modal.className = 'n3-cust-modal';
+      modal.setAttribute('data-n3-ui', '1');
+      modal.innerHTML = `
+        <div class="n3-cust-header">
+          <div class="n3-cust-icon">${iconFn ? iconFn(comp.lucideIcon || 'layout-template', {size: 16}) : ''}</div>
+          <div class="n3-cust-title">Customize: ${comp.name}</div>
+          <button class="n3-cust-close" title="Skip">${ic('x')}</button>
+        </div>
+        <div class="n3-cust-body">
+          <div>
+            <div class="n3-cust-label">What should this section say?</div>
+            <textarea class="n3-cust-textarea" rows="4"
+              placeholder="e.g. 'Wood-fired pizza restaurant called Ember & Oak in Wakefield RI. Family-owned since 2019. Emphasize local ingredients and a cozy vibe.'"></textarea>
+          </div>
+          <div>
+            <div class="n3-cust-label">Reference images <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div>
+            <div class="n3-cust-dropzone" title="Click or drop images here">
+              <div class="n3-cust-dropzone-label">${ic('image')} Drop images here or <span>browse</span></div>
+              <input type="file" accept="image/*" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer">
+            </div>
+            <div class="n3-cust-thumbs"></div>
+          </div>
+          <div class="n3-cust-error" style="display:none"></div>
+        </div>
+        <div class="n3-cust-footer">
+          <div class="n3-cust-spacer"></div>
+          <button class="n3-cust-skip">Skip</button>
+          <button class="n3-cust-generate">${ic('bot')} Generate with AI</button>
+        </div>`;
+
+      backdrop.appendChild(modal);
+      document.body.appendChild(backdrop);
+      this._custModal = backdrop;
+
+      // Focus textarea
+      setTimeout(() => modal.querySelector('.n3-cust-textarea').focus(), 80);
+
+      const close = () => {
+        this._custImages.forEach(img => URL.revokeObjectURL(img.objectUrl));
+        this._custImages = [];
+        backdrop.remove();
+        this._custModal = null;
+      };
+
+      // Skip / close
+      backdrop.querySelector('.n3-cust-close').addEventListener('click', () => {
+        N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
+        close();
+      });
+      backdrop.querySelector('.n3-cust-skip').addEventListener('click', () => {
+        N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
+        close();
+      });
+      // Clicking backdrop outside modal = skip
+      backdrop.addEventListener('click', e => {
+        if (e.target === backdrop) {
+          N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
+          close();
+        }
+      });
+
+      // Image upload
+      const thumbsEl  = modal.querySelector('.n3-cust-thumbs');
+      const dropzone  = modal.querySelector('.n3-cust-dropzone');
+      const fileInput = modal.querySelector('input[type="file"]');
+
+      const addFiles = files => {
+        Array.from(files).forEach(file => {
+          if (!file.type.startsWith('image/')) return;
+          const objectUrl = URL.createObjectURL(file);
+          this._custImages.push({ file, objectUrl });
+          const thumb = document.createElement('div');
+          thumb.className = 'n3-cust-thumb';
+          const idx = this._custImages.length - 1;
+          thumb.innerHTML = `<img src="${objectUrl}" alt=""><button class="n3-cust-thumb-rm" title="Remove">${ic('x')}</button>`;
+          thumb.querySelector('.n3-cust-thumb-rm').addEventListener('click', () => {
+            URL.revokeObjectURL(objectUrl);
+            this._custImages.splice(idx, 1);
+            thumb.remove();
+          });
+          thumbsEl.appendChild(thumb);
+        });
+      };
+
+      fileInput.addEventListener('change', e => addFiles(e.target.files));
+      dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('n3-cust-drag-over'); });
+      dropzone.addEventListener('dragleave', () => dropzone.classList.remove('n3-cust-drag-over'));
+      dropzone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropzone.classList.remove('n3-cust-drag-over');
+        addFiles(e.dataTransfer.files);
+      });
+
+      // Generate
+      const genBtn   = modal.querySelector('.n3-cust-generate');
+      const errorEl  = modal.querySelector('.n3-cust-error');
+      const textarea = modal.querySelector('.n3-cust-textarea');
+
+      genBtn.addEventListener('click', async () => {
+        const prompt = textarea.value.trim();
+        if (!prompt) { textarea.focus(); return; }
+
+        genBtn.disabled = true;
+        genBtn.innerHTML = `${ic('loader')} Generating…`;
+        errorEl.style.display = 'none';
+
+        try {
+          // Upload images first (use uploads endpoint with a synthetic siteId)
+          const imageUrls = [];
+          for (const img of this._custImages) {
+            const fd = new FormData();
+            fd.append('file', img.file);
+            const up = await fetch(`${this._apiBase}/uploads/component-customize/upload`, {
+              method: 'POST',
+              body: fd,
+            });
+            if (up.ok) {
+              const data = await up.json();
+              imageUrls.push(data.file.url);
+            }
+          }
+
+          // Call customize endpoint
+          const res = await fetch(`${this._apiBase}/components/customize`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+              componentId:   comp.id,
+              componentHtml: componentEl.outerHTML,
+              prompt,
+              imageUrls,
+            }),
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `HTTP ${res.status}`);
+          }
+
+          const { html } = await res.json();
+
+          // Replace component in DOM with AI-generated HTML
+          const tmp = document.createElement('div');
+          tmp.innerHTML = html.trim();
+          const newNode = tmp.firstElementChild || tmp;
+          newNode.setAttribute('data-n3-block', '1');
+          componentEl.replaceWith(newNode);
+
+          // Emit so history captures the replacement
+          this._events.emit('component:insert', newNode);
+
+          close();
+          N3UI.toast(`${comp.name} customized!`, 'success', 2500);
+        } catch (err) {
+          errorEl.textContent = 'Error: ' + err.message;
+          errorEl.style.display = 'block';
+          genBtn.disabled = false;
+          genBtn.innerHTML = `${ic('bot')} Retry`;
+        }
+      });
     }
   }
 
