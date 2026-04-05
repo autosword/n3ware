@@ -173,6 +173,15 @@
       this._category     = 'all';
       this._dragging     = null;   // html string while dragging
       this._dropTarget   = null;   // highlighted block element
+      // Placement mode state
+      this._placing      = null;   // { comp, html } while in placement mode
+      this._placeCursor  = null;   // floating cursor element
+      this._placeZones   = [];     // [{el, y, ref, before}] drop zone descriptors
+      this._placeZoneEls = [];     // zone bar DOM elements
+      this._activeZone   = -1;     // index of currently highlighted zone
+      this._onPlaceMove  = null;
+      this._onPlaceClick = null;
+      this._onPlaceKey   = null;
     }
 
     /** Append the panel to the document body. */
@@ -352,20 +361,193 @@
           e.stopPropagation();
           const comp = this._components.find(c => c.id === btn.dataset.compId);
           if (!comp) return;
-          // Insert after currently selected block, or at end of body
-          const selected = document.querySelector('.n3-selected');
-          this._insert(comp.html, selected);
-          N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
+          this._enterPlacementMode(comp);
         });
       });
     }
 
+    // ── Placement mode ────────────────────────────────────────────────────────
+
     /**
-     * Parse and insert the component HTML at/after a target block.
-     * @param {string} html
-     * @param {Element|null} target  — insert after this; null = append to body
+     * Enter placement mode for a component.
+     * Shows a floating cursor glyph and drop-zone indicators between page blocks.
      */
-    _insert(html, target) {
+    _enterPlacementMode(comp) {
+      if (this._placing) this._exitPlacementMode(false);
+      this._placing = comp;
+
+      const iconFn = (window._n3wareModules||{}).icon;
+
+      // Floating cursor glyph
+      const cur = document.createElement('div');
+      cur.className = 'n3-place-cursor';
+      cur.setAttribute('data-n3-ui', '1');
+      cur.innerHTML = (iconFn ? iconFn(comp.lucideIcon || 'layout-template', {size: 22}) : '') +
+        '<div class="n3-place-cursor-badge">+</div>';
+      cur.style.opacity = '0';
+      document.body.appendChild(cur);
+      this._placeCursor = cur;
+
+      // Build drop zones
+      this._buildDropZones();
+
+      document.body.classList.add('n3-placing');
+
+      // Mousemove: update cursor position + active zone
+      document.addEventListener('mousemove', this._onPlaceMove = e => {
+        cur.style.left = (e.clientX + 12) + 'px';
+        cur.style.top  = (e.clientY + 12) + 'px';
+        cur.style.opacity = '1';
+        this._updateActiveZone(e.clientY + window.scrollY);
+      });
+
+      // Click: place at active zone (ignore clicks on editor UI)
+      document.addEventListener('click', this._onPlaceClick = e => {
+        if (N3UI.isEditorEl(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const zone = this._placeZones[this._activeZone];
+        this._exitPlacementMode(false);
+        if (zone) {
+          this._insertAtZone(comp.html, zone);
+          N3UI.toast(`Added: ${comp.name}`, 'success', 2000);
+        }
+      }, true); // capture so we beat other click handlers
+
+      N3UI.toast('Click to place — Esc to cancel', 'info', 3000);
+    }
+
+    /**
+     * Cancel placement mode.
+     * @returns {boolean} true if was in placement mode (so caller knows to swallow the event)
+     */
+    cancelPlacement() {
+      if (!this._placing) return false;
+      this._exitPlacementMode(true);
+      N3UI.toast('Placement cancelled', 'info', 1500);
+      return true;
+    }
+
+    /** @private */
+    _exitPlacementMode(cancelled) {
+      this._placing = null;
+      if (this._placeCursor) { this._placeCursor.remove(); this._placeCursor = null; }
+      this._placeZoneEls.forEach(el => el.remove());
+      this._placeZoneEls = [];
+      this._placeZones = [];
+      this._activeZone = -1;
+      document.body.classList.remove('n3-placing');
+      if (this._onPlaceMove)  { document.removeEventListener('mousemove', this._onPlaceMove); this._onPlaceMove = null; }
+      if (this._onPlaceClick) { document.removeEventListener('click', this._onPlaceClick, true); this._onPlaceClick = null; }
+    }
+
+    /**
+     * Find the top-level layout container and compute drop zones between its
+     * direct block children, skipping all editor UI elements.
+     * @private
+     */
+    _buildDropZones() {
+      // Find the outermost content container: prefer <main>, else body
+      const container = document.querySelector('main, [role="main"]') || document.body;
+      const children = Array.from(container.children).filter(el =>
+        !el.classList.contains('n3-toolbar')  &&
+        !el.classList.contains('n3-fab')      &&
+        !el.classList.contains('n3-comp-panel') &&
+        !el.classList.contains('n3-rev-panel') &&
+        !el.classList.contains('n3-style-panel') &&
+        !el.classList.contains('n3-analytics-overlay') &&
+        !el.classList.contains('n3-save-fab') &&
+        !el.classList.contains('n3-demo-banner') &&
+        !el.hasAttribute('data-n3-ui') &&
+        getComputedStyle(el).display !== 'none'
+      );
+
+      const contRect = container.getBoundingClientRect();
+      const scrollTop = window.scrollY;
+      const zones = [];
+
+      if (!children.length) {
+        // Empty page: single zone at top
+        zones.push({ y: contRect.top + scrollTop + 20, ref: null, before: true, container });
+      } else {
+        // Zone before first child
+        const first = children[0].getBoundingClientRect();
+        zones.push({ y: first.top + scrollTop, ref: children[0], before: true, container });
+
+        // Zones between siblings
+        for (let i = 0; i < children.length - 1; i++) {
+          const r1 = children[i].getBoundingClientRect();
+          const r2 = children[i + 1].getBoundingClientRect();
+          const midY = scrollTop + (r1.bottom + r2.top) / 2;
+          zones.push({ y: midY, ref: children[i + 1], before: true, container });
+        }
+
+        // Zone after last child
+        const last = children[children.length - 1].getBoundingClientRect();
+        zones.push({ y: last.bottom + scrollTop, ref: children[children.length - 1], before: false, container });
+      }
+
+      this._placeZones = zones;
+      this._activeZone = -1;
+
+      // Create visual zone bar elements
+      const contLeft  = contRect.left;
+      const contWidth = contRect.width;
+      zones.forEach((zone, i) => {
+        const bar = document.createElement('div');
+        bar.className = 'n3-place-zone';
+        bar.setAttribute('data-n3-ui', '1');
+        bar.style.position  = 'absolute';
+        bar.style.left      = contLeft + 'px';
+        bar.style.width     = contWidth + 'px';
+        bar.style.top       = (zone.y - 2) + 'px';
+        document.body.appendChild(bar);
+        this._placeZoneEls.push(bar);
+      });
+    }
+
+    /**
+     * Highlight the zone closest to the given absolute Y (pageY).
+     * @private
+     */
+    _updateActiveZone(pageY) {
+      if (!this._placeZones.length) return;
+      let closest = 0;
+      let minDist = Infinity;
+      this._placeZones.forEach((z, i) => {
+        const d = Math.abs(z.y - pageY);
+        if (d < minDist) { minDist = d; closest = i; }
+      });
+      if (closest === this._activeZone) return;
+      this._activeZone = closest;
+      this._placeZoneEls.forEach((bar, i) =>
+        bar.classList.toggle('n3-place-zone-active', i === closest)
+      );
+    }
+
+    /**
+     * Insert component HTML at the specified drop zone.
+     * @param {string} html
+     * @param {{ref: Element|null, before: boolean, container: Element}} zone
+     * @private
+     */
+    _insertAtZone(html, zone) {
+      if (zone.ref) {
+        this._insert(html, zone.before ? zone.ref : zone.ref, zone.before);
+      } else {
+        this._insert(html, null, false);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Parse and insert the component HTML at/after (or before) a target block.
+     * @param {string} html
+     * @param {Element|null} target  — reference element
+     * @param {boolean} [before=false] — insert before target instead of after
+     */
+    _insert(html, target, before = false) {
       // Ensure Tailwind CDN is present when inserting Tailwind components
       if (!document.querySelector('script[src*="tailwindcss"]')) {
         const tw  = document.createElement('script');
@@ -380,7 +562,11 @@
       const node = tmp.firstElementChild || tmp;
 
       if (target) {
-        target.parentNode.insertBefore(node, target.nextSibling);
+        if (before) {
+          target.parentNode.insertBefore(node, target);
+        } else {
+          target.parentNode.insertBefore(node, target.nextSibling);
+        }
       } else {
         const blocks = document.querySelectorAll('[data-n3-block]');
         if (blocks.length) {

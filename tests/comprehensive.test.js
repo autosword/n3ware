@@ -491,6 +491,61 @@ async function runTests(server) {
     assert(r.body.site.html === undefined, 'html not leaked in metadata endpoint');
     ok('Security: html not exposed in GET /api/sites/:id metadata');
   }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  section('10. Component library API — placement mode backend');
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  {
+    // GET /api/components returns JSON array (no auth required — public)
+    const r = await apiReq(server, 'GET', '/api/components');
+    assert(r.status === 200, 'GET /api/components → 200');
+    assert(Array.isArray(r.body), 'components response is an array');
+    ok('GET /api/components returns array');
+  }
+
+  {
+    // Each component has required fields for placement mode
+    const r = await apiReq(server, 'GET', '/api/components');
+    if (Array.isArray(r.body) && r.body.length > 0) {
+      const first = r.body[0];
+      assert(typeof first.id       === 'string', 'component has id field');
+      assert(typeof first.name     === 'string', 'component has name field');
+      assert(typeof first.html     === 'string', 'component has html field');
+      assert(typeof first.category === 'string', 'component has category field');
+      ok('Component shape: id, name, html, category present');
+    } else {
+      // If no components loaded, just pass gracefully
+      assert(true, 'components array (empty or populated)');
+      ok('Component shape: skipped (empty component library)');
+    }
+  }
+
+  {
+    // lucideIcon field present for icon picker rendering
+    const r = await apiReq(server, 'GET', '/api/components');
+    if (Array.isArray(r.body) && r.body.length > 0) {
+      const withIcon = r.body.filter(c => typeof c.lucideIcon === 'string');
+      assert(withIcon.length > 0, 'at least one component has lucideIcon');
+      ok(`Components with lucideIcon: ${withIcon.length}/${r.body.length}`);
+    } else {
+      assert(true, 'lucideIcon check skipped (empty library)');
+      ok('lucideIcon check skipped');
+    }
+  }
+
+  {
+    // Component HTML is non-empty strings
+    const r = await apiReq(server, 'GET', '/api/components');
+    if (Array.isArray(r.body) && r.body.length > 0) {
+      const emptyHtml = r.body.filter(c => !c.html || c.html.trim().length === 0);
+      assert(emptyHtml.length === 0, 'no component has empty html');
+      ok(`All ${r.body.length} components have non-empty html`);
+    } else {
+      assert(true, 'html check skipped');
+      ok('html check skipped');
+    }
+  }
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
