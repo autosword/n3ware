@@ -391,6 +391,43 @@ async function runInputAttacks(route, resolvedPath) {
   }
 }
 
+// ── Rate-limit checks ─────────────────────────────────────────────────────────
+// Hits /api/migrate/scrape twice in rapid succession with the same payload.
+// The safe target is https://example.com (we don't care about its content).
+// IMPORTANT: After this check we wait RATE_LIMIT_WAIT_MS before continuing so
+// the window has expired and subsequent pen test runs don't inherit rate-limit
+// state from this run.
+const RATE_LIMIT_WAIT_MS = 31_000;
+const SCRAPE_TARGET = 'https://example.com';
+
+async function runRateLimitChecks() {
+  process.stdout.write(`\n${C.cyan}── Rate-limit: POST /api/migrate/scrape${C.reset} ${C.dim}[category: rate-limit]${C.reset}\n`);
+  const path = '/api/migrate/scrape';
+  const body = { url: SCRAPE_TARGET };
+
+  // First request — should pass (200 or 422 if scrape fails; not 429)
+  const s1 = await req('POST', path, { body });
+  await delay(DELAY_MS);
+  if (s1 !== 429) {
+    recordPass('POST', path, 'rate-limit first request (should not be 429)', s1);
+  } else {
+    recordFail('POST', path, 'rate-limit first request', s1, '2xx/4xx (not 429)', 'first request was rate-limited — possible leftover state from previous run');
+  }
+
+  // Second request immediately after — must be 429
+  const s2 = await req('POST', path, { body });
+  await delay(DELAY_MS);
+  if (s2 === 429) {
+    recordPass('POST', path, 'rate-limit second request (must be 429)', s2);
+  } else {
+    recordFail('POST', path, 'rate-limit second request', s2, '429', `second rapid request returned ${s2} — rate limit not enforced`);
+  }
+
+  // Wait for the rate-limit window to expire so subsequent runs start clean.
+  process.stdout.write(`  ${C.dim}Waiting ${RATE_LIMIT_WAIT_MS / 1000}s for rate-limit window to expire…${C.reset}\n`);
+  await delay(RATE_LIMIT_WAIT_MS);
+}
+
 // ── Main runner ───────────────────────────────────────────────────────────────
 async function main() {
   process.stdout.write(`\n${C.bold}n3ware penetration test suite${C.reset}\n`);
@@ -412,6 +449,9 @@ async function main() {
     // All routes (required and public) get input attack tests
     await runInputAttacks(route, resolvedPath);
   }
+
+  // ── Rate-limit category ───────────────────────────────────────────────────
+  await runRateLimitChecks();
 
   // ── Summary ──────────────────────────────────────────────────────────────
   process.stdout.write(`\n${C.bold}${'─'.repeat(72)}${C.reset}\n`);

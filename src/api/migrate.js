@@ -14,15 +14,23 @@ const { authOrApiKey } = require('./auth');
 const scraper  = require('../integrations/scraper');
 const migrator = require('../integrations/migrator');
 const storage  = require('../storage');
+const { createRateLimit, getIp } = require('../middleware/rate-limit');
 
 const router = express.Router();
+
+// Rate limit scrape: 1 request per (IP, target URL) per 30 seconds.
+const scrapeRateLimit = createRateLimit({
+  keyFn:  req => getIp(req) + '::' + String((req.body && req.body.url) || '').toLowerCase().trim(),
+  window: 30,
+  max:    1,
+});
 
 // In-memory job store — keyed by jobId, TTL-cleaned every 15 min
 const jobs = new Map();
 
 // ── POST /scrape — no auth required ──────────────────────────────────────────
 
-router.post('/scrape', async (req, res) => {
+router.post('/scrape', scrapeRateLimit, async (req, res) => {
   const { url } = req.body || {};
   if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'url is required' });
