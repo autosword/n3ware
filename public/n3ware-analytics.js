@@ -287,6 +287,7 @@
     // ── Private ───────────────────────────────────────────────────────────────
 
     _skeleton() {
+      const _ic = (n, s) => { const f = (window._n3wareModules||{}).icon; return f ? f(n, {size: s||16}) : ''; };
       return `<div class="n3-an-header">
         <div class="n3-an-tabs">
           <button class="n3-an-tab n3-an-active" data-tab="page">This Page</button>
@@ -297,7 +298,7 @@
           <button class="n3-an-period n3-an-active" data-period="14d">14d</button>
           <button class="n3-an-period" data-period="30d">30d</button>
         </div>
-        <button class="n3-an-close" title="Close">✕</button>
+        <button class="n3-an-close" title="Close" style="display:inline-flex;align-items:center;justify-content:center">${_ic('x', 18)}</button>
       </div>
       <div class="n3-an-body"><p class="n3-an-loading">Loading analytics…</p></div>`;
     }
@@ -448,6 +449,7 @@
     }
 
     _render(data) {
+      const _ic = (n, s) => { const f = (window._n3wareModules||{}).icon; return f ? f(n, {size: s||14}) : ''; };
       // Destroy any existing charts before re-rendering
       this._charts.forEach(c => c.destroy());
       this._charts = [];
@@ -497,7 +499,7 @@
           const evIcon = _iconFn ? _iconFn(ev.lucideIcon || ev.icon || 'mouse-pointer-click', { size: 16 }) : (ev.icon || '');
           return `<div class="n3-an-event"><span class="n3-an-event-icon" style="display:inline-flex;align-items:center">${evIcon}</span><span class="n3-an-event-label">${_esc(ev.label)}</span><span class="n3-an-event-count">${ev.count}</span><span class="n3-an-event-trend ${trendCls}">${trendArrow}${trendPct}%</span></div>`;
         }).join('');
-        eventsHtml = `<div class="n3-an-section"><p class="n3-an-section-title">⚡ Customer Actions</p><div class="n3-an-events">${evRows}</div></div>`;
+        eventsHtml = `<div class="n3-an-section"><p class="n3-an-section-title" style="display:flex;align-items:center;gap:5px"><span style="display:inline-flex">${_ic('zap', 14)}</span> Customer Actions</p><div class="n3-an-events">${evRows}</div></div>`;
       }
 
       // ── Traffic Sources (Chart.js horizontal bar) ─────────────────────────
@@ -563,14 +565,14 @@
       let citiesHtml = '';
       if (data.cities && data.cities.length) {
         const citH = Math.max(data.cities.length * 28 + 10, 80);
-        citiesHtml = `<div class="n3-an-section"><p class="n3-an-section-title">📍 Top Cities</p><div style="position:relative;height:${citH}px"><canvas id="n3-chart-cities"></canvas></div></div>`;
+        citiesHtml = `<div class="n3-an-section"><p class="n3-an-section-title" style="display:flex;align-items:center;gap:5px"><span style="display:inline-flex">${_ic('map-pin', 14)}</span> Top Cities</p><div style="position:relative;height:${citH}px"><canvas id="n3-chart-cities"></canvas></div></div>`;
       }
 
       const geoBlock = (refHtml || citiesHtml)
         ? `<div class="n3-an-2col">${refHtml}${citiesHtml}</div>` : '';
 
       const connectHtml = !data.gaConnected && this._cfg
-        ? `<div class="n3-an-connect-prompt"><span>📊</span><span>Connect Google Analytics for real-time data — available in dashboard settings</span></div>` : '';
+        ? `<div class="n3-an-connect-prompt"><span style="display:inline-flex;align-items:center">${_ic('bar-chart', 16)}</span><span>Connect Google Analytics for real-time data — available in dashboard settings</span></div>` : '';
 
       const allHtml = statsHtml + chartHtml + eventsHtml + sourcesHtml + devHtml + topHtml + geoBlock + connectHtml;
       body.innerHTML = allHtml;

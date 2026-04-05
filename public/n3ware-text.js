@@ -161,7 +161,8 @@
       ci.oninput = () => { exec('foreColor', ci.value); sw.style.color = ci.value; };
       cw.append(ci, sw);
       bar.appendChild(cw);
-      bar.appendChild(fBtn('🔗', 'Insert Link', () => { const u = prompt('Enter URL:'); if (u) exec('createLink', u); }));
+      const _icLink = (window._n3wareModules||{}).icon;
+      bar.appendChild(fBtn(_icLink ? _icLink('link', {size: 14}) : 'Link', 'Insert Link', () => { const u = prompt('Enter URL:'); if (u) exec('createLink', u); }));
       return bar;
     }
 

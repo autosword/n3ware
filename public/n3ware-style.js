@@ -43,6 +43,7 @@
     // ── Private ──────────────────────────────────────────────────────────────
 
     _build() {
+      const _ic = (n, s) => { const f = (window._n3wareModules||{}).icon; return f ? f(n, {size: s||18}) : ''; };
       const p = document.createElement('div');
       p.className = 'n3-style-panel';
       p.setAttribute('data-n3-ui', '1');
@@ -51,7 +52,7 @@
           <div><div class="n3-panel-title">Style</div></div>
           <div style="display:flex;align-items:center;gap:8px">
             <span class="n3-panel-tag" id="n3-sel-tag">—</span>
-            <button class="n3-panel-close" id="n3-panel-close">✕</button>
+            <button class="n3-panel-close" id="n3-panel-close" style="display:inline-flex;align-items:center;justify-content:center">${_ic('x', 18)}</button>
           </div>
         </div>
         <div class="n3-panel-section">
@@ -161,6 +162,7 @@
       this._el = document.createElement('div');
       this._el.className = 'n3-toolbar';
       this._el.setAttribute('data-n3-ui', '1');
+      const _ic = (n, s) => { const f = (window._n3wareModules||{}).icon; return f ? f(n, {size: s||18}) : ''; };
       const desktopBtns = this._cloud
         ? `<button class="n3-toolbar-btn n3-cloud-btn n3-mob-hide" data-action="cloud-save" title="Publish to cloud">☁ Publish</button>
            <button class="n3-toolbar-btn n3-mob-hide" data-action="cloud-revisions" title="Revision history">↺ History</button>
@@ -185,9 +187,9 @@
         ${desktopBtns}
         <button class="n3-toolbar-btn n3-mob-hide" data-action="copy-html">⎘ Copy HTML</button>
         <button class="n3-toolbar-btn n3-mob-hide" data-action="json-diff">{ } Diff</button>
-        <button class="n3-toolbar-btn n3-mob-show" data-action="mob-menu" title="More options" style="font-size:16px;min-width:36px">☰</button>
+        <button class="n3-toolbar-btn n3-mob-show" data-action="mob-menu" title="More options" style="display:inline-flex;align-items:center;justify-content:center;min-width:36px">${_ic('menu', 20)}</button>
         <div class="n3-toolbar-spacer"></div>
-        <button class="n3-toolbar-btn n3-danger" data-action="exit-edit">✕ Exit</button>
+        <button class="n3-toolbar-btn n3-danger" data-action="exit-edit" style="display:inline-flex;align-items:center;gap:4px">${_ic('x', 16)} Exit</button>
         <div class="n3-mob-dropdown" id="n3-mob-dropdown">${mobMenuItems}</div>`;
       this._el.addEventListener('click', e => {
         const b = e.target.closest('[data-action]');

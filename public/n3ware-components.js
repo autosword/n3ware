@@ -82,13 +82,14 @@
 
     /** Inject the revisions panel into the DOM. */
     mount() {
+      const _ic = (n, s) => { const f = (window._n3wareModules||{}).icon; return f ? f(n, {size: s||18}) : ''; };
       this._el = document.createElement('div');
       this._el.className = 'n3-rev-panel';
       this._el.setAttribute('data-n3-ui', '1');
       this._el.innerHTML = `
         <div class="n3-rev-header">
           <span>Revision History</span>
-          <button class="n3-rev-close" title="Close">✕</button>
+          <button class="n3-rev-close" title="Close" style="display:inline-flex;align-items:center;justify-content:center">${_ic('x', 18)}</button>
         </div>
         <div class="n3-rev-list"><p class="n3-rev-empty">Loading…</p></div>`;
       this._el.querySelector('.n3-rev-close').addEventListener('click', () => this.close());
@@ -255,10 +256,11 @@
     // ── Private ────────────────────────────────────────────────────────────────
 
     _skeleton() {
+      const _ic = (n, s) => { const f = (window._n3wareModules||{}).icon; return f ? f(n, {size: s||18}) : ''; };
       return [
         `<div class="n3-comp-hdr">`,
-        `  <div class="n3-comp-title">🧩 Components</div>`,
-        `  <button class="n3-comp-close" title="Close">✕</button>`,
+        `  <div class="n3-comp-title" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex">${_ic('puzzle', 18)}</span> Components</div>`,
+        `  <button class="n3-comp-close" title="Close" style="display:inline-flex;align-items:center;justify-content:center">${_ic('x', 18)}</button>`,
         `</div>`,
         `<div class="n3-comp-search-wrap">`,
         `  <input class="n3-comp-search" type="text" placeholder="Search…" autocomplete="off">`,

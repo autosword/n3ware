@@ -513,7 +513,12 @@
      * @param {number}                      [duration=2500]  Display time in ms
      */
     static toast(msg, type = 'info', duration = 2500) {
-      const icons = { success: '✓', error: '✕', info: 'ℹ' };
+      const _icFn = (window._n3wareModules||{}).icon;
+      const icons = {
+        success: _icFn ? _icFn('check', {size: 14}) : '✓',
+        error:   _icFn ? _icFn('x',     {size: 14}) : '✗',
+        info:    _icFn ? _icFn('help-circle', {size: 14}) : 'i',
+      };
       const el = document.createElement('div');
       el.className = `n3-toast n3-${type}`;
       el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
@@ -1009,7 +1014,7 @@
 
             <label style="display:block;margin-bottom:8px;font-size:13px;color:#aaa;font-weight:500">Upload Images <span style="color:#555">(optional)</span></label>
             <div id="n3pc-dropzone" style="background:#0A0A0A;border:2px dashed #333;border-radius:10px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color 0.2s">
-              <div style="font-size:26px;margin-bottom:6px">📷</div>
+              <div style="margin-bottom:6px;display:flex;justify-content:center;opacity:0.5">${((window._n3wareModules||{}).icon||function(){return'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>'})('camera', {size: 26})}</div>
               <div style="color:#666;font-size:14px">Drop images here or <span style="color:#E31137">click to browse</span></div>
               <div style="color:#444;font-size:12px;margin-top:4px">JPG, PNG, WebP · max 5 MB each</div>
               <input id="n3pc-file-input" type="file" accept="image/*" multiple style="display:none">
@@ -1030,7 +1035,7 @@
 
           <button id="n3pc-generate-btn"
             style="width:100%;background:#E31137;color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:opacity 0.2s">
-            🤖 Generate Page with AI
+            <span style="display:inline-flex;align-items:center;gap:6px;justify-content:center">${((window._n3wareModules||{}).icon||function(){return''})('bot', {size: 18})} Generate Page with AI</span>
           </button>
         </div>`;
 
@@ -1221,7 +1226,8 @@
         formBody.style.display  = 'block';
         genBtn.style.display    = 'block';
         genBtn.disabled         = false;
-        genBtn.textContent      = this._selectedTemplate ? '🤖 Customize with AI' : '🤖 Generate Page with AI';
+        const _botIc = ((window._n3wareModules||{}).icon||function(){return''})('bot', {size: 18});
+        genBtn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;justify-content:center">${_botIc} ${this._selectedTemplate ? 'Customize with AI' : 'Generate Page with AI'}</span>`;
         N3UI.toast(`Error: ${err.message}`, 'error');
       }
     }
@@ -1555,7 +1561,7 @@
           window.location.replace(url.toString());
         }, 1500);
       } catch (err) {
-        this._saveBtn.innerHTML = '✕ Failed';
+        this._saveBtn.innerHTML = 'Failed';
         this._saveBtn.style.background = '#DC2626';
         N3UI.toast('Save failed: ' + err.message, 'error', 4000);
         setTimeout(() => {
