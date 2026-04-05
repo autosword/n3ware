@@ -613,3 +613,20 @@ Appears on **6 pages** (with different `data-default-cost`):
 - `public/vs-weebly.html` — `data-default-cost="10"`
 - `public/vs-godaddy.html` — `data-default-cost="11"`
 - `public/index.html` — `data-default-cost="50"`
+
+---
+
+## 22. Penetration test suite
+
+**Location:** `tests/penetration.test.js`
+**Run:** `node tests/penetration.test.js` or `npm run pentest`
+**Override target:** `BASE_URL=http://localhost:8080 node tests/penetration.test.js`
+
+Exercises every API route with missing, bogus, expired, and wrong-secret credentials. Also tests NoSQL/SQL injection payloads in path params and request bodies, oversized bodies (11MB), and method override mismatches. Does NOT mutate data — auth failures are expected and the suite verifies them.
+
+**Skipped routes** (deliberately excluded):
+- `POST /api/domains/register` — could accidentally purchase a domain
+- `POST /api/billing/webhook` — raw-body Stripe endpoint, not worth probing
+- Wrong-owner isolation test (case 7) — requires two real authenticated sessions, must be done manually
+
+**This suite is NOT part of the normal dev loop.** Do not run it on every session or include it in CI. It is an on-demand check before major launches or after any auth-boundary changes. Future AI sessions: you do not need to read or run this file unless explicitly asked to verify auth security.

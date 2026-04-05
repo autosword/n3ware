@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "node tests/api.test.js && node tests/run-tests.js"
+    "test": "node tests/api.test.js && node tests/run-tests.js",
+    "pentest": "node tests/penetration.test.js"
   },
   "keywords": [
     "visual-editor",
