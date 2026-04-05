@@ -572,3 +572,44 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 - `tests/auth-flow.test.js` — magic link + CRUD tests (80 assertions)
 - `tests/save-flow.test.js` — save pipeline tests (21 assertions)
 - `tests/n3ware.test.html` — browser-based editor tests
+
+---
+
+## 21. Shared Marketing Partials
+
+These HTML blocks are copy-pasted verbatim across multiple pages (no build step). When copy changes, update **all** copies listed below.
+
+### Convert-or-launch module
+Two-card section: Card A = domain input → `/demo.html?url=<encoded>`, Card B = "Start free →" `/dashboard`. Inline `<script>` uses `document.currentScript.previousElementSibling` for scoping.
+
+Appears on **9 pages**:
+- `public/index.html` (before `<!-- Templates Showcase -->`)
+- `public/features.html` (before `<!-- CTA section -->`)
+- `public/brand.html` (before `<!-- FOOTER -->`) — uses `n3-` CSS var classes
+- `public/components.html` (before `<!-- ─── JavaScript -->`)
+- `public/vs-agency.html` (before `<!-- Final CTA -->`)
+- `public/vs-wix.html` (before `<!-- Final CTA -->`)
+- `public/vs-squarespace.html` (before `<!-- Final CTA -->`)
+- `public/vs-weebly.html` (before `<!-- Final CTA -->`)
+- `public/vs-godaddy.html` (before `<!-- Final CTA -->`)
+
+### Bring-your-own-domain callout
+Red-background `<section>` with domain input and "Connect your domain →" CTA.
+
+Appears on **6 pages**: `index.html`, `features.html`, `vs-agency.html`, `vs-wix.html`, `vs-squarespace.html`, `vs-weebly.html` (search for `<!-- Any domain callout -->` or `bg-[#E31337]` domain section).
+
+### No-developer-required module
+Dark card: "No developer. No designer. No excuses." with 3-bullet checklist.
+
+Appears on **6 pages**: `index.html`, `features.html`, `vs-agency.html`, `vs-wix.html`, `vs-squarespace.html`, `vs-godaddy.html`.
+
+### ROI calculator
+Interactive `<div class="n3-roi-calc ...">` with `data-default-cost` attribute. Inputs: current monthly cost, extras toggle (+$15), years. Output: their total vs n3ware total, savings in red, equiv phrase. Edge case: if current < $20 and no extras → "Already cheaper". Canonical n3ware price = **$20/mo**.
+
+Appears on **6 pages** (with different `data-default-cost`):
+- `public/vs-agency.html` — `data-default-cost="400"`
+- `public/vs-wix.html` — `data-default-cost="17"`
+- `public/vs-squarespace.html` — `data-default-cost="23"`
+- `public/vs-weebly.html` — `data-default-cost="10"`
+- `public/vs-godaddy.html` — `data-default-cost="11"`
+- `public/index.html` — `data-default-cost="50"`

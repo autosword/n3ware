@@ -310,6 +310,55 @@
 
   </div>
 
+  <!-- Convert or Launch -->
+  <section class="py-20 px-6 border-t border-[#2A2A2A]">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-3">Two ways to get started</h2>
+        <p class="text-gray-400 max-w-xl mx-auto">Test on your live site today, or launch something new in under an hour.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 hover:border-[#E31337]/30 transition-colors">
+          <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+            <i data-lucide="globe" class="w-4 h-4 text-[#E31337]"></i>
+            <span>Already have a site?</span>
+          </div>
+          <h3 class="text-2xl font-black text-white mb-3">Try n3ware on your existing site.</h3>
+          <p class="text-gray-400 text-sm leading-relaxed mb-6">Paste your domain. We'll load it with the n3ware editor layered on top, right in your browser. Edit your real site, see it work — no sign-up required.</p>
+          <div class="flex gap-3 mb-3">
+            <div class="flex-1 flex items-center bg-[#0A0A0A] border border-[#3A3A3A] rounded-xl overflow-hidden focus-within:border-[#E31337] transition-colors">
+              <span class="px-3 text-gray-600 text-sm select-none">https://</span>
+              <input type="text" class="n3-try-input flex-1 bg-transparent py-2.5 pr-3 text-white text-sm outline-none" placeholder="yourbusiness.com">
+            </div>
+            <button class="n3-try-btn bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap">Try it now →</button>
+          </div>
+          <p class="text-xs text-gray-600">We don't save anything until you sign up. Your current site stays untouched.</p>
+          <!-- TODO: wire ?url param to bootstrap the editor against an external domain in an iframe -->
+        </div>
+        <div class="bg-[#111111] border border-[#E31337]/20 rounded-2xl p-8 hover:border-[#E31337]/50 transition-colors">
+          <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+            <i data-lucide="sparkles" class="w-4 h-4 text-[#E31337]"></i>
+            <span>Starting fresh?</span>
+          </div>
+          <h3 class="text-2xl font-black text-white mb-3">Launch a new website in minutes.</h3>
+          <p class="text-gray-400 text-sm leading-relaxed mb-6">Pick a template for your business — restaurant, salon, real estate, contractor, whatever you run — and fill it out with AI. Live on your domain in under an hour.</p>
+          <a href="/dashboard" class="block text-center bg-[#E31337] hover:bg-[#FF2847] text-white py-3 rounded-xl font-semibold transition-colors mb-3">Start free →</a>
+          <p class="text-xs text-gray-600">Free to build. $20/mo to go live. Just domain cost extra.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+  (function(){
+    var sec=document.currentScript.previousElementSibling;
+    var inp=sec.querySelector('.n3-try-input');
+    var btn=sec.querySelector('.n3-try-btn');
+    function go(){var d=inp.value.trim().replace(/^https?:\/\//,'');if(d)window.location.href='/demo.html?url='+encodeURIComponent(d);}
+    btn.addEventListener('click',go);
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
+  })();
+  </script>
+
   <!-- CTA section -->
   <section class="py-24 px-6 text-center" style="background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(227,19,55,0.12) 0%, transparent 70%)">
     <div class="max-w-2xl mx-auto">

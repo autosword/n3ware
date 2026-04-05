@@ -157,7 +157,7 @@
           </div>
           <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
             <span class="text-gray-300">Pricing</span>
-            <span class="text-center text-[#E31337] font-medium text-xs">Starter free · Pro at launch</span>
+            <span class="text-center text-[#E31337] font-medium text-xs">Free to build · $20/mo live</span>
             <span class="text-center text-gray-400 text-xs">From $23/mo</span>
           </div>
           <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
@@ -185,6 +185,121 @@
       <p class="text-xs text-gray-600 text-center mt-4">Competitor data based on publicly available pricing and feature documentation as of April 2026.</p>
     </div>
   </section>
+
+  <!-- ROI Calculator -->
+  <section class="py-20 px-6 bg-[#111111]/60">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-10">
+        <p class="text-xs font-mono text-[#E31337] tracking-widest uppercase mb-3">ROI Calculator</p>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-3">See what YOU'D save</h2>
+        <p class="text-gray-400 max-w-xl mx-auto">Enter what you're actually paying. Watch the savings update in real time.</p>
+      </div>
+      <div class="n3-roi-calc bg-[#111111] border border-[#2A2A2A] rounded-2xl overflow-hidden" data-default-cost="23">
+        <div class="grid md:grid-cols-2">
+          <div class="p-8 md:border-r border-b md:border-b-0 border-[#2A2A2A]">
+            <h3 class="font-bold text-lg mb-6 text-white">What you pay now</h3>
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm text-gray-400 mb-2">Monthly cost</label>
+                <div class="flex items-center bg-[#0A0A0A] border border-[#3A3A3A] rounded-xl overflow-hidden focus-within:border-[#E31337] transition-colors">
+                  <span class="px-4 text-gray-500 font-medium select-none">$</span>
+                  <input type="number" class="n3-roi-current flex-1 bg-transparent py-3 pr-2 text-white text-xl font-bold outline-none" min="0" max="5000" step="1">
+                  <span class="px-4 text-gray-500 text-sm select-none">/mo</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm text-gray-400 mb-3">Including hosting, plugins &amp; maintenance?</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button class="n3-roi-btn-no py-2.5 rounded-xl text-sm font-semibold border transition-all" style="background:#E31337;border-color:#E31337;color:#fff">No</button>
+                  <button class="n3-roi-btn-yes py-2.5 rounded-xl text-sm font-semibold border transition-all" style="background:transparent;border-color:#3A3A3A;color:#888888">Yes (+$15/mo)</button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm text-gray-400 mb-2">Over how many years?</label>
+                <div class="flex items-center bg-[#0A0A0A] border border-[#3A3A3A] rounded-xl overflow-hidden focus-within:border-[#E31337] transition-colors">
+                  <input type="number" class="n3-roi-years flex-1 bg-transparent py-3 px-4 text-white text-xl font-bold outline-none" min="1" max="20" step="1" value="5">
+                  <span class="px-4 text-gray-500 text-sm select-none">years</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="p-8 flex flex-col">
+            <h3 class="font-bold text-lg mb-6 text-white">Your savings with n3ware</h3>
+            <div class="space-y-3 mb-6">
+              <div class="bg-[#1A1A1A] rounded-xl px-4 py-3">
+                <p class="text-xs text-gray-500 mb-0.5">Your cost over <span class="n3-roi-lbl">5</span> years</p>
+                <p class="n3-roi-their-total text-xl font-bold text-white">—</p>
+              </div>
+              <div class="bg-[#1A1A1A] rounded-xl px-4 py-3">
+                <p class="text-xs text-gray-500 mb-0.5">n3ware over <span class="n3-roi-lbl2">5</span> years · free to build · $20/mo live</p>
+                <p class="n3-roi-our-total text-xl font-bold text-white">—</p>
+              </div>
+            </div>
+            <div class="rounded-xl p-5 mb-4" style="background:rgba(227,19,55,0.08);border:1px solid rgba(227,19,55,0.25)">
+              <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="trending-up" class="w-4 h-4 shrink-0" style="color:#E31337"></i>
+                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">You'd save</p>
+              </div>
+              <p class="n3-roi-savings text-6xl font-black leading-tight" style="color:#E31337">—</p>
+              <p class="n3-roi-equiv text-sm text-gray-400 mt-2 leading-relaxed"></p>
+              <p class="text-xs text-gray-600 mt-2">Plus your domain (~$10–$20/yr). That's it.</p>
+            </div>
+            <a href="/dashboard" class="block text-center bg-[#E31337] hover:bg-[#FF2847] text-white py-3 rounded-xl font-semibold transition-colors text-sm">Start free →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+  (function(){
+    var fmt=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
+    function equiv(s){
+      if(s>=20000)return'That\'s more than a year of employee payroll for most small businesses.';
+      if(s>=10000)return'That\'s enough to hire part-time help for six months.';
+      if(s>=5000)return'That\'s a family vacation — or new equipment for your business.';
+      if(s>=2000)return'That\'s a new MacBook Pro — or a full year of marketing spend.';
+      if(s>=500)return'That\'s a solid marketing budget for the whole year.';
+      return'Every dollar saved goes back into your business.';
+    }
+    document.querySelectorAll('.n3-roi-calc').forEach(function(c){
+      var inpCost=c.querySelector('.n3-roi-current');
+      var inpYears=c.querySelector('.n3-roi-years');
+      var btnNo=c.querySelector('.n3-roi-btn-no');
+      var btnYes=c.querySelector('.n3-roi-btn-yes');
+      var elTheir=c.querySelector('.n3-roi-their-total');
+      var elOur=c.querySelector('.n3-roi-our-total');
+      var elSav=c.querySelector('.n3-roi-savings');
+      var elEq=c.querySelector('.n3-roi-equiv');
+      var lbls=c.querySelectorAll('.n3-roi-lbl,.n3-roi-lbl2');
+      var extrasOn=false;
+      inpCost.value=parseFloat(c.dataset.defaultCost)||50;
+      function recalc(){
+        var cur=Math.max(0,parseFloat(inpCost.value)||0);
+        var yrs=Math.max(1,Math.min(20,parseInt(inpYears.value)||5));
+        var theirTot=(cur+(extrasOn?15:0))*12*yrs;
+        var ourTot=20*12*yrs;
+        var sav=theirTot-ourTot;
+        lbls.forEach(function(l){l.textContent=yrs;});
+        elTheir.textContent=fmt.format(theirTot);
+        elOur.textContent=fmt.format(ourTot);
+        if(cur<20&&!extrasOn){
+          elSav.textContent='Already cheaper';
+          elSav.style.fontSize='2rem';
+          elEq.textContent='You\'re paying less than $20/mo — but consider what you\'re getting for that.';
+        } else {
+          elSav.textContent=sav>0?fmt.format(sav):'$0';
+          elSav.style.fontSize='';
+          elEq.textContent=sav>0?equiv(sav):'n3ware costs about the same over that period.';
+        }
+      }
+      btnNo.addEventListener('click',function(){extrasOn=false;btnNo.style.cssText='background:#E31337;border-color:#E31337;color:#fff';btnYes.style.cssText='background:transparent;border-color:#3A3A3A;color:#888888';recalc();});
+      btnYes.addEventListener('click',function(){extrasOn=true;btnYes.style.cssText='background:#E31337;border-color:#E31337;color:#fff';btnNo.style.cssText='background:transparent;border-color:#3A3A3A;color:#888888';recalc();});
+      inpCost.addEventListener('input',recalc);
+      inpYears.addEventListener('input',recalc);
+      recalc();
+    });
+  })();
+  </script>
 
   <!-- Any domain callout -->
   <section class="py-16 px-6">
@@ -292,6 +407,55 @@
       <div class="border-t border-[#2A2A2A] mb-8"></div>
     </div>
   </section>
+
+  <!-- Convert or Launch -->
+  <section class="py-20 px-6 border-t border-[#2A2A2A]">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-3">Two ways to get started</h2>
+        <p class="text-gray-400 max-w-xl mx-auto">Test on your live site today, or launch something new in under an hour.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 hover:border-[#E31337]/30 transition-colors">
+          <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+            <i data-lucide="globe" class="w-4 h-4 text-[#E31337]"></i>
+            <span>Already have a site?</span>
+          </div>
+          <h3 class="text-2xl font-black text-white mb-3">Try n3ware on your existing site.</h3>
+          <p class="text-gray-400 text-sm leading-relaxed mb-6">Paste your domain. We'll load it with the n3ware editor layered on top, right in your browser. Edit your real site, see it work — no sign-up required.</p>
+          <div class="flex gap-3 mb-3">
+            <div class="flex-1 flex items-center bg-[#0A0A0A] border border-[#3A3A3A] rounded-xl overflow-hidden focus-within:border-[#E31337] transition-colors">
+              <span class="px-3 text-gray-600 text-sm select-none">https://</span>
+              <input type="text" class="n3-try-input flex-1 bg-transparent py-2.5 pr-3 text-white text-sm outline-none" placeholder="yourbusiness.com">
+            </div>
+            <button class="n3-try-btn bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap">Try it now →</button>
+          </div>
+          <p class="text-xs text-gray-600">We don't save anything until you sign up. Your current site stays untouched.</p>
+          <!-- TODO: wire ?url param to bootstrap the editor against an external domain in an iframe -->
+        </div>
+        <div class="bg-[#111111] border border-[#E31337]/20 rounded-2xl p-8 hover:border-[#E31337]/50 transition-colors">
+          <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+            <i data-lucide="sparkles" class="w-4 h-4 text-[#E31337]"></i>
+            <span>Starting fresh?</span>
+          </div>
+          <h3 class="text-2xl font-black text-white mb-3">Launch a new website in minutes.</h3>
+          <p class="text-gray-400 text-sm leading-relaxed mb-6">Pick a template for your business — restaurant, salon, real estate, contractor, whatever you run — and fill it out with AI. Live on your domain in under an hour.</p>
+          <a href="/dashboard" class="block text-center bg-[#E31337] hover:bg-[#FF2847] text-white py-3 rounded-xl font-semibold transition-colors mb-3">Start free →</a>
+          <p class="text-xs text-gray-600">Free to build. $20/mo to go live. Just domain cost extra.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+  (function(){
+    var sec=document.currentScript.previousElementSibling;
+    var inp=sec.querySelector('.n3-try-input');
+    var btn=sec.querySelector('.n3-try-btn');
+    function go(){var d=inp.value.trim().replace(/^https?:\/\//,'');if(d)window.location.href='/demo.html?url='+encodeURIComponent(d);}
+    btn.addEventListener('click',go);
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
+  })();
+  </script>
 
   <!-- Final CTA -->
   <section class="py-24 px-6 text-center" style="background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(227,19,55,0.12) 0%, transparent 70%)">
