@@ -68,6 +68,7 @@
     'n3ware-charts.js',
     'n3ware-analytics.js',
     'n3ware-components.js',
+    'n3ware-theme.js',
   ];
 
   /**
@@ -499,6 +500,42 @@
         `.n3-script-modal-cancel:hover{background:rgba(255,255,255,.14)}`,
         `.n3-script-modal-save{background:${T.accent};border:1px solid ${T.accent};color:#fff;padding:7px 16px;border-radius:6px;cursor:pointer;font:600 13px/1 system-ui,sans-serif;transition:all .12s;touch-action:manipulation}`,
         `.n3-script-modal-save:hover{background:${T.accentDark}}`,
+        // ── Theme panel ──────────────────────────────────────────────────────
+        `.n3-theme-panel{position:fixed;top:0;left:0;bottom:0;z-index:999995;background:#0B1120;border-right:1px solid ${T.border};width:264px;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;font:13px/1.5 system-ui,sans-serif;color:${T.text};box-shadow:4px 0 24px rgba(0,0,0,.4);overflow:hidden}`,
+        `.n3-theme-panel.n3-theme-open{transform:translateX(0)}`,
+        `.n3-theme-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 12px;border-bottom:1px solid ${T.border};background:#0B1120;position:sticky;top:0;z-index:1;flex-shrink:0}`,
+        `.n3-theme-title{font:700 13px/1 system-ui;color:${T.text};display:flex;align-items:center;gap:7px}`,
+        `.n3-theme-close{background:transparent;border:none;color:${T.muted};cursor:pointer;font-size:15px;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all .12s}`,
+        `.n3-theme-close:hover{background:rgba(255,255,255,.1);color:${T.text}}`,
+        `.n3-theme-body{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:${T.border} transparent}`,
+        `.n3-theme-section{padding:12px 14px;border-bottom:1px solid ${T.border}}`,
+        `.n3-theme-section-title{font:700 10px/1 system-ui;text-transform:uppercase;letter-spacing:.07em;color:${T.muted};margin-bottom:10px}`,
+        `.n3-theme-field{margin-bottom:8px}`,
+        `.n3-theme-label{display:block;font-size:11px;color:${T.muted};margin-bottom:5px}`,
+        `.n3-theme-hint{font-size:10px;color:#555;margin-left:4px}`,
+        `.n3-theme-color-row .n3-theme-label{margin-bottom:4px}`,
+        `.n3-theme-color-wrap{display:flex;align-items:center;gap:8px}`,
+        `.n3-theme-swatch{position:relative;width:28px;height:28px;border-radius:5px;border:1px solid ${T.border};flex-shrink:0;overflow:hidden;cursor:pointer}`,
+        `.n3-theme-cpick{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none}`,
+        `.n3-theme-hex{flex:1;background:rgba(255,255,255,.05);border:1px solid ${T.border};color:${T.text};border-radius:5px;padding:5px 8px;font:12px/1 monospace;outline:none;box-sizing:border-box;transition:border-color .12s}`,
+        `.n3-theme-hex:focus{border-color:${T.accent}}`,
+        `.n3-theme-select{width:100%;background:rgba(255,255,255,.06);border:1px solid ${T.border};color:${T.text};border-radius:6px;padding:6px 8px;font:12px/1 system-ui,sans-serif;outline:none;cursor:pointer;transition:border-color .12s}`,
+        `.n3-theme-select:hover{border-color:${T.accent}}`,
+        `.n3-theme-slider{width:100%;height:4px;-webkit-appearance:none;background:${T.border};border-radius:2px;outline:none;cursor:pointer;margin-top:4px}`,
+        `.n3-theme-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:${T.accent};border-radius:50%;cursor:pointer}`,
+        `.n3-theme-rval{color:${T.text};font-weight:600;float:right}`,
+        `.n3-theme-asset{border:1px dashed ${T.border};border-radius:6px;padding:9px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:border-color .12s,background .12s;min-height:38px}`,
+        `.n3-theme-asset:hover,.n3-theme-drag-over{border-color:${T.accent};background:rgba(227,19,55,.05)}`,
+        `.n3-theme-aprev{width:28px;height:28px;object-fit:contain;border-radius:4px;flex-shrink:0}`,
+        `.n3-theme-adrop-label{flex:1;font-size:11px;color:${T.muted}}`,
+        `.n3-theme-arm{background:rgba(239,68,68,.15);border:none;color:#F87171;width:18px;height:18px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;transition:background .12s}`,
+        `.n3-theme-arm:hover{background:rgba(239,68,68,.35)}`,
+        `.n3-theme-footer{display:flex;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid ${T.border};flex-shrink:0;background:#0B1120}`,
+        `.n3-theme-reset-btn{background:rgba(255,255,255,.07);border:1px solid ${T.border};color:${T.text};padding:7px 14px;border-radius:6px;cursor:pointer;font:600 12px/1 system-ui,sans-serif;transition:all .12s}`,
+        `.n3-theme-reset-btn:hover{background:rgba(255,255,255,.14)}`,
+        `.n3-theme-save-btn{background:${T.accent};border:1px solid ${T.accent};color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font:600 12px/1 system-ui,sans-serif;transition:all .12s}`,
+        `.n3-theme-save-btn:hover{background:${T.accentDark};border-color:${T.accentDark}}`,
+        `.n3-theme-save-btn:disabled{opacity:.5;cursor:not-allowed}`,
         // ── Mobile / narrow viewport overrides ──────────────────────────────
         `@media(max-width:767px){
           .n3-mob-hide{display:none!important}
@@ -604,7 +641,8 @@
         el.closest('.n3-toast')                ||
         el.closest('.n3-script-modal-overlay') ||
         el.closest('.n3-script-ph')      ||
-        el.closest('.n3-save-fab')
+        el.closest('.n3-save-fab')       ||
+        el.closest('.n3-theme-panel')
       ));
     }
   }
@@ -747,6 +785,10 @@
       this.components = M.N3Components
         ? new M.N3Components(this.events, this._cloudCfg) : null;
 
+      // Theme panel
+      this.theme = M.N3Theme
+        ? new M.N3Theme(this.events, this._cloudCfg) : null;
+
       this._fab     = null;
       this._fabOpen = false;
       this._onKeyDown = this._handleKeyDown.bind(this);
@@ -767,6 +809,7 @@
       if (this.revPanel)   this.revPanel.mount();
       if (this.analytics)  this.analytics.mount();
       if (this.components) this.components.mount();
+      if (this.theme)      this.theme.mount();
       this._buildControlPanel();
       this._buildSaveBtn();
       this._wireEvents();
@@ -827,7 +870,7 @@
           text: this.text, drag: this.drag, controls: this.controls,
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
           analytics: this.analytics, components: this.components,
-          scripts: this.scripts,
+          scripts: this.scripts, theme: this.theme,
         },
       };
     }
@@ -835,9 +878,10 @@
     // ── Private ──────────────────────────────────────────────────────────────
 
     _buildControlPanel() {
-      const PENCIL = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-      const CHART  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>`;
-      const GRID   = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`;
+      const PENCIL  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+      const CHART   = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>`;
+      const GRID    = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`;
+      const PALETTE = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`;
 
       this._fab = document.createElement('div');
       this._fab.className = 'n3-fab';
@@ -870,8 +914,19 @@
       editBtn.title = 'Toggle Edit Mode (Ctrl+Shift+E)';
       editBtn.addEventListener('click', e => { e.stopPropagation(); this.toggle(); });
 
+      const themeBtn = document.createElement('button');
+      themeBtn.className = 'n3-fab-btn';
+      themeBtn.innerHTML = PALETTE;
+      themeBtn.title = 'Theme';
+      themeBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (this.theme) { this.theme.toggle(); themeBtn.classList.toggle('n3-active', this.theme.isOpen()); }
+      });
+
       actions.appendChild(analyticsBtn);
       actions.appendChild(compBtn);
+      actions.appendChild(themeBtn);
+      this._themeFabBtn = themeBtn;
 
       if (this._cloudCfg) {
         const PLUS = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
@@ -888,6 +943,7 @@
       this._editFabBtn      = editBtn;
       this._analyticsFabBtn = analyticsBtn;
       this._compFabBtn      = compBtn;
+      // this._themeFabBtn already set above
 
       const toggle = document.createElement('button');
       toggle.className = 'n3-fab-toggle';

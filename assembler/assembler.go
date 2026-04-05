@@ -15,9 +15,19 @@ type SiteManifest struct {
 	Name    string `json:"name"`
 	OwnerId string `json:"ownerId"`
 	APIKey  string `json:"apiKey"`
-	Theme   struct {
+	Theme struct {
+		// Legacy fields (pre-theme-panel)
 		PrimaryColor string `json:"primaryColor"`
 		FontFamily   string `json:"fontFamily"`
+		// Full theme fields written by n3ware-theme.js
+		Primary     string `json:"primary"`
+		Secondary   string `json:"secondary"`
+		Accent      string `json:"accent"`
+		Bg          string `json:"bg"`
+		Fg          string `json:"fg"`
+		Font        string `json:"font"`
+		HeadingFont string `json:"headingFont"`
+		Radius      string `json:"radius"`
 	} `json:"theme"`
 	Pages []struct {
 		Slug  string `json:"slug"`
@@ -115,16 +125,49 @@ func (a *Assembler) assemble(r *http.Request, siteId, pagePath string) (string, 
 	// 5. Build head scripts block
 	var headScripts strings.Builder
 	headScripts.WriteString(`<script src="https://cdn.tailwindcss.com"></script>` + "\n")
-	if manifest.Theme.PrimaryColor != "" || manifest.Theme.FontFamily != "" {
-		headScripts.WriteString("<script>\n  tailwind.config = {\n    theme: { extend: {\n")
-		if manifest.Theme.PrimaryColor != "" {
-			headScripts.WriteString(fmt.Sprintf("      colors: { primary: '%s' },\n", manifest.Theme.PrimaryColor))
-		}
-		if manifest.Theme.FontFamily != "" {
-			headScripts.WriteString(fmt.Sprintf("      fontFamily: { sans: ['%s', 'sans-serif'] },\n", manifest.Theme.FontFamily))
-		}
-		headScripts.WriteString("    }}\n  }\n</script>\n")
+
+	// Resolve theme values (new fields take precedence over legacy fields)
+	th := manifest.Theme
+	primary := th.Primary
+	if primary == "" { primary = th.PrimaryColor }
+	if primary == "" { primary = "#3B82F6" }
+	secondary := th.Secondary
+	if secondary == "" { secondary = "#8B5CF6" }
+	accent := th.Accent
+	if accent == "" { accent = "#F59E0B" }
+	bg := th.Bg
+	if bg == "" { bg = "#FFFFFF" }
+	fg := th.Fg
+	if fg == "" { fg = "#111827" }
+	radius := th.Radius
+	if radius == "" { radius = "8" }
+	font := th.Font
+	if font == "" { font = th.FontFamily }
+	headingFont := th.HeadingFont
+	if headingFont == "" { headingFont = font }
+
+	fontCss := "system-ui,-apple-system,sans-serif"
+	if font != "" && font != "system" {
+		fontCss = "'" + font + "',sans-serif"
 	}
+	headingFontCss := "system-ui,-apple-system,sans-serif"
+	if headingFont != "" && headingFont != "system" {
+		headingFontCss = "'" + headingFont + "',sans-serif"
+	}
+
+	headScripts.WriteString("<style id=\"n3-theme-vars\">\n:root{\n")
+	headScripts.WriteString(fmt.Sprintf("  --n3-primary:%s;\n", primary))
+	headScripts.WriteString(fmt.Sprintf("  --n3-secondary:%s;\n", secondary))
+	headScripts.WriteString(fmt.Sprintf("  --n3-accent:%s;\n", accent))
+	headScripts.WriteString(fmt.Sprintf("  --n3-bg:%s;\n", bg))
+	headScripts.WriteString(fmt.Sprintf("  --n3-fg:%s;\n", fg))
+	headScripts.WriteString(fmt.Sprintf("  --n3-font:%s;\n", fontCss))
+	headScripts.WriteString(fmt.Sprintf("  --n3-heading-font:%s;\n", headingFontCss))
+	headScripts.WriteString(fmt.Sprintf("  --n3-radius:%spx;\n", radius))
+	headScripts.WriteString("}\n</style>\n")
+
+	headScripts.WriteString("<script>\ntailwind.config={theme:{extend:{colors:{primary:'var(--n3-primary)',secondary:'var(--n3-secondary)',accent:'var(--n3-accent)'},borderRadius:{base:'var(--n3-radius)'}}}}\n</script>\n")
+
 	for _, s := range manifest.HeadScripts {
 		headScripts.WriteString(s + "\n")
 	}

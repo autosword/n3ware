@@ -162,6 +162,37 @@ router.post('/:id/save', async (req, res) => {
   }
 });
 
+// ── Save theme ─────────────────────────────────────────────────────────────
+router.put('/:id/theme', async (req, res) => {
+  try {
+    const { theme } = req.body || {};
+    if (!theme || typeof theme !== 'object') {
+      return res.status(400).json({ error: '`theme` object is required' });
+    }
+
+    if (GCS_ENABLED) {
+      const allowedKeys = ['primary','secondary','accent','bg','fg','font','headingFont','radius'];
+      const safeTheme = {};
+      for (const k of allowedKeys) {
+        if (theme[k] !== undefined) safeTheme[k] = String(theme[k]).slice(0, 100);
+      }
+      await gcsFiles.updateManifest(req.params.id, { theme: safeTheme });
+      await cache.onSave(req.params.id, _baseUrl(req));
+      return res.json({ ok: true, theme: safeTheme });
+    }
+
+    // Firestore/local storage: store theme on the site record
+    const existing = await storage.getSite(req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Site not found' });
+    if (!_canWrite(req, existing)) return res.status(403).json({ error: 'Forbidden' });
+    await storage.saveSite(req.params.id, { ...existing, theme });
+    await cache.onSave(req.params.id, _baseUrl(req));
+    res.json({ ok: true, theme });
+  } catch (err) {
+    _error(res, 500, err);
+  }
+});
+
 // ── Delete site ────────────────────────────────────────────────────────────
 router.delete('/:id', async (req, res) => {
   try {
