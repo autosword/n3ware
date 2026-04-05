@@ -68,7 +68,16 @@
     'n3ware-charts.js',
     'n3ware-analytics.js',
     'n3ware-components.js',
+    'n3ware-theme-css.js',
+    'n3ware-theme-persist.js',
+    'n3ware-theme-apply.js',
+    'n3ware-theme-panel.js',
     'n3ware-theme.js',
+    'n3ware-nav-persist.js',
+    'n3ware-nav-render.js',
+    'n3ware-nav-panel.js',
+    'n3ware-nav.js',
+    'n3ware-sub-nav.js',
   ];
 
   /**
@@ -789,6 +798,13 @@
       this.theme = M.N3Theme
         ? new M.N3Theme(this.events, this._cloudCfg) : null;
 
+      // Nav editor
+      this.nav = M.N3NavEditor
+        ? new M.N3NavEditor(this.events, this._cloudCfg) : null;
+
+      // Sub-nav scroll-spy
+      this.subNav = M.N3SubNav ? new M.N3SubNav(this.events) : null;
+
       this._fab     = null;
       this._fabOpen = false;
       this._onKeyDown = this._handleKeyDown.bind(this);
@@ -810,6 +826,8 @@
       if (this.analytics)  this.analytics.mount();
       if (this.components) this.components.mount();
       if (this.theme)      this.theme.mount();
+      if (this.nav)        this.nav.mount();
+      if (this.subNav)     this.subNav.mount();
       this._buildControlPanel();
       this._buildSaveBtn();
       this._wireEvents();
@@ -870,7 +888,7 @@
           text: this.text, drag: this.drag, controls: this.controls,
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
           analytics: this.analytics, components: this.components,
-          scripts: this.scripts, theme: this.theme,
+          scripts: this.scripts, theme: this.theme, nav: this.nav, subNav: this.subNav,
         },
       };
     }

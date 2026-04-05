@@ -365,7 +365,15 @@
         if (ok) this._events.emit('controls:delete', el);
       });
 
-      overlay.append(typeLabel, dragBtn, upBtn, downBtn, dupBtn, delBtn);
+      // "Edit Nav" button — only on primary navs (skip sub-navs)
+      if (el.tagName === 'NAV' && !el.hasAttribute('data-n3-sub-nav')) {
+        const _ic = (n) => { const f = (window._n3wareModules || {}).icon; return f ? f(n, { size: 14 }) : '☰'; };
+        const navBtn = N3UI.btn(_ic('menu'), 'n3-ctrl-btn', 'Edit Nav');
+        navBtn.addEventListener('click', e => { e.stopPropagation(); this._events.emit('controls:edit-nav', el); });
+        overlay.append(typeLabel, dragBtn, upBtn, downBtn, dupBtn, navBtn, delBtn);
+      } else {
+        overlay.append(typeLabel, dragBtn, upBtn, downBtn, dupBtn, delBtn);
+      }
       this._overlay = overlay;
       document.body.appendChild(overlay);
       this._positionOverlay(el);

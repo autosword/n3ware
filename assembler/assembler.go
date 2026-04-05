@@ -16,18 +16,26 @@ type SiteManifest struct {
 	OwnerId string `json:"ownerId"`
 	APIKey  string `json:"apiKey"`
 	Theme struct {
-		// Legacy fields (pre-theme-panel)
-		PrimaryColor string `json:"primaryColor"`
-		FontFamily   string `json:"fontFamily"`
-		// Full theme fields written by n3ware-theme.js
-		Primary     string `json:"primary"`
-		Secondary   string `json:"secondary"`
-		Accent      string `json:"accent"`
-		Bg          string `json:"bg"`
-		Fg          string `json:"fg"`
-		Font        string `json:"font"`
-		HeadingFont string `json:"headingFont"`
-		Radius      string `json:"radius"`
+		Colors struct {
+			Primary   string `json:"primary"`
+			Secondary string `json:"secondary"`
+			Accent    string `json:"accent"`
+		} `json:"colors"`
+		LogoUrl    string `json:"logoUrl"`
+		FaviconUrl string `json:"faviconUrl"`
+		Fonts struct {
+			Heading string `json:"heading"`
+			Body    string `json:"body"`
+		} `json:"fonts"`
+		Sizes struct {
+			H1   int `json:"h1"`
+			H2   int `json:"h2"`
+			H3   int `json:"h3"`
+			H4   int `json:"h4"`
+			H5   int `json:"h5"`
+			H6   int `json:"h6"`
+			Body int `json:"body"`
+		} `json:"sizes"`
 	} `json:"theme"`
 	Pages []struct {
 		Slug  string `json:"slug"`
@@ -126,47 +134,33 @@ func (a *Assembler) assemble(r *http.Request, siteId, pagePath string) (string, 
 	var headScripts strings.Builder
 	headScripts.WriteString(`<script src="https://cdn.tailwindcss.com"></script>` + "\n")
 
-	// Resolve theme values (new fields take precedence over legacy fields)
+	// Resolve theme values
 	th := manifest.Theme
-	primary := th.Primary
-	if primary == "" { primary = th.PrimaryColor }
+	primary := th.Colors.Primary
 	if primary == "" { primary = "#3B82F6" }
-	secondary := th.Secondary
+	secondary := th.Colors.Secondary
 	if secondary == "" { secondary = "#8B5CF6" }
-	accent := th.Accent
+	accent := th.Colors.Accent
 	if accent == "" { accent = "#F59E0B" }
-	bg := th.Bg
-	if bg == "" { bg = "#FFFFFF" }
-	fg := th.Fg
-	if fg == "" { fg = "#111827" }
-	radius := th.Radius
-	if radius == "" { radius = "8" }
-	font := th.Font
-	if font == "" { font = th.FontFamily }
-	headingFont := th.HeadingFont
-	if headingFont == "" { headingFont = font }
 
-	fontCss := "system-ui,-apple-system,sans-serif"
-	if font != "" && font != "system" {
-		fontCss = "'" + font + "',sans-serif"
+	bodyFontCss := "system-ui,-apple-system,sans-serif"
+	if th.Fonts.Body != "" && th.Fonts.Body != "system" {
+		bodyFontCss = "'" + th.Fonts.Body + "',sans-serif"
 	}
 	headingFontCss := "system-ui,-apple-system,sans-serif"
-	if headingFont != "" && headingFont != "system" {
-		headingFontCss = "'" + headingFont + "',sans-serif"
+	if th.Fonts.Heading != "" && th.Fonts.Heading != "system" {
+		headingFontCss = "'" + th.Fonts.Heading + "',sans-serif"
 	}
 
 	headScripts.WriteString("<style id=\"n3-theme-vars\">\n:root{\n")
 	headScripts.WriteString(fmt.Sprintf("  --n3-primary:%s;\n", primary))
 	headScripts.WriteString(fmt.Sprintf("  --n3-secondary:%s;\n", secondary))
 	headScripts.WriteString(fmt.Sprintf("  --n3-accent:%s;\n", accent))
-	headScripts.WriteString(fmt.Sprintf("  --n3-bg:%s;\n", bg))
-	headScripts.WriteString(fmt.Sprintf("  --n3-fg:%s;\n", fg))
-	headScripts.WriteString(fmt.Sprintf("  --n3-font:%s;\n", fontCss))
-	headScripts.WriteString(fmt.Sprintf("  --n3-heading-font:%s;\n", headingFontCss))
-	headScripts.WriteString(fmt.Sprintf("  --n3-radius:%spx;\n", radius))
+	headScripts.WriteString(fmt.Sprintf("  --n3-font-body:%s;\n", bodyFontCss))
+	headScripts.WriteString(fmt.Sprintf("  --n3-font-heading:%s;\n", headingFontCss))
 	headScripts.WriteString("}\n</style>\n")
 
-	headScripts.WriteString("<script>\ntailwind.config={theme:{extend:{colors:{primary:'var(--n3-primary)',secondary:'var(--n3-secondary)',accent:'var(--n3-accent)'},borderRadius:{base:'var(--n3-radius)'}}}}\n</script>\n")
+	headScripts.WriteString("<script>\ntailwind.config={theme:{extend:{colors:{primary:'var(--n3-primary)',secondary:'var(--n3-secondary)',accent:'var(--n3-accent)'}}}}\n</script>\n")
 
 	for _, s := range manifest.HeadScripts {
 		headScripts.WriteString(s + "\n")

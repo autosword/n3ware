@@ -45,20 +45,16 @@ function serveSites() {
         { headers: { 'Accept': 'text/html' } }
       );
 
-      let rawHtml;
-      let fromAssembler = false;
-      if (assemblerResp.ok) {
-        rawHtml = await assemblerResp.text();
-        fromAssembler = true;
-      } else {
-        // Assembler failed (not a v2 site or error) — fall back to Firestore html
-        rawHtml = site.html || '';
+      if (!assemblerResp.ok) {
+        console.error(`[serving] Assembler returned ${assemblerResp.status} for site ${siteId}`);
+        return res.status(502).send(_assemblerErrorPage(siteId, assemblerResp.status));
       }
 
+      const rawHtml = await assemblerResp.text();
       const trackerScripts = generateScripts(site.integrations || {});
-      // Assembler already injects the editor script for v2 sites; skip re-injection
+      // Assembler already injects the editor script; skip re-injection
       const withTrackers = _injectTrackers(rawHtml, trackerScripts);
-      const html = fromAssembler ? withTrackers : _injectEditor(withTrackers, siteId, site.apiKey);
+      const html = withTrackers;
       res.set('Content-Type', 'text/html; charset=utf-8');
       res.set('Cache-Control', CACHE_CONTROL);
       res.set('X-Site-Id', siteId);
@@ -123,6 +119,14 @@ function _notFoundPage(siteId) {
 </head><body><div class="box"><div class="code">404</div>
 <h1>Site Not Found</h1><p>No site with id <code>${_esc(siteId)}</code> exists.</p>
 <p><a href="/">← Back to n3ware</a></p></div></body></html>`;
+}
+
+function _assemblerErrorPage(siteId, status) {
+  return `<!DOCTYPE html><html><head><title>Service Unavailable</title>
+<style>body{font:16px/1.6 system-ui,sans-serif;background:#0F172A;color:#F1F5F9;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}
+.box{text-align:center;padding:48px}.code{color:#EF4444;font-size:64px;font-weight:900;margin-bottom:8px}h1{margin-bottom:8px}p{color:#94A3B8}</style>
+</head><body><div class="box"><div class="code">502</div>
+<h1>Service Unavailable</h1><p>The assembler returned ${status} for site <code>${_esc(siteId)}</code>.</p></div></body></html>`;
 }
 
 module.exports = serveSites;

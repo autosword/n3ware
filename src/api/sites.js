@@ -171,10 +171,28 @@ router.put('/:id/theme', async (req, res) => {
     }
 
     if (GCS_ENABLED) {
-      const allowedKeys = ['primary','secondary','accent','bg','fg','font','headingFont','radius'];
+      const { colors, logoUrl, faviconUrl, fonts, sizes } = theme;
       const safeTheme = {};
-      for (const k of allowedKeys) {
-        if (theme[k] !== undefined) safeTheme[k] = String(theme[k]).slice(0, 100);
+      if (colors && typeof colors === 'object') {
+        safeTheme.colors = {
+          primary:   String(colors.primary   || '#3B82F6').slice(0, 100),
+          secondary: String(colors.secondary || '#8B5CF6').slice(0, 100),
+          accent:    String(colors.accent    || '#F59E0B').slice(0, 100),
+        };
+      }
+      if (logoUrl    !== undefined) safeTheme.logoUrl    = logoUrl    ? String(logoUrl).slice(0, 500)    : null;
+      if (faviconUrl !== undefined) safeTheme.faviconUrl = faviconUrl ? String(faviconUrl).slice(0, 500) : null;
+      if (fonts && typeof fonts === 'object') {
+        safeTheme.fonts = {
+          heading: String(fonts.heading || 'system').slice(0, 100),
+          body:    String(fonts.body    || 'system').slice(0, 100),
+        };
+      }
+      if (sizes && typeof sizes === 'object') {
+        safeTheme.sizes = {};
+        for (const k of ['h1','h2','h3','h4','h5','h6','body']) {
+          if (sizes[k] !== undefined) safeTheme.sizes[k] = Number(sizes[k]) || 0;
+        }
       }
       await gcsFiles.updateManifest(req.params.id, { theme: safeTheme });
       await cache.onSave(req.params.id, _baseUrl(req));

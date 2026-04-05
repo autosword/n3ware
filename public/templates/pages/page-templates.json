@@ -14,16 +14,36 @@
         "id": "hero-centered"
       },
       {
+        "type": "custom",
+        "html": "<nav data-n3-sub-nav data-n3-block=\"1\" class=\"sticky top-16 z-30 bg-white border-b border-stone-100\"><div class=\"overflow-x-auto whitespace-nowrap\"><div class=\"flex items-center px-4 sm:px-8 min-w-max\"><a href=\"#about-mission\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Mission</a><a href=\"#about-stats\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Stats</a><a href=\"#about-team\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Team</a><a href=\"#about-cta\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Get Started</a></div></div></nav>"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"about-mission\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "ai",
         "brief": "Mission statement section: bold headline 'Our Mission', two paragraphs about the company's purpose and values, professional and warm tone"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"about-stats\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",
         "id": "stats-bar"
       },
       {
+        "type": "custom",
+        "html": "<div id=\"about-team\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "component",
         "id": "team-grid"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"about-cta\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",
@@ -46,16 +66,36 @@
         "id": "hero-service"
       },
       {
+        "type": "custom",
+        "html": "<nav data-n3-sub-nav data-n3-block=\"1\" class=\"sticky top-16 z-30 bg-white border-b border-stone-100\"><div class=\"overflow-x-auto whitespace-nowrap\"><div class=\"flex items-center px-4 sm:px-8 min-w-max\"><a href=\"#services-overview\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Services</a><a href=\"#services-process\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Process</a><a href=\"#services-testimonials\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Reviews</a><a href=\"#services-cta\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Contact</a></div></div></nav>"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"services-overview\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "component",
         "id": "services-grid-icons"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"services-process\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "ai",
         "brief": "Our process section: headline 'How It Works', numbered 4-step process showing how we deliver results, each step with icon, title, and short description"
       },
       {
+        "type": "custom",
+        "html": "<div id=\"services-testimonials\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "component",
         "id": "testimonials-cards"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"services-cta\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",
@@ -138,12 +178,28 @@
         "id": "hero-centered"
       },
       {
+        "type": "custom",
+        "html": "<nav data-n3-sub-nav data-n3-block=\"1\" class=\"sticky top-16 z-30 bg-white border-b border-stone-100\"><div class=\"overflow-x-auto whitespace-nowrap\"><div class=\"flex items-center px-4 sm:px-8 min-w-max\"><a href=\"#faq-general\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">General</a><a href=\"#faq-more\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">More Questions</a><a href=\"#faq-cta\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Still Have Questions?</a></div></div></nav>"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"faq-general\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "component",
         "id": "faq-accordion"
       },
       {
+        "type": "custom",
+        "html": "<div id=\"faq-more\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "component",
         "id": "faq-two-column"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"faq-cta\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",
@@ -167,15 +223,35 @@
       },
       {
         "type": "custom",
+        "html": "<nav data-n3-sub-nav data-n3-block=\"1\" class=\"sticky top-16 z-30 bg-white border-b border-stone-100\"><div class=\"overflow-x-auto whitespace-nowrap\"><div class=\"flex items-center px-4 sm:px-8 min-w-max\"><a href=\"#portfolio-work\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Our Work</a><a href=\"#portfolio-gallery\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Gallery</a><a href=\"#portfolio-case-study\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Case Study</a><a href=\"#portfolio-cta\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Work With Us</a></div></div></nav>"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"portfolio-work\" class=\"scroll-mt-28\"></div>"
+      },
+      {
+        "type": "custom",
         "html": "<section class='py-20 bg-white'>\n  <div class='max-w-6xl mx-auto px-6'>\n    <h2 class='text-3xl font-bold text-gray-900 mb-8 text-center'>Our Work</h2>\n    <div class='flex flex-wrap gap-2 mb-8 justify-center'>\n      <button class='bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold'>All</button>\n      <button class='bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-200'>Web Design</button>\n      <button class='bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-200'>Branding</button>\n      <button class='bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-200'>Photography</button>\n    </div>\n    <div class='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>\n      <div class='group relative overflow-hidden rounded-2xl bg-gray-100' style='aspect-ratio:4/3'>\n        <img src='https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&q=80' alt='Artisan Bakery project' class='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'>\n        <div class='absolute inset-0 bg-black/0 group-hover:bg-black/50 transition flex items-end p-4 opacity-0 group-hover:opacity-100'>\n          <div><p class='text-white font-bold'>Artisan Bakery</p><p class='text-white/70 text-sm'>Web Design</p></div>\n        </div>\n      </div>\n      <div class='group relative overflow-hidden rounded-2xl bg-gray-100' style='aspect-ratio:4/3'>\n        <img src='https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80' alt='Law firm branding' class='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'>\n        <div class='absolute inset-0 bg-black/0 group-hover:bg-black/50 transition flex items-end p-4 opacity-0 group-hover:opacity-100'>\n          <div><p class='text-white font-bold'>Northview Legal</p><p class='text-white/70 text-sm'>Branding</p></div>\n        </div>\n      </div>\n      <div class='group relative overflow-hidden rounded-2xl bg-gray-100' style='aspect-ratio:4/3'>\n        <img src='https://images.unsplash.com/photo-1606812757053-bf1a2f3fb23d?w=600&q=80' alt='Cafe photography' class='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'>\n        <div class='absolute inset-0 bg-black/0 group-hover:bg-black/50 transition flex items-end p-4 opacity-0 group-hover:opacity-100'>\n          <div><p class='text-white font-bold'>Summit Cafe</p><p class='text-white/70 text-sm'>Photography</p></div>\n        </div>\n      </div>\n      <div class='group relative overflow-hidden rounded-2xl bg-gray-100' style='aspect-ratio:4/3'>\n        <img src='https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=600&q=80' alt='App design' class='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'>\n        <div class='absolute inset-0 bg-black/0 group-hover:bg-black/50 transition flex items-end p-4 opacity-0 group-hover:opacity-100'>\n          <div><p class='text-white font-bold'>Bloom Wellness</p><p class='text-white/70 text-sm'>Web Design</p></div>\n        </div>\n      </div>\n      <div class='group relative overflow-hidden rounded-2xl bg-gray-100' style='aspect-ratio:4/3'>\n        <img src='https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=600&q=80' alt='Packaging design' class='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'>\n        <div class='absolute inset-0 bg-black/0 group-hover:bg-black/50 transition flex items-end p-4 opacity-0 group-hover:opacity-100'>\n          <div><p class='text-white font-bold'>Green Earth</p><p class='text-white/70 text-sm'>Branding</p></div>\n        </div>\n      </div>\n      <div class='group relative overflow-hidden rounded-2xl bg-gray-100' style='aspect-ratio:4/3'>\n        <img src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80' alt='Restaurant photos' class='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'>\n        <div class='absolute inset-0 bg-black/0 group-hover:bg-black/50 transition flex items-end p-4 opacity-0 group-hover:opacity-100'>\n          <div><p class='text-white font-bold'>Harbor Restaurant</p><p class='text-white/70 text-sm'>Photography</p></div>\n        </div>\n      </div>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"portfolio-gallery\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",
         "id": "gallery-masonry"
       },
       {
+        "type": "custom",
+        "html": "<div id=\"portfolio-case-study\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "ai",
         "brief": "Featured case study section: headline 'Case Study', pick one project, describe the client challenge, our approach, and the measurable results achieved"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"portfolio-cta\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",
@@ -231,11 +307,27 @@
       },
       {
         "type": "custom",
+        "html": "<nav data-n3-sub-nav data-n3-block=\"1\" class=\"sticky top-16 z-30 bg-white border-b border-stone-100\"><div class=\"overflow-x-auto whitespace-nowrap\"><div class=\"flex items-center px-4 sm:px-8 min-w-max\"><a href=\"#locations-list\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Locations</a><a href=\"#locations-hours\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Hours</a><a href=\"#locations-contact\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Contact</a></div></div></nav>"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"locations-list\" class=\"scroll-mt-28\"></div>"
+      },
+      {
+        "type": "custom",
         "html": "<section class='py-20 bg-white'>\n  <div class='max-w-6xl mx-auto px-6'>\n    <h2 class='text-3xl font-bold text-gray-900 mb-2 text-center'>Our Locations</h2>\n    <p class='text-gray-500 mb-10 text-center'>Visit us at any of our convenient locations</p>\n    <div class='grid grid-cols-1 md:grid-cols-3 gap-6'>\n      <div class='border border-gray-200 rounded-2xl p-6 hover:shadow-md transition'>\n        <div class='w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mb-4 text-red-600 text-lg'>📍</div>\n        <h3 class='font-bold text-gray-900 text-lg mb-1'>Downtown</h3>\n        <p class='text-gray-500 text-sm mb-4'>123 Main Street, Suite 100<br>City, ST 00000</p>\n        <p class='text-sm text-gray-700 mb-1'><strong>Mon–Fri:</strong> 9am – 6pm</p>\n        <p class='text-sm text-gray-700 mb-4'><strong>Sat:</strong> 10am – 4pm</p>\n        <p class='text-sm font-semibold text-gray-900 mb-4'>(555) 000-0001</p>\n        <a href='https://maps.google.com' target='_blank' class='text-sm font-bold text-red-500 hover:underline'>Get directions →</a>\n      </div>\n      <div class='border border-gray-200 rounded-2xl p-6 hover:shadow-md transition'>\n        <div class='w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mb-4 text-red-600 text-lg'>📍</div>\n        <h3 class='font-bold text-gray-900 text-lg mb-1'>Northside</h3>\n        <p class='text-gray-500 text-sm mb-4'>456 Park Avenue<br>City, ST 00000</p>\n        <p class='text-sm text-gray-700 mb-1'><strong>Mon–Fri:</strong> 8am – 7pm</p>\n        <p class='text-sm text-gray-700 mb-4'><strong>Sat–Sun:</strong> 9am – 5pm</p>\n        <p class='text-sm font-semibold text-gray-900 mb-4'>(555) 000-0002</p>\n        <a href='https://maps.google.com' target='_blank' class='text-sm font-bold text-red-500 hover:underline'>Get directions →</a>\n      </div>\n      <div class='border border-gray-200 rounded-2xl p-6 hover:shadow-md transition'>\n        <div class='w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mb-4 text-red-600 text-lg'>📍</div>\n        <h3 class='font-bold text-gray-900 text-lg mb-1'>Eastside</h3>\n        <p class='text-gray-500 text-sm mb-4'>789 Commerce Blvd<br>City, ST 00000</p>\n        <p class='text-sm text-gray-700 mb-1'><strong>Mon–Sat:</strong> 7am – 8pm</p>\n        <p class='text-sm text-gray-700 mb-4'><strong>Sun:</strong> 10am – 5pm</p>\n        <p class='text-sm font-semibold text-gray-900 mb-4'>(555) 000-0003</p>\n        <a href='https://maps.google.com' target='_blank' class='text-sm font-bold text-red-500 hover:underline'>Get directions →</a>\n      </div>\n    </div>\n  </div>\n</section>"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"locations-hours\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",
         "id": "hours-location"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"locations-contact\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",
@@ -290,12 +382,36 @@
         "id": "hero-restaurant"
       },
       {
+        "type": "custom",
+        "html": "<nav data-n3-sub-nav data-n3-block=\"1\" class=\"sticky top-16 z-30 bg-white border-b border-stone-100\"><div class=\"overflow-x-auto whitespace-nowrap\"><div class=\"flex items-center px-4 sm:px-8 min-w-max\"><a href=\"#menu-starters\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Starters</a><a href=\"#menu-mains\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Mains</a><a href=\"#menu-desserts\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Desserts</a><a href=\"#menu-drinks\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Drinks</a></div></div></nav>"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"menu-starters\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "component",
         "id": "menu-categories"
       },
       {
+        "type": "custom",
+        "html": "<div id=\"menu-mains\" class=\"scroll-mt-28\"></div>"
+      },
+      {
         "type": "component",
         "id": "menu-grid"
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"menu-desserts\" class=\"scroll-mt-28\"></div>"
+      },
+      {
+        "type": "ai",
+        "brief": "Desserts section: headline 'Sweet Endings', a 2-column grid of 4 dessert items each with a name, description, and price. Use warm, appetizing language."
+      },
+      {
+        "type": "custom",
+        "html": "<div id=\"menu-drinks\" class=\"scroll-mt-28\"></div>"
       },
       {
         "type": "component",

@@ -37,16 +37,54 @@
   </div>
 
   <!-- Navigation -->
-  <nav class="bg-stone-900 text-white py-4 px-8 flex items-center justify-between sticky top-[44px] z-50">
-    <div class="playfair text-2xl font-semibold text-amber-400">Ember &amp; Oak</div>
-    <div class="hidden md:flex items-center gap-8 text-sm text-stone-300">
-      <a href="#menu" class="hover:text-white transition-colors">Menu</a>
-      <a href="#about" class="hover:text-white transition-colors">About</a>
-      <a href="#chef" class="hover:text-white transition-colors">Our Chef</a>
-      <a href="#reservations" class="hover:text-white transition-colors">Reservations</a>
+  <nav data-n3-primary-nav data-n3-block="1" class="fixed top-[44px] left-0 right-0 z-40 bg-stone-900/95 backdrop-blur-md text-white h-16 border-b border-stone-700">
+    <div class="container mx-auto px-6 flex items-center justify-between h-full">
+      <div class="playfair text-2xl font-semibold text-amber-400">Ember &amp; Oak</div>
+      <div class="hidden md:flex items-center gap-8 text-sm text-stone-300">
+        <a href="#menu" class="hover:text-white transition-colors">Menu</a>
+        <a href="#about" class="hover:text-white transition-colors">About</a>
+        <a href="#chef" class="hover:text-white transition-colors">Our Chef</a>
+        <a href="#reservations" class="hover:text-white transition-colors">Reservations</a>
+      </div>
+      <div class="hidden md:block">
+        <button class="bg-amber-500 hover:bg-amber-400 text-stone-900 font-semibold px-5 py-2 rounded-lg text-sm transition-colors">Reserve a Table</button>
+      </div>
+      <button id="demo-hamburger" class="md:hidden flex items-center justify-center w-9 h-9 rounded hover:bg-stone-700 transition" aria-label="Open menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
     </div>
-    <button class="bg-amber-500 hover:bg-amber-400 text-stone-900 font-semibold px-5 py-2 rounded-lg text-sm transition-colors">Reserve a Table</button>
+    <!-- Mobile backdrop -->
+    <div id="demo-backdrop" class="fixed inset-0 z-40 bg-black/40 opacity-0 pointer-events-none transition-opacity duration-200"></div>
+    <!-- Mobile drawer -->
+    <div id="demo-drawer" class="fixed top-0 right-0 bottom-0 z-50 w-64 bg-stone-900 text-white shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
+      <div class="flex items-center justify-between px-4 py-5 border-b border-stone-700">
+        <span class="playfair text-lg font-semibold text-amber-400">Ember &amp; Oak</span>
+        <button id="demo-close" class="w-8 h-8 flex items-center justify-center rounded hover:bg-stone-700 transition" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <nav class="flex-1 py-2">
+        <a href="#menu" class="block px-5 py-3 text-sm text-stone-300 border-b border-stone-800 hover:text-white hover:bg-stone-800 transition">Menu</a>
+        <a href="#about" class="block px-5 py-3 text-sm text-stone-300 border-b border-stone-800 hover:text-white hover:bg-stone-800 transition">About</a>
+        <a href="#chef" class="block px-5 py-3 text-sm text-stone-300 border-b border-stone-800 hover:text-white hover:bg-stone-800 transition">Our Chef</a>
+        <a href="#reservations" class="block px-5 py-3 text-sm text-stone-300 hover:text-white hover:bg-stone-800 transition">Reservations</a>
+      </nav>
+      <div class="px-4 pb-8">
+        <button class="w-full bg-amber-500 hover:bg-amber-400 text-stone-900 font-semibold px-5 py-3 rounded-lg text-sm transition-colors">Reserve a Table</button>
+      </div>
+    </div>
   </nav>
+  <script>
+    (function(){
+      var h=document.getElementById('demo-hamburger'),b=document.getElementById('demo-backdrop'),d=document.getElementById('demo-drawer'),c=document.getElementById('demo-close');
+      function open(){d.classList.remove('translate-x-full');d.classList.add('translate-x-0');b.classList.remove('opacity-0','pointer-events-none');b.classList.add('opacity-100');document.body.style.overflow='hidden';}
+      function close(){d.classList.add('translate-x-full');d.classList.remove('translate-x-0');b.classList.add('opacity-0','pointer-events-none');b.classList.remove('opacity-100');document.body.style.overflow='';}
+      if(h)h.addEventListener('click',open);
+      if(b)b.addEventListener('click',close);
+      if(c)c.addEventListener('click',close);
+      d&&d.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){setTimeout(close,150);});});
+    })();
+  </script>
 
   <!-- Hero -->
   <section class="hero-bg min-h-screen flex items-center justify-center text-center text-white px-6">
@@ -270,12 +308,12 @@
   <!-- Footer -->
   <footer class="bg-stone-950 text-stone-500 py-8 px-8 text-center text-sm">
     <p class="playfair text-amber-400 text-lg mb-2">Ember &amp; Oak</p>
-    <p>123 SE Morrison St, Portland, OR · (503) 555-0182 · info@emberandoak.com</p>
+    <p>123 SE Morrison St, Portland, OR · (503) 555-0182 · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="335a5d555c73565e515641525d575c52581d505c5e">[email&#160;protected]</a></p>
     <p class="mt-4 text-stone-700 text-xs">This is a demo page for <strong class="text-blue-500">n3ware</strong> — click the n3 button to start editing!</p>
   </footer>
 
   <!-- n3:script:google-analytics:start -->
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     /* Google Analytics 4 — demo placeholder (ID not real) */
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}

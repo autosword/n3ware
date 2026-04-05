@@ -529,5 +529,22 @@
     "html": "<section class=\"bg-white py-16 px-4 border-t border-b border-gray-100\">\n  <div class=\"max-w-6xl mx-auto\">\n    <p class=\"text-center text-gray-400 font-semibold text-sm uppercase tracking-widest mb-10\">Trusted by local businesses across the region</p>\n    <div class=\"flex flex-wrap justify-center items-center gap-6\">\n      <div class=\"bg-gray-100 rounded-xl px-8 py-4 text-gray-500 font-bold text-lg hover:bg-gray-200 transition\">Acme Co.</div>\n      <div class=\"bg-gray-100 rounded-xl px-8 py-4 text-gray-500 font-bold text-lg hover:bg-gray-200 transition\">Smith &amp; Sons</div>\n      <div class=\"bg-gray-100 rounded-xl px-8 py-4 text-gray-500 font-bold text-lg hover:bg-gray-200 transition\">Green Valley</div>\n      <div class=\"bg-gray-100 rounded-xl px-8 py-4 text-gray-500 font-bold text-lg hover:bg-gray-200 transition\">Peak Realty</div>\n      <div class=\"bg-gray-100 rounded-xl px-8 py-4 text-gray-500 font-bold text-lg hover:bg-gray-200 transition\">BlueLine Co.</div>\n      <div class=\"bg-gray-100 rounded-xl px-8 py-4 text-gray-500 font-bold text-lg hover:bg-gray-200 transition\">Horizon Group</div>\n    </div>\n  </div>\n</section>",
     "variants": [],
     "lucideIcon": "building-2"
+  },
+  {
+    "id": "nav-sub-sticky",
+    "name": "Sticky Sub-Nav",
+    "category": "Navigation",
+    "description": "Sticky scroll-spy sub-navigation bar with horizontal scroll on mobile. Links highlight as sections scroll into view.",
+    "tags": [
+      "navigation",
+      "sticky",
+      "scroll-spy",
+      "sub-nav",
+      "anchor"
+    ],
+    "thumbnail": "🧭",
+    "html": "<nav data-n3-sub-nav data-n3-block=\"1\" class=\"sticky top-16 z-30 bg-white border-b border-stone-100\">\n  <div class=\"overflow-x-auto whitespace-nowrap\">\n    <div class=\"flex items-center px-4 sm:px-8 min-w-max\">\n      <a href=\"#section-1\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Section One</a>\n      <a href=\"#section-2\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Section Two</a>\n      <a href=\"#section-3\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Section Three</a>\n      <a href=\"#section-4\" class=\"inline-block px-4 py-3 text-sm font-medium text-stone-500 border-b-2 border-transparent hover:text-primary hover:border-primary transition\">Section Four</a>\n    </div>\n  </div>\n</nav>",
+    "variants": [],
+    "lucideIcon": "navigation"
   }
 ]

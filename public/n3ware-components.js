@@ -250,21 +250,25 @@
     /** Open the component panel and load components if not yet loaded. */
     open() {
       if (!this._el) return;
-      // Force browser to commit closed state before adding open class so transition fires on first call.
+      this._open = true;
+      if (!this._loaded) this._load();
       this._el.classList.remove('n3-comp-open');
+      this._el.style.removeProperty('transform');
+      this._el.style.display = 'flex';
       void this._el.offsetHeight; // reflow — commits closed state
       setTimeout(() => {
+        if (!this._el) return;
         this._el.classList.add('n3-comp-open');
-        this._open = true;
-        if (!this._loaded) this._load();
-      }, 0);
+        this._el.style.setProperty('transform', 'translateX(0)', 'important');
+      }, 20);
     }
 
     /** Close the component panel. */
     close() {
       if (!this._el) return;
-      this._el.classList.remove('n3-comp-open');
       this._open = false;
+      this._el.classList.remove('n3-comp-open');
+      this._el.style.removeProperty('transform');
     }
 
     /** @returns {boolean} */
@@ -600,6 +604,11 @@
 
       this._events.emit('component:insert', node);
       node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Trigger Tailwind CDN to scan new classes introduced by the inserted component.
+      // Must defer so the DOM mutation is committed before the scan runs.
+      setTimeout(() => { try { window.tailwind && window.tailwind.refresh && window.tailwind.refresh(); } catch (_) {} }, 0);
+
       return node;
     }
 
@@ -766,6 +775,9 @@
           const newNode = tmp.firstElementChild || tmp;
           newNode.setAttribute('data-n3-block', '1');
           componentEl.replaceWith(newNode);
+
+          // Scan new classes introduced by AI-generated HTML
+          setTimeout(() => { try { window.tailwind && window.tailwind.refresh && window.tailwind.refresh(); } catch (_) {} }, 0);
 
           // Emit so history captures the replacement
           this._events.emit('component:insert', newNode);

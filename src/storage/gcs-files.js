@@ -128,8 +128,11 @@ async function createSite(siteId, name, ownerId, templateHtml = '', apiKey = '')
     ownerId: ownerId || null,
     apiKey:  apiKey  || null,
     theme: {
-      primaryColor: '#3B82F6',
-      fontFamily:   'sans-serif',
+      colors:    { primary: '#3B82F6', secondary: '#8B5CF6', accent: '#F59E0B' },
+      logoUrl:   null,
+      faviconUrl: null,
+      fonts:     { heading: 'system', body: 'system' },
+      sizes:     { h1: 60, h2: 48, h3: 36, h4: 28, h5: 22, h6: 18, body: 16 },
     },
     pages: [
       { slug: 'index', title: 'Home', path: '/' },
