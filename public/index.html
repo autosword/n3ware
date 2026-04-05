@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://brand.n3ware.com/n3ware-logo.png">
   <link rel="apple-touch-icon" href="https://brand.n3ware.com/n3ware-logo.png">
-  <title>n3ware — Edit Any Website. Visually.</title>
+  <title>n3ware — The Website Builder Small Businesses Should've Had All Along</title>
+  <meta name="description" content="Edit your website by clicking on it. No developer. No monthly ransom. Your domain. Your code. n3ware makes it simple.">
+  <meta property="og:title" content="n3ware — Edit Your Website. No Developer Needed.">
+  <meta property="og:description" content="Click to edit. Drag to rearrange. Save in one click. Built for small business owners who want control without the complexity.">
+  <meta property="og:image" content="https://brand.n3ware.com/n3ware-logo-color.png">
+  <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
@@ -35,19 +40,6 @@
       background-clip: text;
     }
     .glow { box-shadow: 0 0 40px rgba(227,24,55,0.35); }
-    .code-glow { box-shadow: 0 0 60px rgba(227,24,55,0.12); }
-    /* Subtle circuit-board grid background */
-    .circuit-bg {
-      background-image:
-        linear-gradient(rgba(227,24,55,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(227,24,55,0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-    .float-anim { animation: float 3s ease-in-out infinite; }
     @keyframes pulse-dot {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.3; }
@@ -67,6 +59,9 @@
       to   { opacity: 1; transform: translateY(0); }
     }
     .tpl-card { animation: tpl-fade-in 0.25s ease both; }
+    .check { color: #22c55e; }
+    .cross { color: #ef4444; }
+    .partial { color: #eab308; }
   </style>
 </head>
 <body class="text-[#E5E5E5] overflow-x-hidden" style="background:#0A0A0A">
@@ -74,20 +69,32 @@
   <!-- Nav -->
   <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-lg border-b border-[#2A2A2A]/70">
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="font-black text-xl tracking-tight" style="color:#E31337">n3ware</span>
-        <span class="text-xs text-gray-500 bg-[#1A1A1A] px-2 py-0.5 rounded-full">v1.0</span>
-      </div>
+      <a href="/" class="flex items-center gap-2">
+        <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware" class="h-8">
+      </a>
       <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
         <a href="/features.html" class="hover:text-white transition-colors">Features</a>
-        <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
         <a href="#templates" class="hover:text-white transition-colors">Templates</a>
-        <a href="/components" class="hover:text-white transition-colors">Components</a>
-        <a href="/brand" class="hover:text-white transition-colors">Brand</a>
+        <a href="/components.html" class="hover:text-white transition-colors">Components</a>
+        <a href="/brand.html" class="hover:text-white transition-colors">Brand</a>
         <a href="/vs-agency.html" class="hover:text-white transition-colors">Compare</a>
-        <a href="#get-started" class="hover:text-white transition-colors">Get Started</a>
-        <a href="demo.html" class="bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">Live Demo →</a>
+        <a href="/dashboard" class="hover:text-white transition-colors">Get Started</a>
+        <a href="/demo.html" class="bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">Live Demo →</a>
       </div>
+      <!-- Mobile menu button -->
+      <button class="md:hidden text-gray-400 hover:text-white" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-[#2A2A2A] bg-[#0A0A0A] px-6 py-4 flex flex-col gap-4 text-sm text-gray-400">
+      <a href="/features.html" class="hover:text-white transition-colors">Features</a>
+      <a href="#templates" class="hover:text-white transition-colors">Templates</a>
+      <a href="/components.html" class="hover:text-white transition-colors">Components</a>
+      <a href="/brand.html" class="hover:text-white transition-colors">Brand</a>
+      <a href="/vs-agency.html" class="hover:text-white transition-colors">Compare</a>
+      <a href="/dashboard" class="hover:text-white transition-colors">Get Started</a>
+      <a href="/demo.html" class="text-[#E31337] font-medium">Live Demo →</a>
     </div>
   </nav>
 
@@ -95,227 +102,221 @@
   <section class="min-h-screen flex items-center justify-center pt-16 px-6 relative overflow-hidden">
     <!-- Background glow -->
     <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div class="w-[800px] h-[800px] rounded-full bg-[#E31337]/5 blur-3xl"></div>
+      <div class="w-[900px] h-[900px] rounded-full bg-[#E31337]/4 blur-3xl"></div>
     </div>
-    <div class="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-[#E31337]/3 blur-3xl pointer-events-none"></div>
 
     <div class="max-w-5xl mx-auto text-center relative z-10">
       <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-8">
         <span class="w-2 h-2 bg-[#E31337] rounded-full pulse-dot"></span>
-        Zero dependencies · Pure JavaScript · Drop-in ready
+        For small business owners — not developers
       </div>
 
-      <h1 class="text-6xl md:text-8xl font-black leading-none mb-6 tracking-tight">
-        Edit Any Website.<br>
-        <span class="gradient-text">Visually.</span>
+      <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight">
+        The website builder<br>
+        small businesses<br>
+        <span class="gradient-text">should've had all along.</span>
       </h1>
 
-      <p class="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed">
-        One script tag. Instant visual editing. Drag, drop, type, style — all without touching your codebase.
+      <p class="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto mb-8 leading-relaxed">
+        Click to edit. Drag to rearrange. Save in one click.<br class="hidden sm:block">
+        Your domain. Your code. No monthly ransom.
       </p>
 
-      <!-- Code snippet -->
-      <div class="relative inline-block max-w-xl w-full code-glow mb-12">
-        <div class="bg-gray-900 border border-gray-700/50 rounded-xl overflow-hidden">
-          <div class="flex items-center gap-2 px-4 py-3 bg-[#1A1A1A] border-b border-[#2A2A2A]/50">
-            <div class="w-3 h-3 rounded-full bg-red-500/70"></div>
-            <div class="w-3 h-3 rounded-full bg-yellow-500/70"></div>
-            <div class="w-3 h-3 rounded-full bg-green-500/70"></div>
-            <span class="text-xs text-gray-500 ml-2">your-page.html</span>
-          </div>
-          <div class="px-6 py-4 text-left">
-            <code class="font-mono text-sm">
-              <span class="text-gray-600">&lt;!-- Add before &lt;/body&gt; --&gt;</span><br>
-              <span class="text-[#E31337]">&lt;script</span>
-              <span class="text-[#E5E5E5]"> src</span><span class="text-gray-400">=</span><span class="text-yellow-400">"n3ware.js"</span>
-              <span class="text-[#E31337]">&gt;&lt;/script&gt;</span>
-            </code>
-          </div>
+      <!-- Social proof row -->
+      <div class="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500 mb-12">
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>
+          <span>No developer needed</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>
+          <span>Works on any device</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>
+          <span>Keep your domain</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>
+          <span>Own your code</span>
         </div>
       </div>
 
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="demo.html" class="glow bg-[#E31337] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
-          Try Live Demo →
+        <a href="/dashboard" class="glow bg-[#E31337] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
+          Start Free →
         </a>
-        <a href="#get-started" class="border border-gray-700 hover:border-[#E31337] text-[#888888] hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all">
-          Get Started
+        <a href="/demo.html" class="border border-gray-700 hover:border-[#E31337] text-[#888888] hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all">
+          See Live Demo
+        </a>
+        <a href="/features.html" class="text-[#888888] hover:text-[#E31337] text-base font-medium transition-colors underline underline-offset-4">
+          All Features →
         </a>
       </div>
     </div>
   </section>
 
   <!-- How It Works -->
-  <section id="how-it-works" class="py-32 px-6">
+  <section class="py-24 px-6">
     <div class="max-w-5xl mx-auto">
-      <div class="text-center mb-20">
-        <h2 class="text-4xl md:text-5xl font-black mb-4">How It Works</h2>
-        <p class="text-gray-400 text-lg">Three steps to visual editing power</p>
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-black mb-4">Up and running in minutes</h2>
+        <p class="text-gray-400 text-lg">No tutorials. No plugins. No waiting on a developer.</p>
       </div>
-
       <div class="grid md:grid-cols-3 gap-8">
         <div class="relative">
           <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 h-full hover:border-[#E31337]/40 transition-colors">
             <div class="w-12 h-12 bg-[#E31337] rounded-xl flex items-center justify-center text-2xl font-black mb-6">1</div>
-            <h3 class="text-xl font-bold mb-3">Add the Script</h3>
-            <p class="text-gray-400 leading-relaxed">Drop a single <code class="text-[#E31337] bg-[#E31337]/10 px-1 rounded">&lt;script&gt;</code> tag anywhere on your page. No npm, no build step, no configuration.</p>
+            <h3 class="text-xl font-bold mb-3">Pick a template</h3>
+            <p class="text-gray-400 leading-relaxed">Choose from 9 professionally designed templates built for restaurants, salons, contractors, realtors, and more.</p>
           </div>
           <div class="hidden md:block absolute top-1/2 -right-4 w-8 text-gray-700 text-2xl">→</div>
         </div>
-
         <div class="relative">
           <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 h-full hover:border-[#E31337]/40 transition-colors">
             <div class="w-12 h-12 bg-[#E31337] rounded-xl flex items-center justify-center text-2xl font-black mb-6">2</div>
-            <h3 class="text-xl font-bold mb-3">Click Edit</h3>
-            <p class="text-gray-400 leading-relaxed">A floating <strong class="text-white">n3</strong> button appears. Click it (or press <kbd class="bg-gray-800 px-1 rounded text-xs">Ctrl+Shift+E</kbd>) to activate the visual editor.</p>
+            <h3 class="text-xl font-bold mb-3">Click and edit</h3>
+            <p class="text-gray-400 leading-relaxed">Click any text to change it. Drag sections to rearrange. Change colors and fonts from one panel. No code ever.</p>
           </div>
           <div class="hidden md:block absolute top-1/2 -right-4 w-8 text-gray-700 text-2xl">→</div>
         </div>
-
         <div>
           <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 h-full hover:border-[#E31337]/40 transition-colors">
             <div class="w-12 h-12 bg-[#E31337] rounded-xl flex items-center justify-center text-2xl font-black mb-6">3</div>
-            <h3 class="text-xl font-bold mb-3">Drag, Drop, Type</h3>
-            <p class="text-gray-400 leading-relaxed">Click text to edit inline, drag elements to reorder, adjust styles in the panel, then export clean HTML.</p>
+            <h3 class="text-xl font-bold mb-3">Publish. Done.</h3>
+            <p class="text-gray-400 leading-relaxed">Hit save. Your site is live. On your domain. Indexed by Google. No export. No upload. No waiting.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Features -->
-  <section id="features" class="py-32 px-6 bg-[#111111]/40">
+  <!-- Feature Grid -->
+  <section id="features" class="py-24 px-6 bg-[#111111]/40">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-20">
-        <h2 class="text-4xl md:text-5xl font-black mb-4">Everything You Need</h2>
-        <p class="text-gray-400 text-lg">Professional visual editing, right in the browser</p>
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-6">
+          <i data-lucide="sparkles" class="w-4 h-4 inline"></i> Everything you need to run your site yourself
+        </div>
+        <h2 class="text-4xl md:text-5xl font-black mb-4">Stop paying someone else to press save</h2>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">Every feature designed so a non-technical business owner can manage their own site — without ever learning code.</p>
       </div>
 
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Feature cards -->
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="pencil" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">Inline Text Editing</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Click any text element to edit in place. Bold, italic, links, colors, heading levels — all via a floating toolbar.</p>
+          <i data-lucide="pencil" class="w-8 h-8 text-[#E31337] mb-4"></i>
+          <h3 class="font-bold text-lg mb-2">Click-to-Edit Text</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Click any headline, paragraph, or button on your live site and start typing. Bold, italic, links — no toolbar hunting.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="grip-vertical" class="w-8 h-8"></i></div>
+          <i data-lucide="grip-vertical" class="w-8 h-8 text-[#E31337] mb-4"></i>
           <h3 class="font-bold text-lg mb-2">Drag & Drop Layout</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Grab the ⠿ handle to reorder any block element. A glowing blue line shows exactly where it'll land.</p>
+          <p class="text-gray-400 text-sm leading-relaxed">Grab the handle and drag any section to a new position. A blue drop line shows exactly where it'll land.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="settings" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">Style Panel</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Adjust colors, padding, margin, border radius, opacity, CSS classes, and raw CSS — all from a sleek side panel.</p>
+          <i data-lucide="palette" class="w-8 h-8 text-[#E31337] mb-4"></i>
+          <h3 class="font-bold text-lg mb-2">Brand Theme Panel</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Set your brand colors, fonts, and logo once. n3ware applies them site-wide instantly — every page, every element.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="image" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">Image Controls</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Replace images via URL, edit alt text, align with one click, and drag corner handles to resize visually.</p>
+          <i data-lucide="navigation" class="w-8 h-8 text-[#E31337] mb-4"></i>
+          <h3 class="font-bold text-lg mb-2">Nav Manager</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Add, remove, and reorder nav links. Update your logo. Toggle the CTA button. All from a single side panel.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="undo" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">Undo / Redo</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Full history stack. Ctrl+Z / Cmd+Z to undo, Ctrl+Shift+Z to redo. Every change is tracked.</p>
+          <i data-lucide="image" class="w-8 h-8 text-[#E31337] mb-4"></i>
+          <h3 class="font-bold text-lg mb-2">Image Editing</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Swap any image by URL or upload. Resize by dragging corners. No Photoshop. No separate media library.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="download" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">Export Options</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Save clean HTML, copy to clipboard, or get a JSON diff of exactly what changed — selector, before, and after.</p>
+          <i data-lucide="undo-2" class="w-8 h-8 text-[#E31337] mb-4"></i>
+          <h3 class="font-bold text-lg mb-2">Undo Anything</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Every change is tracked. Ctrl+Z to undo. Full revision history in the cloud so you can roll back to any saved version.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="check" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">Non-Destructive</h3>
-          <p class="text-[#888888] text-sm leading-relaxed">Zero impact when not editing. No external CSS. All editor UI injected via JS and namespaced with <code class="text-[#E31337]">n3-</code>.</p>
+          <i data-lucide="smartphone" class="w-8 h-8 text-[#E31337] mb-4"></i>
+          <h3 class="font-bold text-lg mb-2">Edit From Your Phone</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">The editor works on iOS and Android. Update your hours or a price from the parking lot. No laptop required.</p>
         </div>
 
         <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="phone" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">Mobile Ready</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Touch-friendly drag and drop. Works on iOS and Android. Editor UI adapts to any screen size.</p>
+          <i data-lucide="bar-chart-2" class="w-8 h-8 text-[#E31337] mb-4"></i>
+          <h3 class="font-bold text-lg mb-2">Analytics Built In</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">See who's visiting, where they're from, and what they're clicking. No Google Analytics setup. No plugin. Just on.</p>
         </div>
 
-        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6 hover:border-[#E31337]/40 transition-all hover:-translate-y-1">
-          <div class="text-3xl mb-4"><i data-lucide="code" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">Zero Dependencies</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Pure vanilla JavaScript. Works on WordPress, static HTML, React apps — any website. No npm, no bundler.</p>
-        </div>
-
-        <a href="/components" class="bg-gray-900 border border-[#E31337]/30 bg-[#E31337]/10 rounded-2xl p-6 hover:border-[#E31337]/60 transition-all hover:-translate-y-1 block">
-          <div class="text-3xl mb-4"><i data-lucide="layout-grid" class="w-8 h-8"></i></div>
-          <h3 class="font-bold text-lg mb-2">30+ Ready-Made Components</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">Heroes, pricing tables, testimonials, menus, galleries — professionally designed Tailwind blocks for any SMB site.</p>
+        <a href="/components.html" class="bg-gray-900 border border-[#E31337]/30 bg-[#E31337]/5 rounded-2xl p-6 hover:border-[#E31337]/60 transition-all hover:-translate-y-1 block">
+          <i data-lucide="layout-grid" class="w-8 h-8 text-[#E31337] mb-4"></i>
+          <h3 class="font-bold text-lg mb-2">30+ Ready-Made Sections</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Heroes, pricing tables, testimonials, galleries, menus — drop any pre-built section into your page in one click.</p>
           <div class="mt-4 text-[#E31337] text-sm font-medium">Browse component library →</div>
+        </a>
+      </div>
+
+      <div class="mt-10 text-center">
+        <a href="/features.html" class="inline-flex items-center gap-2 text-sm text-[#E31337] hover:text-[#FF4D6A] border border-[#E31337]/40 bg-[#E31337]/10 px-5 py-2.5 rounded-lg transition-colors">
+          <i data-lucide="arrow-right" class="w-4 h-4 inline"></i> See all features in detail
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Modular Architecture -->
-  <section id="architecture" class="py-32 px-6">
+  <!-- 30yr credibility section -->
+  <section class="py-24 px-6">
     <div class="max-w-5xl mx-auto">
       <div class="text-center mb-16">
         <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-6">
-          <i data-lucide="settings" class="w-4 h-4 inline"></i> Clean, modular internals
+          <i data-lucide="history" class="w-4 h-4 inline"></i> Built from real experience
         </div>
-        <h2 class="text-4xl md:text-5xl font-black mb-4">10-Class Modular Architecture</h2>
-        <p class="text-gray-400 text-lg max-w-2xl mx-auto">A single file, internally organized into clean, decoupled classes. Event-driven communication. Dependency injection. JSDoc throughout.</p>
+        <h2 class="text-4xl md:text-5xl font-black mb-4">30 years watching businesses get overcharged</h2>
+        <p class="text-gray-400 text-lg max-w-3xl mx-auto leading-relaxed">
+          Three decades of web development taught us the same lesson over and over: small businesses pay too much, wait too long, and own too little. n3ware fixes all three.
+        </p>
       </div>
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="bg-[#111111] border border-[#2A2A2A] rounded-xl p-5 font-mono text-sm">
-          <div class="text-[#E31337] font-bold mb-3 text-xs uppercase tracking-wider">Core</div>
-          <div class="space-y-2">
-            <div class="flex items-start gap-3"><span class="text-[#E31337] shrink-0">N3Editor</span><span class="text-gray-500">— main orchestrator, public API surface</span></div>
-            <div class="flex items-start gap-3"><span class="text-[#E31337] shrink-0">N3Events</span><span class="text-gray-500">— pub/sub bus: on() emit() off() clear()</span></div>
-            <div class="flex items-start gap-3"><span class="text-[#E31337] shrink-0">N3History</span><span class="text-gray-500">— undo/redo stack with canUndo/canRedo</span></div>
-            <div class="flex items-start gap-3"><span class="text-[#E31337] shrink-0">N3UI</span><span class="text-gray-500">— CSS injection, toast, confirm dialog</span></div>
-            <div class="flex items-start gap-3"><span class="text-[#E31337] shrink-0">N3Export</span><span class="text-gray-500">— cleanHTML(), diff(), download, copy</span></div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 text-center hover:border-[#E31337]/30 transition-colors">
+          <div class="w-14 h-14 bg-[#E31337]/10 border border-[#E31337]/30 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <i data-lucide="history" class="w-7 h-7 text-[#E31337]"></i>
           </div>
+          <h3 class="font-bold text-xl mb-3">30 years in</h3>
+          <p class="text-gray-400 leading-relaxed text-sm">Decades of web work — agencies, freelance, SaaS — all pointing to the same gap: no good tool for the business owner who wants independence.</p>
         </div>
-        <div class="bg-[#111111] border border-[#2A2A2A] rounded-xl p-5 font-mono text-sm">
-          <div class="text-[#E31337] font-bold mb-3 text-xs uppercase tracking-wider">Editing</div>
-          <div class="space-y-2">
-            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3TextEditor</span><span class="text-gray-500">— contentEditable + formatting toolbar</span></div>
-            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3DragManager</span><span class="text-gray-500">— drag start/move/end, drop indicator</span></div>
-            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3ElementControls</span><span class="text-gray-500">— hover overlays, dup, delete</span></div>
-            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3StylePanel</span><span class="text-gray-500">— right sidebar: colors, spacing, classes</span></div>
-            <div class="flex items-start gap-3"><span class="text-[#E5E5E5] shrink-0">N3Toolbar</span><span class="text-gray-500">— top bar: undo/redo, save, exit</span></div>
+
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 text-center hover:border-[#E31337]/30 transition-colors">
+          <div class="w-14 h-14 bg-[#E31337]/10 border border-[#E31337]/30 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <i data-lucide="sparkles" class="w-7 h-7 text-[#E31337]"></i>
           </div>
+          <h3 class="font-bold text-xl mb-3">Built for owners</h3>
+          <p class="text-gray-400 leading-relaxed text-sm">Not for designers. Not for developers. For the restaurant owner who wants to update their hours at 9pm from their phone.</p>
         </div>
-      </div>
-      <div class="mt-6 bg-[#111111] border border-[#2A2A2A] rounded-xl p-5 font-mono text-sm">
-        <div class="text-[#E31337] font-bold mb-3 text-xs uppercase tracking-wider">Advanced API</div>
-        <div class="grid sm:grid-cols-2 gap-x-8 gap-y-1 text-gray-300">
-          <div><span class="text-[#E31337]">n3ware</span>.on(<span class="text-[#E5E5E5]">'editor:modeChange'</span>, cb) <span class="text-gray-600">// event bus</span></div>
-          <div><span class="text-[#E31337]">n3ware</span>.on(<span class="text-[#E5E5E5]">'drag:drop'</span>, cb)          <span class="text-gray-600">// drag events</span></div>
-          <div><span class="text-[#E31337]">n3ware</span>._modules.history.canUndo()      <span class="text-gray-600">// direct access</span></div>
-          <div><span class="text-[#E31337]">n3ware</span>._modules.exporter.diff(a, b)   <span class="text-gray-600">// diff API</span></div>
+
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 text-center hover:border-[#E31337]/30 transition-colors">
+          <div class="w-14 h-14 bg-[#E31337]/10 border border-[#E31337]/30 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <i data-lucide="smartphone" class="w-7 h-7 text-[#E31337]"></i>
+          </div>
+          <h3 class="font-bold text-xl mb-3">Your site. Period.</h3>
+          <p class="text-gray-400 leading-relaxed text-sm">Real HTML. Your domain. One-click export. No vendor lock-in. If you ever want to leave, your site leaves with you.</p>
         </div>
-      </div>
-      <div class="mt-6 text-center">
-        <a href="/tests" class="inline-flex items-center gap-2 text-sm text-[#E31337] hover:text-[#FF4D6A] border border-[#E31337]/40 bg-[#E31337]/10 px-5 py-2.5 rounded-lg transition-colors">
-          <i data-lucide="flask-conical" class="w-4 h-4 inline"></i> View Test Suite — 60+ tests across all 10 modules
-        </a>
       </div>
     </div>
   </section>
 
   <!-- Templates Showcase -->
-  <section id="templates" class="py-32 px-6 bg-[#111111]/40">
+  <section id="templates" class="py-24 px-6 bg-[#111111]/40">
     <div class="max-w-6xl mx-auto">
-
       <div class="text-center mb-16">
         <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-6">
           <i data-lucide="store" class="w-4 h-4 inline"></i> 9 ready-to-launch templates
         </div>
         <h2 class="text-4xl md:text-5xl font-black mb-4">Templates for Every Local Business</h2>
-        <p class="text-gray-400 text-lg max-w-2xl mx-auto">Launch your site in minutes with professionally designed templates built for Southern Rhode Island's most common businesses.</p>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">Launch your site in minutes with professionally designed templates built for the most common small business types.</p>
       </div>
 
       <!-- Category filter tabs -->
@@ -368,7 +369,7 @@
             </div>
             <p class="text-gray-400 text-sm mb-5 leading-relaxed">Property listings, market stats, and client testimonials</p>
             <div class="flex gap-3">
-              <a href="/templates/realtor.html" target="_blank" class="flex-1 text-center text-sm py-2 rounded-lg border border-gray-700 text-gray-400 hover:border-blue-500 hover:text-[#E31337] transition-colors">Preview</a>
+              <a href="/templates/realtor.html" target="_blank" class="flex-1 text-center text-sm py-2 rounded-lg border border-gray-700 text-gray-400 hover:border-blue-500 hover:text-blue-400 transition-colors">Preview</a>
               <a href="/dashboard" class="flex-1 text-center text-sm py-2 rounded-lg bg-blue-600/20 border border-blue-700/50 text-blue-400 hover:bg-blue-600/40 transition-colors font-medium">Use Template</a>
             </div>
           </div>
@@ -464,12 +465,12 @@
           <div class="p-5">
             <div class="flex items-start justify-between gap-3 mb-3">
               <h3 class="font-bold text-base text-white">Portfolio</h3>
-              <span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-full bg-purple-950 text-[#E31337] border border-purple-800/70">Creative</span>
+              <span class="shrink-0 text-xs font-medium px-2.5 py-1 rounded-full bg-purple-950 text-purple-400 border border-purple-800/70">Creative</span>
             </div>
             <p class="text-gray-400 text-sm mb-5 leading-relaxed">Project showcase, about section, contact form</p>
             <div class="flex gap-3">
-              <a href="/templates/portfolio.html" target="_blank" class="flex-1 text-center text-sm py-2 rounded-lg border border-gray-700 text-gray-400 hover:border-purple-500 hover:text-[#E31337] transition-colors">Preview</a>
-              <a href="/dashboard" class="flex-1 text-center text-sm py-2 rounded-lg bg-purple-600/20 border border-purple-700/50 text-[#E31337] hover:bg-purple-600/40 transition-colors font-medium">Use Template</a>
+              <a href="/templates/portfolio.html" target="_blank" class="flex-1 text-center text-sm py-2 rounded-lg border border-gray-700 text-gray-400 hover:border-purple-500 hover:text-purple-400 transition-colors">Preview</a>
+              <a href="/dashboard" class="flex-1 text-center text-sm py-2 rounded-lg bg-purple-600/20 border border-purple-700/50 text-purple-400 hover:bg-purple-600/40 transition-colors font-medium">Use Template</a>
             </div>
           </div>
         </div>
@@ -521,33 +522,85 @@
         <div class="inline-block bg-[#111111] border border-[#2A2A2A] rounded-2xl px-8 py-7">
           <p class="text-gray-500 text-sm mb-1">Don't see your industry?</p>
           <p class="font-semibold text-white text-lg mb-5">We'll build a custom template for you.</p>
-          <a href="mailto:hello@n3ware.com" class="inline-flex items-center gap-2 text-[#E31337] hover:text-[#FF4D6A] border border-blue-800/50 bg-blue-950/30 hover:bg-blue-950/50 px-5 py-2.5 rounded-lg transition-colors text-sm font-medium">
+          <a href="mailto:hello@n3ware.com" class="inline-flex items-center gap-2 text-[#E31337] hover:text-[#FF4D6A] border border-[#E31337]/30 bg-[#E31337]/10 hover:bg-[#E31337]/20 px-5 py-2.5 rounded-lg transition-colors text-sm font-medium">
             <i data-lucide="mail" class="w-4 h-4 inline"></i> Get in touch
           </a>
         </div>
       </div>
-
     </div>
   </section>
 
-  <!-- Get Started -->
-  <section id="get-started" class="py-32 px-6">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="text-4xl md:text-5xl font-black mb-6">Start Editing in Seconds</h2>
-      <p class="text-[#888888] text-lg mb-12">Add this before your closing <code class="text-[#E31337]">&lt;/body&gt;</code> tag.</p>
-
-      <div class="bg-gray-900 border border-[#2A2A2A] rounded-2xl overflow-hidden mb-8 code-glow">
-        <div class="flex items-center justify-between px-6 py-3 bg-[#1A1A1A] border-b border-[#2A2A2A]">
-          <span class="text-sm text-[#888888] font-mono">HTML</span>
-          <button onclick="copyEmbed()" class="text-xs text-[#E31337] hover:text-[#FF4D6A] transition-colors">Copy →</button>
-        </div>
-        <pre class="px-6 py-6 text-left overflow-x-auto"><code id="embed-code" class="font-mono text-sm text-gray-300">&lt;script src="https://n3ware.com/n3ware.js"&gt;&lt;/script&gt;</code></pre>
+  <!-- Domain callout -->
+  <section class="py-24 px-6" style="background:#E31337">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-black text-white mb-4">Works with your domain</h2>
+        <p class="text-red-100 text-lg max-w-2xl mx-auto">No forced subdomain. No n3ware branding on your site. Your domain points to your site — period.</p>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="demo.html" class="glow bg-[#E31337] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
-          See it in action →
-        </a>
+      <div class="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+        <div class="bg-white/10 border border-white/20 rounded-2xl p-6 text-center">
+          <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="globe" class="w-6 h-6 text-white"></i>
+          </div>
+          <h3 class="font-bold text-white mb-2">Point your domain</h3>
+          <p class="text-red-100 text-sm">One DNS change. Takes 5 minutes. Works with GoDaddy, Namecheap, Google Domains, Cloudflare — anywhere.</p>
+        </div>
+
+        <div class="bg-white/10 border border-white/20 rounded-2xl p-6 text-center">
+          <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="lock" class="w-6 h-6 text-white"></i>
+          </div>
+          <h3 class="font-bold text-white mb-2">Free SSL included</h3>
+          <p class="text-red-100 text-sm">HTTPS is automatic. Your visitors see the padlock. No setup. No annual cert fees. Always on.</p>
+        </div>
+
+        <div class="bg-white/10 border border-white/20 rounded-2xl p-6 text-center">
+          <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="search" class="w-6 h-6 text-white"></i>
+          </div>
+          <h3 class="font-bold text-white mb-2">Google-friendly</h3>
+          <p class="text-red-100 text-sm">Clean HTML, fast load times, proper meta tags. Your site ranks on your domain — not ours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- No Developer Required -->
+  <section class="py-24 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-6">
+          <i data-lucide="user-x" class="w-4 h-4 inline"></i> No developer. No agency. No middleman.
+        </div>
+        <h2 class="text-4xl md:text-5xl font-black mb-4">You're in control — finally</h2>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">Stop submitting tickets and waiting a week to fix a typo. With n3ware, you make the change yourself in 30 seconds.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 hover:border-[#E31337]/30 transition-colors">
+          <div class="w-14 h-14 bg-[#E31337]/10 border border-[#E31337]/30 rounded-2xl flex items-center justify-center mb-5">
+            <i data-lucide="mouse-pointer-click" class="w-7 h-7 text-[#E31337]"></i>
+          </div>
+          <h3 class="font-bold text-xl mb-3">Click to change it</h3>
+          <p class="text-gray-400 leading-relaxed text-sm">Prices changed? Menu updated? New hours? Click the text on your live site and type the new value. Done in 10 seconds.</p>
+        </div>
+
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 hover:border-[#E31337]/30 transition-colors">
+          <div class="w-14 h-14 bg-[#E31337]/10 border border-[#E31337]/30 rounded-2xl flex items-center justify-center mb-5">
+            <i data-lucide="image-plus" class="w-7 h-7 text-[#E31337]"></i>
+          </div>
+          <h3 class="font-bold text-xl mb-3">Swap photos yourself</h3>
+          <p class="text-gray-400 leading-relaxed text-sm">Got a new team photo or product shot? Click the image, paste a URL or upload from your phone. No Photoshop. No FTP.</p>
+        </div>
+
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 hover:border-[#E31337]/30 transition-colors">
+          <div class="w-14 h-14 bg-[#E31337]/10 border border-[#E31337]/30 rounded-2xl flex items-center justify-center mb-5">
+            <i data-lucide="save" class="w-7 h-7 text-[#E31337]"></i>
+          </div>
+          <h3 class="font-bold text-xl mb-3">One button to publish</h3>
+          <p class="text-gray-400 leading-relaxed text-sm">When you're happy, hit the green save button. Your changes go live on your domain in seconds. Revision history keeps you safe.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -556,9 +609,9 @@
   <section class="py-20 px-6 border-t border-[#2A2A2A]">
     <div class="max-w-5xl mx-auto text-center">
       <p class="text-xs font-mono text-[#E31337] tracking-widest uppercase mb-4">Compare</p>
-      <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-4">Switching from another builder?</h2>
+      <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-4">Switching from something else?</h2>
       <p class="text-gray-400 mb-10 max-w-xl mx-auto">See how n3ware stacks up against the tools small businesses use today — feature by feature, price by price.</p>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <a href="/vs-weebly.html" class="group bg-[#111111] border border-[#2A2A2A] hover:border-[#E31337]/50 rounded-2xl px-6 py-5 transition-colors text-left">
           <p class="text-xs text-gray-500 mb-1">vs</p>
           <p class="font-bold text-white group-hover:text-[#E31337] transition-colors">Weebly</p>
@@ -577,24 +630,85 @@
         <a href="/vs-godaddy.html" class="group bg-[#111111] border border-[#2A2A2A] hover:border-[#E31337]/50 rounded-2xl px-6 py-5 transition-colors text-left">
           <p class="text-xs text-gray-500 mb-1">vs</p>
           <p class="font-bold text-white group-hover:text-[#E31337] transition-colors">GoDaddy</p>
-          <p class="text-xs text-gray-500 mt-1">Actually modern. Actually yours.</p>
+          <p class="text-xs text-gray-500 mt-1">Actually modern.</p>
+        </a>
+        <a href="/vs-agency.html" class="group bg-[#111111] border border-[#E31337]/20 hover:border-[#E31337]/60 rounded-2xl px-6 py-5 transition-colors text-left col-span-2 md:col-span-1">
+          <p class="text-xs text-[#E31337] mb-1">vs</p>
+          <p class="font-bold text-white group-hover:text-[#E31337] transition-colors">Web Agency</p>
+          <p class="text-xs text-gray-500 mt-1">Save $20k over 5 years.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="py-24 px-6 bg-[#111111]/40">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-4xl md:text-5xl font-black mb-6">Start editing your site today</h2>
+      <p class="text-gray-400 text-lg mb-10 max-w-xl mx-auto">No credit card. No commitment. Pick a template, customize it, and launch — all in one afternoon.</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="/dashboard" class="glow bg-[#E31337] hover:bg-[#FF2847] text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105">
+          Get Started Free →
+        </a>
+        <a href="/demo.html" class="border border-gray-700 hover:border-[#E31337] text-[#888888] hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all">
+          Try the Demo First
         </a>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="border-t border-[#2A2A2A] py-12 px-6">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <span class="font-black text-lg" style="color:#E31337">n3ware</span>
-        <span class="text-gray-600 text-sm">— Visual editing for the web</span>
+  <footer class="border-t border-[#2A2A2A] py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-4 gap-10 mb-12">
+        <!-- Brand -->
+        <div class="md:col-span-1">
+          <a href="/" class="flex items-center gap-2 mb-4">
+            <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware" class="h-8">
+          </a>
+          <p class="text-gray-500 text-sm leading-relaxed mb-4">The website builder small businesses should've had all along.</p>
+          <a href="mailto:hello@n3ware.com" class="text-sm text-gray-500 hover:text-[#E31337] transition-colors">hello@n3ware.com</a>
+        </div>
+
+        <!-- Product -->
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4 uppercase tracking-wider">Product</h4>
+          <ul class="space-y-3 text-sm text-gray-500">
+            <li><a href="/features.html" class="hover:text-[#E31337] transition-colors">Features</a></li>
+            <li><a href="#templates" class="hover:text-[#E31337] transition-colors">Templates</a></li>
+            <li><a href="/components.html" class="hover:text-[#E31337] transition-colors">Components</a></li>
+            <li><a href="/demo.html" class="hover:text-[#E31337] transition-colors">Live Demo</a></li>
+            <li><a href="/dashboard" class="hover:text-[#E31337] transition-colors">Get Started</a></li>
+          </ul>
+        </div>
+
+        <!-- Compare -->
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4 uppercase tracking-wider">Compare</h4>
+          <ul class="space-y-3 text-sm text-gray-500">
+            <li><a href="/vs-weebly.html" class="hover:text-[#E31337] transition-colors">n3ware vs Weebly</a></li>
+            <li><a href="/vs-wix.html" class="hover:text-[#E31337] transition-colors">n3ware vs Wix</a></li>
+            <li><a href="/vs-squarespace.html" class="hover:text-[#E31337] transition-colors">n3ware vs Squarespace</a></li>
+            <li><a href="/vs-godaddy.html" class="hover:text-[#E31337] transition-colors">n3ware vs GoDaddy</a></li>
+            <li><a href="/vs-agency.html" class="hover:text-[#E31337] transition-colors">n3ware vs Web Agency</a></li>
+          </ul>
+        </div>
+
+        <!-- Company -->
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4 uppercase tracking-wider">Company</h4>
+          <ul class="space-y-3 text-sm text-gray-500">
+            <li><a href="/brand.html" class="hover:text-[#E31337] transition-colors">Brand</a></li>
+            <li><a href="/privacy.html" class="hover:text-[#E31337] transition-colors">Privacy Policy</a></li>
+            <li><a href="/terms.html" class="hover:text-[#E31337] transition-colors">Terms of Service</a></li>
+            <li><a href="mailto:hello@n3ware.com" class="hover:text-[#E31337] transition-colors">Contact Us</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="flex items-center gap-4 text-sm text-gray-600">
-        <a href="/privacy" class="hover:text-[#E31337] transition-colors">Privacy</a>
-        <a href="/terms" class="hover:text-[#E31337] transition-colors">Terms</a>
-        <a href="/brand" class="hover:text-[#E31337] transition-colors">Brand</a>
-        <a href="https://github.com/autosword/n3ware" target="_blank" class="hover:text-[#E31337] transition-colors">GitHub</a>
+
+      <div class="border-t border-[#2A2A2A] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-gray-600 text-sm">&copy; 2026 n3ware. All rights reserved.</p>
+        <p class="text-gray-600 text-sm">Built for small business owners who deserve better.</p>
       </div>
     </div>
   </footer>
@@ -609,7 +723,6 @@
           b.classList.add('tpl-filter');
         });
         btn.classList.add('tpl-filter-active');
-
         document.querySelectorAll('.tpl-card').forEach(card => {
           const show = filter === 'all' || card.dataset.category === filter;
           card.style.display = show ? '' : 'none';
@@ -617,14 +730,6 @@
         });
       });
     });
-
-    function copyEmbed() {
-      navigator.clipboard.writeText('<script src="https://n3ware.com/n3ware.js"><\/script>').then(() => {
-        const btn = document.querySelector('[onclick="copyEmbed()"]');
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy →', 2000);
-      });
-    }
   </script>
   <script>if(window.lucide) lucide.createIcons();</script>
 </body>
