@@ -7,13 +7,12 @@
  * optional reference images.  Falls back to returning the template
  * unchanged when ANTHROPIC_API_KEY is not set.
  *
- * Body: { componentId, componentHtml, prompt, imageUrls: [] }
+ * Body: { componentId, componentHtml, prompt, images: [{mediaType, data}] }
  * Response: { html }
  */
 
-const express   = require('express');
-const Anthropic  = require('@anthropic-ai/sdk');
-const { authOrApiKey } = require('./auth');
+const express  = require('express');
+const Anthropic = require('@anthropic-ai/sdk');
 
 const router = express.Router();
 
@@ -22,18 +21,18 @@ const SYSTEM_PROMPT = `You are customizing a pre-built website component's HTML 
 Given:
 - The component's full HTML template
 - A user description of what the site/component should say
-- Optional reference image URLs to use in place of placeholder images
+- Optional reference images attached inline (use them as replacement sources for <img> tags)
 
 Your task: return ONLY the updated HTML with:
 - Text content (headings, paragraphs, button labels, alt text) replaced to match the user's description
-- <img> src attributes replaced with the provided image URLs when available; otherwise keep existing src values
+- <img> src attributes: if reference images were provided, describe them as alt text and keep placeholder src (browser cannot serve base64 in static HTML); otherwise keep existing src values
 - ALL class names, IDs, data attributes, layout structure, and Tailwind classes preserved exactly
 - NO markdown, code fences, explanations, or preamble — raw HTML only
 
 Do not add or remove HTML elements. Do not change inline styles or class lists. Only change text nodes and src/alt attributes.`;
 
-router.post('/customize', authOrApiKey, async (req, res) => {
-  const { componentId, componentHtml, prompt, imageUrls } = req.body;
+router.post('/customize', async (req, res) => {
+  const { componentId, componentHtml, prompt, images } = req.body;
 
   if (!componentHtml || typeof componentHtml !== 'string') {
     return res.status(400).json({ error: 'componentHtml is required' });
@@ -49,22 +48,35 @@ router.post('/customize', authOrApiKey, async (req, res) => {
     return res.json({ html: componentHtml, mock: true });
   }
 
-  const imageSection = (imageUrls && imageUrls.length)
-    ? `\nReference images to use for <img> src attributes (in order):\n${imageUrls.map((u, i) => `  Image ${i + 1}: ${u}`).join('\n')}`
+  const hasImages = Array.isArray(images) && images.length > 0;
+  const imageNote = hasImages
+    ? `\n${images.length} reference image(s) attached — use them for <img> src attributes where appropriate.`
     : '';
 
-  const userPrompt =
-    `Component ID: ${componentId || 'unknown'}\n\n` +
-    `User description: ${prompt.trim()}${imageSection}\n\n` +
-    `Component HTML to customize:\n${componentHtml}`;
+  const textBlock = {
+    type: 'text',
+    text: `Component ID: ${componentId || 'unknown'}\n\n` +
+          `User description: ${prompt.trim()}${imageNote}\n\n` +
+          `Component HTML to customize:\n${componentHtml}`,
+  };
+
+  const contentBlocks = hasImages
+    ? [
+        textBlock,
+        ...images.map(img => ({
+          type:   'image',
+          source: { type: 'base64', media_type: img.mediaType, data: img.data },
+        })),
+      ]
+    : [textBlock];
 
   try {
     const client = new Anthropic({ apiKey: anthropicKey });
     const message = await client.messages.create({
-      model:      'claude-sonnet-4-20250514',
+      model:      'claude-sonnet-4-6',
       max_tokens: 4096,
       system:     SYSTEM_PROMPT,
-      messages:   [{ role: 'user', content: userPrompt }],
+      messages:   [{ role: 'user', content: contentBlocks }],
     });
 
     let html = message.content[0]?.text || componentHtml;

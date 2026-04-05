@@ -724,19 +724,16 @@
         errorEl.style.display = 'none';
 
         try {
-          // Upload images first (use uploads endpoint with a synthetic siteId)
-          const imageUrls = [];
+          // Encode images as base64 to send directly (no upload endpoint needed)
+          const images = [];
           for (const img of this._custImages) {
-            const fd = new FormData();
-            fd.append('file', img.file);
-            const up = await fetch(`${this._apiBase}/uploads/component-customize/upload`, {
-              method: 'POST',
-              body: fd,
+            const b64 = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result.split(',')[1]);
+              reader.onerror = reject;
+              reader.readAsDataURL(img.file);
             });
-            if (up.ok) {
-              const data = await up.json();
-              imageUrls.push(data.file.url);
-            }
+            images.push({ mediaType: img.file.type, data: b64 });
           }
 
           // Call customize endpoint
@@ -747,7 +744,7 @@
               componentId:   comp.id,
               componentHtml: componentEl.outerHTML,
               prompt,
-              imageUrls,
+              images,
             }),
           });
 
