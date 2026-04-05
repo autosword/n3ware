@@ -73,6 +73,13 @@ class FirestoreStorage {
    * List all sites (metadata only).
    * @returns {Promise<object[]>}
    */
+  async findSiteByApiKey(apiKey) {
+    const snap = await this._sites.where('apiKey', '==', apiKey).limit(1).get();
+    if (snap.empty) return null;
+    const doc = snap.docs[0];
+    return { id: doc.id, ...doc.data() };
+  }
+
   async listSites(filter = {}) {
     // Do NOT use .select() with 'id' — it is not a valid Firestore field path
     // for field masks and causes INVALID_ARGUMENT. Use d.id from the snapshot.

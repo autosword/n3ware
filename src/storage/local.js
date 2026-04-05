@@ -87,6 +87,15 @@ class LocalStorage {
    * List all site records (metadata only, no HTML body).
    * @returns {object[]}
    */
+  findSiteByApiKey(apiKey) {
+    if (!fs.existsSync(this._root)) return null;
+    for (const d of fs.readdirSync(this._root)) {
+      const site = this._readJSON(this._sitePath(d));
+      if (site && site.apiKey === apiKey) return site;
+    }
+    return null;
+  }
+
   listSites({ ownerId } = {}) {
     if (!fs.existsSync(this._root)) return [];
     return fs.readdirSync(this._root)

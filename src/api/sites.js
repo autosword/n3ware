@@ -49,7 +49,11 @@ router.use(authOrApiKey);
 // ── List sites ─────────────────────────────────────────────────────────────
 router.get('/', async (req, res) => {
   try {
-    // JWT users only see their own sites; API key sees all
+    // Site-scoped keys are for per-site operations only — not listing all sites.
+    if (req.authType === 'sitekey') {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    // JWT users only see their own sites; master API key sees all
     const filter = req.authType === 'jwt' && req.user
       ? { ownerId: req.user.id }
       : {};

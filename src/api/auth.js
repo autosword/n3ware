@@ -83,46 +83,63 @@ function verifyToken(req, res, next) {
  * - API key: sets req.authType = 'apikey', req.user = null
  * - Neither: 401
  */
-function authOrApiKey(req, res, next) {
-  // 1. Authorization: Bearer <JWT>
-  const header = req.headers['authorization'] || '';
-  const bearer = header.startsWith('Bearer ') ? header.slice(7) : '';
-  if (bearer) {
-    try {
-      req.user     = jwt.verify(bearer, config.jwtSecret);
-      req.authType = 'jwt';
-      return next();
-    } catch {
-      return res.status(401).json({ error: 'Invalid or expired token' });
+async function authOrApiKey(req, res, next) {
+  try {
+    // 1. Authorization: Bearer <JWT>
+    const header = req.headers['authorization'] || '';
+    const bearer = header.startsWith('Bearer ') ? header.slice(7) : '';
+    if (bearer) {
+      try {
+        req.user     = jwt.verify(bearer, config.jwtSecret);
+        req.authType = 'jwt';
+        return next();
+      } catch {
+        return res.status(401).json({ error: 'Invalid or expired token' });
+      }
     }
-  }
 
-  // 2. n3_token cookie (set by magic-auth on .n3ware.com)
-  const cookieToken = req.cookies && req.cookies.n3_token;
-  if (cookieToken) {
-    try {
-      req.user     = jwt.verify(cookieToken, config.jwtSecret);
-      req.authType = 'jwt';
-      return next();
-    } catch {
-      // Invalid cookie — fall through to API key check
+    // 2. n3_token cookie (set by magic-auth on .n3ware.com)
+    const cookieToken = req.cookies && req.cookies.n3_token;
+    if (cookieToken) {
+      try {
+        req.user     = jwt.verify(cookieToken, config.jwtSecret);
+        req.authType = 'jwt';
+        return next();
+      } catch {
+        // Invalid cookie — fall through to API key check
+      }
     }
-  }
 
-  // 3. X-API-Key header
-  const provided = req.headers['x-api-key'] || req.query.apiKey || '';
-  if (!provided) {
-    return res.status(401).json({ error: 'Authentication required (Bearer token, cookie, or X-API-Key)' });
+    // 3. X-API-Key header
+    const provided = req.headers['x-api-key'] || req.query.apiKey || '';
+    if (!provided) {
+      return res.status(401).json({ error: 'Authentication required (Bearer token, cookie, or X-API-Key)' });
+    }
+
+    // 3a. Master key
+    if (_timingSafeEqual(provided, config.masterApiKey)) {
+      req.user     = null;
+      req.authType = 'apikey';
+      return next();
+    }
+
+    // 3b. Per-site key — look up in storage. Any key that belongs to a real site
+    //     in the DB is valid for site-scoped operations. Bogus keys that don't
+    //     match any site are rejected with 401 here (Cat A fix maintained).
+    const storage = require('../storage');
+    const site = await storage.findSiteByApiKey(provided);
+    if (site) {
+      req.user           = null;
+      req.authType       = 'sitekey';
+      req.providedApiKey = provided;
+      req.site           = site;
+      return next();
+    }
+
+    return res.status(401).json({ error: 'Invalid credentials' });
+  } catch (err) {
+    next(err);
   }
-  if (_timingSafeEqual(provided, config.masterApiKey)) {
-    req.user     = null;
-    req.authType = 'apikey';
-    return next();
-  }
-  // Unknown API key — reject immediately. Do NOT delegate to route handlers;
-  // handlers that received authType='sitekey' were returning data without
-  // re-validating the key (e.g. GET /api/sites returned all sites to any caller).
-  return res.status(401).json({ error: 'Invalid credentials' });
 }
 
 module.exports = { requireApiKey, verifyToken, authOrApiKey };
