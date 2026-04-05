@@ -359,10 +359,10 @@
         `.n3-fab-toggle{width:48px;height:48px;border-radius:50%;background:${T.accent};color:#fff;border:none;cursor:pointer;font:700 16px/1 system-ui,sans-serif;letter-spacing:-.5px;box-shadow:0 4px 24px rgba(59,130,246,.45);display:flex;align-items:center;justify-content:center;transition:all .25s cubic-bezier(.34,1.56,.64,1);overflow:hidden;padding:0}`,
         `.n3-fab-toggle:hover{background:${T.accentDark};transform:scale(1.1)}`,
         `.n3-fab-toggle.n3-editing{background:#EF4444;box-shadow:0 4px 24px rgba(239,68,68,.5);transform:rotate(45deg)}`,
-        `.n3-fab-actions{display:flex;flex-direction:column-reverse;align-items:center;gap:8px;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .2s}`,
-        `.n3-fab.n3-expanded .n3-fab-actions{max-height:300px;opacity:1}`,
-        `.n3-fab-btn{width:40px;height:40px;border-radius:50%;background:${T.bgPanel};color:${T.text};border:1px solid ${T.border};cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}`,
-        `.n3-fab-btn:hover{background:rgba(255,255,255,.12);border-color:${T.accent};transform:scale(1.08)}`,
+        `.n3-fab-actions{display:flex;flex-direction:column-reverse;align-items:flex-end;gap:8px;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .2s}`,
+        `.n3-fab.n3-expanded .n3-fab-actions{max-height:400px;opacity:1}`,
+        `.n3-fab-btn{height:36px;border-radius:999px;background:${T.bgPanel};color:${T.text};border:1px solid ${T.border};cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px 0 10px;font-size:13px;font-weight:500;white-space:nowrap;transition:all .15s}`,
+        `.n3-fab-btn:hover{background:rgba(255,255,255,.12);border-color:${T.accent};transform:scale(1.04)}`,
         `.n3-fab-btn.n3-active{background:${T.accent};border-color:${T.accent};box-shadow:0 0 0 3px rgba(59,130,246,.3)}`,
         `.n3-fab-btn.n3-editing{background:#EF4444;border-color:#EF4444}`,
         `.n3-analytics-overlay{position:fixed;bottom:0;left:0;right:0;z-index:999995;background:rgba(10,10,15,.98);border-top:1px solid ${T.border};transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:78vh;overflow-y:auto;font:13px/1.5 system-ui,sans-serif;color:${T.text};backdrop-filter:blur(12px)}`,
@@ -566,7 +566,7 @@
           .n3-an-2col{grid-template-columns:1fr!important}
           .n3-fab{bottom:16px!important;right:12px!important;}
           .n3-fab-toggle{width:40px!important;height:40px!important;font-size:14px!important;touch-action:manipulation}
-          .n3-fab-btn{touch-action:manipulation}
+          .n3-fab-btn{touch-action:manipulation;font-size:12px!important;padding:0 10px 0 8px!important;height:32px!important}
           body.n3-editing{padding-top:48px!important;}
           .n3-save-fab{bottom:20px!important;right:62px!important;padding:10px 14px!important;font-size:13px!important}
         }`,
@@ -919,7 +919,7 @@
 
       const analyticsBtn = document.createElement('button');
       analyticsBtn.className = 'n3-fab-btn';
-      analyticsBtn.innerHTML = CHART;
+      analyticsBtn.innerHTML = CHART + '<span>Analytics</span>';
       analyticsBtn.title = 'Analytics';
       analyticsBtn.addEventListener('click', e => {
         e.stopPropagation();
@@ -928,7 +928,7 @@
 
       const compBtn = document.createElement('button');
       compBtn.className = 'n3-fab-btn';
-      compBtn.innerHTML = GRID;
+      compBtn.innerHTML = GRID + '<span>Components</span>';
       compBtn.title = 'Component Library';
       compBtn.addEventListener('click', e => {
         e.stopPropagation();
@@ -937,13 +937,13 @@
 
       const editBtn = document.createElement('button');
       editBtn.className = 'n3-fab-btn';
-      editBtn.innerHTML = PENCIL;
+      editBtn.innerHTML = PENCIL + '<span>Edit</span>';
       editBtn.title = 'Toggle Edit Mode (Ctrl+Shift+E)';
       editBtn.addEventListener('click', e => { e.stopPropagation(); this.toggle(); });
 
       const themeBtn = document.createElement('button');
       themeBtn.className = 'n3-fab-btn';
-      themeBtn.innerHTML = PALETTE;
+      themeBtn.innerHTML = PALETTE + '<span>Theme</span>';
       themeBtn.title = 'Theme';
       themeBtn.addEventListener('click', e => {
         e.stopPropagation();
@@ -953,9 +953,10 @@
       const mediaBtn = document.createElement('button');
       mediaBtn.className = 'n3-fab-btn';
       const _MM = window._n3wareModules && window._n3wareModules.N3MediaManager;
-      mediaBtn.innerHTML = (_MM && _MM.ICON)
+      const _mediaIcon = (_MM && _MM.ICON)
         ? _MM.ICON
         : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+      mediaBtn.innerHTML = _mediaIcon + '<span>Media</span>';
       mediaBtn.title = 'Media Manager';
       mediaBtn.addEventListener('click', e => {
         e.stopPropagation();
@@ -973,7 +974,7 @@
         const PLUS = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
         const pageBtn = document.createElement('button');
         pageBtn.className = 'n3-fab-btn';
-        pageBtn.innerHTML = PLUS;
+        pageBtn.innerHTML = PLUS + '<span>New Page</span>';
         pageBtn.title = 'New Page';
         pageBtn.addEventListener('click', e => { e.stopPropagation(); this._openPageCreator(); });
         actions.appendChild(pageBtn);
