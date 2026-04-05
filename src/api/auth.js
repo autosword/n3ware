@@ -119,11 +119,10 @@ function authOrApiKey(req, res, next) {
     req.authType = 'apikey';
     return next();
   }
-  // Not the master key — could be a site-scoped API key; let route handlers verify
-  req.user           = null;
-  req.authType       = 'sitekey';
-  req.providedApiKey = provided;
-  next();
+  // Unknown API key — reject immediately. Do NOT delegate to route handlers;
+  // handlers that received authType='sitekey' were returning data without
+  // re-validating the key (e.g. GET /api/sites returned all sites to any caller).
+  return res.status(401).json({ error: 'Invalid credentials' });
 }
 
 module.exports = { requireApiKey, verifyToken, authOrApiKey };

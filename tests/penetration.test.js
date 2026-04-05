@@ -292,27 +292,58 @@ async function runAuthAttacks(route, resolvedPath) {
 async function runInputAttacks(route, resolvedPath) {
   const { method } = route;
 
-  // 8. Injection payloads in URL param positions (already substituted with FAKE_SITE)
-  //    Also send injection strings in JSON body
-  const injectionPaths = [
-    resolvedPath.replace(FAKE_SITE, `'; DROP TABLE users; --`),
-    resolvedPath.replace(FAKE_SITE, `{"$ne":null}`),
-  ];
-  for (const injPath of injectionPaths) {
-    const injBody = ['POST', 'PUT', 'PATCH'].includes(method)
-      ? { id: `'; DROP TABLE users; --`, '$where': '1==1' }
-      : undefined;
-    const s = await req(method, encodeURI(injPath), { body: injBody });
-    await delay(DELAY_MS);
-    // Acceptable: any 4xx (rejected) or 404 (not found) — bad: 500 or 2xx with data
-    if (s >= 400 && s < 600 && s !== 500) {
-      recordPass(method, resolvedPath, `injection (${injPath.includes('DROP') ? 'sql' : 'nosql'})`, s);
-    } else if (s === 500) {
-      recordFail(method, resolvedPath, 'injection', s, '4xx', `server crashed (500) on injection payload`);
-    } else if (is2xx(s)) {
-      recordFail(method, resolvedPath, 'injection', s, '4xx', `server returned ${s} — verify no data leak`);
-    } else {
-      recordPass(method, resolvedPath, `injection (network/redirect)`, s);
+  // 8. Injection payloads
+  // Strategy: only inject into URL if the route template actually has a path param.
+  // For parameterless routes, the substitution is a no-op and a 200 is expected
+  // normal behavior — testing injection there produces false positives.
+  const hasPathParam = route.path.includes(':');
+  const SQL_INJ   = `'; DROP TABLE users; --`;
+  const NOSQL_INJ = `{"$ne":null}`;
+
+  if (hasPathParam) {
+    // Substitute into URL path param positions
+    const injPaths = [
+      resolvedPath.replace(FAKE_SITE, SQL_INJ).replace(FAKE_SLUG, SQL_INJ)
+                  .replace(FAKE_JOB, SQL_INJ).replace(FAKE_REV, SQL_INJ),
+      resolvedPath.replace(FAKE_SITE, NOSQL_INJ).replace(FAKE_SLUG, NOSQL_INJ)
+                  .replace(FAKE_JOB, NOSQL_INJ).replace(FAKE_REV, NOSQL_INJ),
+    ];
+    for (const [label, injPath] of [['sql', injPaths[0]], ['nosql', injPaths[1]]]) {
+      const injBody = ['POST', 'PUT', 'PATCH'].includes(method)
+        ? { id: SQL_INJ, '$where': '1==1' }
+        : undefined;
+      const s = await req(method, encodeURI(injPath), { body: injBody });
+      await delay(DELAY_MS);
+      if (s >= 400 && s < 600 && s !== 500) {
+        recordPass(method, resolvedPath, `injection (${label})`, s);
+      } else if (s === 500) {
+        recordFail(method, resolvedPath, `injection (${label})`, s, '4xx', `server crashed (500) on ${label} injection`);
+      } else if (is2xx(s)) {
+        recordFail(method, resolvedPath, `injection (${label})`, s, '4xx', `server returned ${s} — verify no data leak`);
+      } else {
+        recordPass(method, resolvedPath, `injection (${label} — redirect/other)`, s);
+      }
+    }
+  } else {
+    // Parameterless route: inject via query string + body only
+    for (const [label, payload] of [['sql', SQL_INJ], ['nosql', NOSQL_INJ]]) {
+      const injQs   = `?q=${encodeURIComponent(payload)}&id=${encodeURIComponent(payload)}`;
+      const injBody = ['POST', 'PUT', 'PATCH'].includes(method)
+        ? { id: payload, '$where': '1==1', q: payload }
+        : undefined;
+      const s = await req(method, resolvedPath + injQs, { body: injBody });
+      await delay(DELAY_MS);
+      // For parameterless public routes responding 200, query-string injection is not
+      // a meaningful test (params are ignored). Skip if route is public and returns 200.
+      if (route.auth === 'public' && is2xx(s)) {
+        recordSkip(method, resolvedPath, `injection (${label} via qs)`, 'parameterless public route — 200 is expected, qs injection not testable here');
+      } else if (s === 500) {
+        recordFail(method, resolvedPath, `injection (${label} via qs)`, s, '4xx', `server crashed (500) on ${label} injection`);
+      } else if (is2xx(s) && route.auth === 'required') {
+        recordFail(method, resolvedPath, `injection (${label} via qs)`, s, '4xx', `server returned ${s} — verify no data leak`);
+      } else {
+        recordPass(method, resolvedPath, `injection (${label} via qs)`, s);
+      }
     }
   }
 
