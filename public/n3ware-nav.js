@@ -63,7 +63,6 @@
       setTimeout(() => {
         if (!this._panel) return;
         this._panel.classList.add('n3-nav-open');
-        this._panel.style.setProperty('transform', 'translateX(0)', 'important');
       }, 20);
     }
 

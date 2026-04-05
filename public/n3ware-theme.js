@@ -54,9 +54,6 @@
       setTimeout(() => {
         if (!this._panel) return;
         this._panel.classList.add('n3-theme-open');
-        // Belt-and-suspenders: force transform via inline style in case
-        // Chrome's style invalidation skips the class rule on first mount.
-        this._panel.style.setProperty('transform', 'translateX(0)', 'important');
       }, 20);
     }
 
