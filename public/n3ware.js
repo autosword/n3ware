@@ -654,7 +654,9 @@
         el.closest('.n3-theme-panel')    ||
         el.closest('.n3-img-backdrop')   ||
         el.closest('.n3-media-backdrop') ||
-        el.closest('.n3-preview-popover')
+        el.closest('.n3-preview-popover') ||
+        el.closest('.n3-test-overlay') ||
+        el.closest('.n3-test-close')
       ));
     }
   }
@@ -814,8 +816,11 @@
 
       this._fab          = null;
       this._fabOpen      = false;
-      this._previewMode  = localStorage.getItem('n3_preview_mode') || 'none';
-      this._previewPopover = null;
+      const _VALID_MODES = new Set(['mobile','tablet','desktop-sm','desktop-wide','full','none']);
+      const _stored = localStorage.getItem('n3_preview_mode') || 'none';
+      this._testMode     = _VALID_MODES.has(_stored) ? _stored : 'none';
+      this._testOverlay  = null;
+      this._testPopover  = null;
       this._onKeyDown    = this._handleKeyDown.bind(this);
 
       // v2: dirty tracking for GCS file saves
@@ -833,15 +838,15 @@
         const ps = document.createElement('style');
         ps.id = 'n3-preview-style';
         ps.textContent = [
-          'body.n3-preview-mobile,body.n3-preview-tablet,body.n3-preview-desktop-sm,body.n3-preview-desktop-wide{margin:0 auto!important;transition:max-width .3s ease,box-shadow .3s ease!important}',
-          'body.n3-preview-mobile{max-width:390px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.45)!important}',
-          'body.n3-preview-tablet{max-width:768px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.45)!important}',
-          'body.n3-preview-desktop-sm{max-width:1024px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.45)!important}',
-          'body.n3-preview-desktop-wide{max-width:1440px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.45)!important}',
-          'body.n3-preview-mobile nav[data-n3-primary-nav]{max-width:390px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}',
-          'body.n3-preview-tablet nav[data-n3-primary-nav]{max-width:768px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}',
-          'body.n3-preview-desktop-sm nav[data-n3-primary-nav]{max-width:1024px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}',
-          'body.n3-preview-desktop-wide nav[data-n3-primary-nav]{max-width:1440px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}',
+          '.n3-test-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999990;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:16px;box-sizing:border-box}',
+          '.n3-test-label{color:#888;font:500 12px/1 system-ui,sans-serif;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:8px}',
+          '.n3-test-label button{background:rgba(255,255,255,.1);border:none;border-radius:6px;color:#ccc;cursor:pointer;font:500 12px/1 system-ui,sans-serif;padding:4px 10px;transition:background .12s}',
+          '.n3-test-label button:hover{background:rgba(255,255,255,.2)}',
+          '.n3-test-close{position:fixed;top:16px;right:80px;background:rgba(255,255,255,.1);border:1px solid #444;border-radius:8px;color:#ccc;cursor:pointer;font:500 13px/1 system-ui,sans-serif;padding:6px 14px;z-index:999992;transition:background .12s}',
+          '.n3-test-close:hover{background:rgba(255,255,255,.2);color:#fff}',
+          '.n3-test-frame-wrap{flex:1;width:100%;display:flex;align-items:stretch;justify-content:center;overflow:hidden;min-height:0}',
+          '.n3-test-frame{height:100%;border:1px solid #333;border-radius:12px;overflow:hidden;flex-shrink:0;transition:width .3s ease;box-shadow:0 0 0 1px rgba(255,255,255,.05),0 8px 40px rgba(0,0,0,.6)}',
+          '.n3-test-frame iframe{width:100%;height:100%;border:none;display:block}',
           '.n3-preview-popover{position:fixed;right:80px;bottom:72px;background:#111111;border:1px solid #2A2A2A;border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:4px;box-shadow:0 4px 24px rgba(0,0,0,.5);z-index:999999;opacity:0;pointer-events:none;transform:translateX(8px);transition:opacity .15s,transform .15s}',
           '.n3-preview-popover.n3-open{opacity:1;pointer-events:all;transform:none}',
           '.n3-preview-opt{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;background:transparent;border:none;color:#E5E5E5;cursor:pointer;font-size:13px;font-weight:500;white-space:nowrap;width:100%;text-align:left;transition:background .12s}',
@@ -852,7 +857,6 @@
         ].join('');
         document.head.appendChild(ps);
       }
-      if (this._previewMode !== 'none') this._setPreviewMode(this._previewMode);
       if (this.toolbar)    this.toolbar.mount();
       if (this.panel)      this.panel.mount();
       if (this.revPanel)   this.revPanel.mount();
@@ -1012,38 +1016,39 @@
         this._pageFabBtn = pageBtn;
       }
 
-      // ── Preview pill + popover ─────────────────────────────────────────────
+      // ── Test pill + popover ────────────────────────────────────────────────
       const previewBtn = document.createElement('button');
-      previewBtn.className = 'n3-fab-btn' + (this._previewMode !== 'none' ? ' n3-active' : '');
-      previewBtn.innerHTML = MONITOR + '<span>Preview</span>';
-      previewBtn.title = 'Viewport preview';
+      previewBtn.className = 'n3-fab-btn' + (this._testMode !== 'none' ? ' n3-active' : '');
+      previewBtn.innerHTML = MONITOR + '<span>Test</span>';
+      previewBtn.title = 'Test viewport';
       this._previewFabBtn = previewBtn;
 
       const EXTLINK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
 
-      const PREVIEW_OPTS = [
+      const TEST_OPTS = [
         { mode: 'mobile',        label: 'Mobile',        icon: PHONE,    width: '390px'  },
         { mode: 'tablet',        label: 'Tablet',        icon: TABLET,   width: '768px'  },
         { mode: 'desktop-sm',   label: 'Small Desktop', icon: MONITOR,  width: '1024px' },
         { mode: 'desktop-wide', label: 'Wide Desktop',  icon: MONITOR,  width: '1440px' },
-        { mode: 'none',         label: 'Full Width',    icon: MAXIMIZE,  width: 'auto'   },
+        { mode: 'full',         label: 'Full Width',    icon: MAXIMIZE,  width: '100%'  },
       ];
 
       const previewPopover = document.createElement('div');
       previewPopover.className = 'n3-preview-popover';
-      PREVIEW_OPTS.forEach(opt => {
+      TEST_OPTS.forEach(opt => {
         const btn = document.createElement('button');
-        btn.className = 'n3-preview-opt' + (this._previewMode === opt.mode ? ' n3-active' : '');
+        btn.className = 'n3-preview-opt' + (this._testMode === opt.mode ? ' n3-active' : '');
         btn.dataset.mode = opt.mode;
         btn.innerHTML = opt.icon + `<span>${opt.label}</span><span class="n3-preview-width">${opt.width}</span>`;
         btn.addEventListener('click', e => {
           e.stopPropagation();
-          this._setPreviewMode(opt.mode);
+          this._setTestMode(opt.mode);
+          previewPopover.classList.remove('n3-open');
         });
         previewPopover.appendChild(btn);
       });
 
-      // Divider + "Open in new tab" action
+      // Divider + "Open in new tab"
       const divider = document.createElement('div');
       divider.style.cssText = 'height:1px;background:#2A2A2A;margin:4px 4px';
       previewPopover.appendChild(divider);
@@ -1052,20 +1057,18 @@
       openTabBtn.innerHTML = EXTLINK + '<span>Open in new tab</span>';
       openTabBtn.addEventListener('click', e => {
         e.stopPropagation();
-        const clean = window.location.origin + window.location.pathname;
-        window.open(clean, '_blank', 'noopener');
+        window.open(location.origin + location.pathname, '_blank', 'noopener');
         previewPopover.classList.remove('n3-open');
-        previewBtn.classList.toggle('n3-active', this._previewMode !== 'none');
       });
       previewPopover.appendChild(openTabBtn);
 
       document.body.appendChild(previewPopover);
-      this._previewPopover = previewPopover;
+      this._testPopover = previewPopover;
 
       previewBtn.addEventListener('click', e => {
         e.stopPropagation();
         const open = previewPopover.classList.toggle('n3-open');
-        previewBtn.classList.toggle('n3-active', open || this._previewMode !== 'none');
+        previewBtn.classList.toggle('n3-active', open || this._testMode !== 'none');
       });
 
       actions.appendChild(previewBtn);
@@ -1082,7 +1085,7 @@
       toggle.addEventListener('click', () => {
         this._fabOpen = !this._fabOpen;
         this._fab.classList.toggle('n3-expanded', this._fabOpen);
-        if (!this._fabOpen && this._previewPopover) this._previewPopover.classList.remove('n3-open');
+        if (!this._fabOpen && this._testPopover) this._testPopover.classList.remove('n3-open');
       });
 
       this._fab.appendChild(actions);
@@ -1097,20 +1100,81 @@
       if (toggle) toggle.classList.toggle('n3-editing', on);
     }
 
-    _setPreviewMode(mode) {
-      const ALL = ['n3-preview-mobile','n3-preview-tablet','n3-preview-desktop-sm','n3-preview-desktop-wide'];
-      document.body.classList.remove(...ALL);
-      if (mode !== 'none') document.body.classList.add(`n3-preview-${mode}`);
-      this._previewMode = mode;
+    _setTestMode(mode) {
+      this._testMode = mode;
       try { localStorage.setItem('n3_preview_mode', mode); } catch (_) {}
-      if (this._previewPopover) {
-        this._previewPopover.querySelectorAll('.n3-preview-opt').forEach(btn => {
+
+      // Update popover active state
+      if (this._testPopover) {
+        this._testPopover.querySelectorAll('.n3-preview-opt').forEach(btn => {
           btn.classList.toggle('n3-active', btn.dataset.mode === mode);
         });
       }
       if (this._previewFabBtn) {
         this._previewFabBtn.classList.toggle('n3-active', mode !== 'none');
       }
+
+      if (mode === 'none') {
+        // Remove overlay
+        if (this._testOverlay) { this._testOverlay.remove(); this._testOverlay = null; }
+        return;
+      }
+
+      const WIDTHS = { mobile: '390px', tablet: '768px', 'desktop-sm': '1024px', 'desktop-wide': '1440px', full: '100%' };
+      const LABELS = { mobile: '📱 Mobile — 390px', tablet: '⬜ Tablet — 768px', 'desktop-sm': '🖥 Small Desktop — 1024px', 'desktop-wide': '🖥 Wide Desktop — 1440px', full: '⛶ Full Width' };
+      const w = WIDTHS[mode] || '100%';
+      const label = LABELS[mode] || mode;
+      const cleanUrl = location.origin + location.pathname;
+
+      if (this._testOverlay) {
+        // Already open — just resize frame, no reload needed
+        const frame = this._testOverlay.querySelector('.n3-test-frame');
+        const lbl   = this._testOverlay.querySelector('.n3-test-label span');
+        if (frame) frame.style.width = w;
+        if (lbl)   lbl.textContent   = label;
+        return;
+      }
+
+      // Build overlay fresh
+      const overlay = document.createElement('div');
+      overlay.className = 'n3-test-overlay';
+
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'n3-test-close';
+      closeBtn.textContent = '✕  Exit Test';
+      closeBtn.addEventListener('click', () => this._setTestMode('none'));
+      document.body.appendChild(closeBtn);
+
+      const labelRow = document.createElement('div');
+      labelRow.className = 'n3-test-label';
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = label;
+      labelRow.appendChild(labelSpan);
+
+      const frameWrap = document.createElement('div');
+      frameWrap.className = 'n3-test-frame-wrap';
+
+      const frameDiv = document.createElement('div');
+      frameDiv.className = 'n3-test-frame';
+      frameDiv.style.width = w;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = cleanUrl;
+      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups');
+      frameDiv.appendChild(iframe);
+      frameWrap.appendChild(frameDiv);
+
+      overlay.appendChild(labelRow);
+      overlay.appendChild(frameWrap);
+      document.body.appendChild(overlay);
+
+      // Store close button reference on overlay so we can clean it up
+      overlay._closeBtn = closeBtn;
+      this._testOverlay = overlay;
+
+      // Override remove to also pull the close button
+      const origRemove = overlay.remove.bind(overlay);
+      overlay.remove = () => { closeBtn.remove(); origRemove(); };
     }
 
     // ── Page Creator Modal ────────────────────────────────────────────────────
