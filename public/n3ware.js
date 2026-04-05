@@ -354,7 +354,7 @@
         `.n3-mob-dd-btn{background:transparent;border:none;color:${T.text};padding:10px 14px;border-radius:6px;cursor:pointer;font:13px/1 system-ui,sans-serif;text-align:left;width:100%;min-height:44px;display:flex;align-items:center;gap:8px;touch-action:manipulation}`,
         `.n3-mob-dd-btn:hover{background:rgba(255,255,255,.08)}`,
         `.n3-fab{position:fixed;bottom:24px;right:24px;z-index:999999;display:flex;flex-direction:column-reverse;align-items:center;gap:10px}`,
-        `.n3-fab-toggle{width:48px;height:48px;border-radius:50%;background:${T.accent};color:#fff;border:none;cursor:pointer;font:700 16px/1 system-ui,sans-serif;letter-spacing:-.5px;box-shadow:0 4px 24px rgba(59,130,246,.45);display:flex;align-items:center;justify-content:center;transition:all .25s cubic-bezier(.34,1.56,.64,1)}`,
+        `.n3-fab-toggle{width:48px;height:48px;border-radius:50%;background:${T.accent};color:#fff;border:none;cursor:pointer;font:700 16px/1 system-ui,sans-serif;letter-spacing:-.5px;box-shadow:0 4px 24px rgba(59,130,246,.45);display:flex;align-items:center;justify-content:center;transition:all .25s cubic-bezier(.34,1.56,.64,1);overflow:hidden;padding:0}`,
         `.n3-fab-toggle:hover{background:${T.accentDark};transform:scale(1.1)}`,
         `.n3-fab-toggle.n3-editing{background:#EF4444;box-shadow:0 4px 24px rgba(239,68,68,.5);transform:rotate(45deg)}`,
         `.n3-fab-actions{display:flex;flex-direction:column-reverse;align-items:center;gap:8px;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .2s}`,
@@ -963,10 +963,7 @@
 
       const toggle = document.createElement('button');
       toggle.className = 'n3-fab-toggle';
-      const _logoUrl = (window._n3wareModules && window._n3wareModules.n3LogoDataUrl) || '';
-      toggle.innerHTML = _logoUrl
-        ? `<img src="${_logoUrl}" style="width:26px;height:26px;filter:brightness(0) invert(1)" alt="n3ware" draggable="false">`
-        : 'n';
+      toggle.innerHTML = '<img src="https://brand.n3ware.com/n3ware-logo.png" style="width:100%;height:100%;object-fit:cover" alt="n3ware" draggable="false">';
       toggle.title = 'n3ware';
       toggle.addEventListener('click', () => {
         this._fabOpen = !this._fabOpen;
