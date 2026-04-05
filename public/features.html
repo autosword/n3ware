@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — n3ware</title>
+  <meta name="description" content="Pixel-perfect navigation, live theme editor, 34+ drop-in components, AI-powered customization, and more. Every tool a small business needs to own their website.">
+  <meta property="og:title" content="Features — n3ware">
+  <meta property="og:description" content="Every tool a small business needs to own their website — no dev required.">
+  <meta property="og:image" content="/features-assets/hero-fixed-nav.jpg">
+  <meta property="og:type" content="website">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            n3: {
+              red: '#E31337', dark: '#111111', darker: '#0A0A0A',
+              surface: '#1A1A1A', border: '#2A2A2A', text: '#E5E5E5', muted: '#888888'
+            },
+            brand: '#E31337'
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'Fira Code', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0A0A0A; }
+    .gradient-text {
+      background: linear-gradient(135deg, #E31337 0%, #FF4D6A 60%, #FF8096 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .feature-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* Mobile nav drawer */
+    #mobile-drawer {
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    #mobile-drawer.open {
+      transform: translateX(0);
+    }
+    #mobile-backdrop {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    #mobile-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body class="text-[#E5E5E5] overflow-x-hidden" style="background:#0A0A0A">
+
+  <!-- Fixed nav -->
+  <nav data-n3-primary-nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-lg border-b border-[#2A2A2A]/70">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <span class="font-black text-xl tracking-tight" style="color:#E31337">n3ware</span>
+        <span class="text-xs text-gray-500 bg-[#1A1A1A] px-2 py-0.5 rounded-full">v1.0</span>
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+        <a href="/features.html" class="text-white font-medium transition-colors">Features</a>
+        <a href="/#how-it-works" class="hover:text-white transition-colors">How It Works</a>
+        <a href="/#templates" class="hover:text-white transition-colors">Templates</a>
+        <a href="/components" class="hover:text-white transition-colors">Components</a>
+        <a href="/brand" class="hover:text-white transition-colors">Brand</a>
+        <a href="/dashboard" class="hover:text-white transition-colors">Get Started</a>
+        <a href="/demo.html" class="bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">Live Demo →</a>
+      </div>
+      <!-- Hamburger -->
+      <button id="hamburger" class="md:hidden flex items-center justify-center w-9 h-9 rounded hover:bg-[#1A1A1A] transition" aria-label="Open menu">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile backdrop -->
+  <div id="mobile-backdrop" class="fixed inset-0 z-40 bg-black/50 md:hidden"></div>
+
+  <!-- Mobile drawer -->
+  <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 z-50 w-72 bg-[#111111] border-l border-[#2A2A2A] flex flex-col md:hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-[#2A2A2A]">
+      <span class="font-bold text-sm">Menu</span>
+      <button id="drawer-close" class="flex items-center justify-center w-8 h-8 rounded hover:bg-[#1A1A1A] transition" aria-label="Close">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-3 flex flex-col">
+      <a href="/features.html" class="px-5 py-3 text-sm font-medium text-white border-b border-[#2A2A2A]">Features</a>
+      <a href="/#how-it-works" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">How It Works</a>
+      <a href="/#templates" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Templates</a>
+      <a href="/components" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Components</a>
+      <a href="/brand" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Brand</a>
+      <a href="/dashboard" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Get Started</a>
+      <div class="px-5 pt-4">
+        <a href="/demo.html" class="block w-full text-center bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">Live Demo →</a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Hero -->
+  <section class="pt-32 pb-16 px-6 text-center">
+    <div class="max-w-3xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-8">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#E31337] inline-block"></span>
+        7 features that ship with every site
+      </div>
+      <h1 class="text-5xl md:text-6xl font-black tracking-tight leading-[1.05] mb-6">
+        Everything you need to<br><span class="gradient-text">own your website.</span>
+      </h1>
+      <p class="text-lg text-gray-400 max-w-xl mx-auto leading-relaxed">
+        From a pixel-perfect nav to AI-generated content, n3ware gives small business owners a full editing suite — no developer, no page builder subscription, no compromise.
+      </p>
+    </div>
+  </section>
+
+  <!-- Feature rows -->
+  <div class="max-w-6xl mx-auto px-6 pb-8">
+
+    <!-- Divider -->
+    <div class="border-t border-[#2A2A2A] mb-24"></div>
+
+    <!-- 1: Fixed nav -->
+    <section class="py-16 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+      <div class="mb-10 md:mb-0">
+        <div class="text-[#E31337] text-6xl font-black leading-none mb-6">1</div>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+          Pixel-perfect navigation,<br>out of the box.
+        </h2>
+        <p class="text-gray-400 leading-relaxed text-base">
+          Every template ships with a fixed-on-scroll primary nav that's responsive by default. Backdrop blur, brand styling, hamburger drawer on mobile, and a structured-data editor so you never touch HTML to change a menu item.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Fixed on scroll</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Backdrop blur</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Mobile hamburger</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Zero HTML</span>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+        <img src="/features-assets/hero-fixed-nav.jpg" alt="Fixed responsive nav on a template site" class="feature-img">
+      </div>
+    </section>
+
+    <div class="border-t border-[#2A2A2A] mb-24"></div>
+
+    <!-- 2: Nav editor — image LEFT on desktop -->
+    <section class="py-16 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+      <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden order-2 md:order-1 mb-10 md:mb-0">
+        <img src="/features-assets/nav-editor.jpg" alt="Nav editor panel showing drag-to-reorder menu items" class="feature-img">
+      </div>
+      <div class="order-1 md:order-2">
+        <div class="text-[#E31337] text-6xl font-black leading-none mb-6">2</div>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+          Edit your menu like a form,<br>not like HTML.
+        </h2>
+        <p class="text-gray-400 leading-relaxed text-base">
+          Click your nav, open the Edit Nav panel, and drag-to-reorder menu items, swap labels, toggle a CTA button, upload a brand logo. Every change renders instantly to your live nav and persists to cloud storage.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Drag to reorder</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Logo upload</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">CTA toggle</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Live preview</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="border-t border-[#2A2A2A] mb-24"></div>
+
+    <!-- 3: Theme editor — two stacked images -->
+    <section class="py-16 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+      <div class="mb-10 md:mb-0">
+        <div class="text-[#E31337] text-6xl font-black leading-none mb-6">3</div>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+          Theme your whole site<br>from one panel.
+        </h2>
+        <p class="text-gray-400 leading-relaxed text-base">
+          Pick your primary, secondary, and accent colors. Upload a logo and favicon. Choose heading and body fonts from curated pairings. Tune H1 through body paragraph sizes with live sliders. Every site uses the same design tokens so typography stays consistent.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Color tokens</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Google Fonts</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Typography sliders</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Logo &amp; favicon</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-4">
+        <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+          <img src="/features-assets/theme-panel-top.jpg" alt="Theme panel showing color pickers and font selectors" class="feature-img">
+        </div>
+        <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+          <img src="/features-assets/theme-panel-sizes.jpg" alt="Theme panel showing typography size sliders" class="feature-img">
+        </div>
+      </div>
+    </section>
+
+    <div class="border-t border-[#2A2A2A] mb-24"></div>
+
+    <!-- 4: Component library — image LEFT -->
+    <section class="py-16 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+      <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden order-2 md:order-1 mb-10 md:mb-0">
+        <img src="/features-assets/component-picker.jpg" alt="Component picker panel showing 34 pre-built blocks" class="feature-img">
+      </div>
+      <div class="order-1 md:order-2">
+        <div class="text-[#E31337] text-6xl font-black leading-none mb-6">4</div>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+          34 drop-in components<br>for every SMB need.
+        </h2>
+        <p class="text-gray-400 leading-relaxed text-base">
+          Heroes, pricing, testimonials, contact, menu, services, team, gallery, FAQ, CTA, stats, and navigation blocks. Each one built with Tailwind, fully responsive, and ready to drop into any page. Pick one, place it, make it yours.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">34 blocks</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Tailwind-built</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Fully responsive</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Instant drop</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="border-t border-[#2A2A2A] mb-24"></div>
+
+    <!-- 5: Placement mode -->
+    <section class="py-16 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+      <div class="mb-10 md:mb-0">
+        <div class="text-[#E31337] text-6xl font-black leading-none mb-6">5</div>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+          Place components exactly<br>where you want them.
+        </h2>
+        <p class="text-gray-400 leading-relaxed text-base">
+          Click a component and your cursor becomes a preview badge. Drop zones light up between existing sections. Click once — the component lands precisely where you dropped it. Undo anytime.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Visual drop zones</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Preview badge</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Precise placement</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Undo / redo</span>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+        <img src="/features-assets/placement-mode.jpg" alt="Placement mode with lit-up drop zones between sections" class="feature-img">
+      </div>
+    </section>
+
+    <div class="border-t border-[#2A2A2A] mb-24"></div>
+
+    <!-- 6: AI customization — image LEFT -->
+    <section class="py-16 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+      <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden order-2 md:order-1 mb-10 md:mb-0">
+        <img src="/features-assets/customize-modal.jpg" alt="AI customization modal with a text prompt and image upload" class="feature-img">
+      </div>
+      <div class="order-1 md:order-2">
+        <div class="text-[#E31337] text-6xl font-black leading-none mb-6">6</div>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+          Tell Claude what you want.<br>Get it.
+        </h2>
+        <p class="text-gray-400 leading-relaxed text-base">
+          After dropping any component, a prompt window opens. Describe what it should say, upload reference images, hit Generate. Claude rewrites the content in-place — headline, subhead, CTAs, all on-brand — while preserving the layout. Skip if you prefer the default template.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Powered by Claude</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Image upload</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">On-brand rewrite</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Skippable</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="border-t border-[#2A2A2A] mb-24"></div>
+
+    <!-- 7: Sub-nav -->
+    <section class="py-16 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+      <div class="mb-10 md:mb-0">
+        <div class="text-[#E31337] text-6xl font-black leading-none mb-6">7</div>
+        <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+          Long-form pages get smart<br>sub-nav for free.
+        </h2>
+        <p class="text-gray-400 leading-relaxed text-base">
+          Services, about, portfolio, locations, FAQ, and menu templates ship with a sticky sub-nav that tracks the section you're reading via intersection observer. Swipeable on mobile. Zero configuration.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">IntersectionObserver</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Sticky scroll-spy</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Swipeable mobile</span>
+          <span class="text-xs bg-[#1A1A1A] border border-[#2A2A2A] px-3 py-1.5 rounded-full text-gray-400">Zero config</span>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+        <img src="/features-assets/sub-nav-component.jpg" alt="Scroll-spy sub-nav tracking active section on a long page" class="feature-img">
+      </div>
+    </section>
+
+    <div class="border-t border-[#2A2A2A] mb-16"></div>
+
+  </div>
+
+  <!-- CTA section -->
+  <section class="py-24 px-6 text-center" style="background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(227,19,55,0.12) 0%, transparent 70%)">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-4xl md:text-5xl font-black tracking-tight mb-6">
+        See it in action.
+      </h2>
+      <p class="text-gray-400 text-lg mb-10 leading-relaxed">
+        Every feature on this page is live in the editor right now. No sign-up needed to explore.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/demo.html" class="inline-flex items-center justify-center gap-2 bg-[#E31337] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors shadow-lg" style="box-shadow: 0 0 32px rgba(227,19,55,0.35)">
+          Try the live demo
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+        <a href="/dashboard" class="inline-flex items-center justify-center gap-2 bg-[#111111] hover:bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#444] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors">
+          Get started
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-[#2A2A2A] py-10 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <span class="font-black text-base" style="color:#E31337">n3ware</span>
+      <div class="flex items-center gap-6">
+        <a href="/features.html" class="hover:text-gray-300 transition-colors">Features</a>
+        <a href="/components" class="hover:text-gray-300 transition-colors">Components</a>
+        <a href="/brand" class="hover:text-gray-300 transition-colors">Brand</a>
+        <a href="/demo.html" class="hover:text-gray-300 transition-colors">Demo</a>
+      </div>
+      <span>© 2026 n3ware. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Init Lucide icons
+    lucide.createIcons();
+
+    // Mobile nav
+    const hamburger = document.getElementById('hamburger');
+    const drawer    = document.getElementById('mobile-drawer');
+    const backdrop  = document.getElementById('mobile-backdrop');
+    const closeBtn  = document.getElementById('drawer-close');
+
+    function openDrawer() {
+      drawer.classList.add('open');
+      backdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+      drawer.classList.remove('open');
+      backdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    hamburger.addEventListener('click', openDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setTimeout(closeDrawer, 150)));
+  </script>
+</body>
+</html>
