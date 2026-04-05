@@ -32,6 +32,7 @@ const componentCustomizeApi = require('./src/api/component-customize');
 const integrationsConfigApi = require('./src/api/integrations-config');
 const pagesApi              = require('./src/api/pages');
 const pageTemplatesApi      = require('./src/api/page-templates');
+const mediaApi              = require('./src/api/media');
 
 // Initialize integrations (logs mock-mode notices)
 require('./src/integrations');
@@ -96,6 +97,12 @@ app.use('/api/sites/:id', (req, res, next) => {
   req.params = { ...req.params, id: req.params.id };
   next();
 }, pagesApi);
+
+// ── Media manager (nested under sites) ───────────────────────────────────────
+app.use('/api/sites/:id/media', (req, res, next) => {
+  req.params = { ...req.params, id: req.params.id };
+  next();
+}, mediaApi);
 
 // ── Billing ───────────────────────────────────────────────────────────────────
 app.use('/api/billing', billingApi);

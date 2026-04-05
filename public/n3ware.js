@@ -79,6 +79,7 @@
     'n3ware-nav.js',
     'n3ware-sub-nav.js',
     'n3ware-image.js',
+    'n3ware-media.js',
   ];
 
   /**
@@ -651,7 +652,8 @@
         el.closest('.n3-script-ph')      ||
         el.closest('.n3-save-fab')       ||
         el.closest('.n3-theme-panel')    ||
-        el.closest('.n3-img-backdrop')
+        el.closest('.n3-img-backdrop')   ||
+        el.closest('.n3-media-backdrop')
       ));
     }
   }
@@ -807,6 +809,7 @@
 
       // Image replacement modal
       this.image = M.N3ImageEditor ? new M.N3ImageEditor(this.events, this._cloudCfg) : null;
+      this.media = M.N3MediaManager ? new M.N3MediaManager(this.events, this._cloudCfg) : null;
 
       this._fab     = null;
       this._fabOpen = false;
@@ -832,6 +835,7 @@
       if (this.nav)        this.nav.mount();
       if (this.subNav)     this.subNav.mount();
       if (this.image)      this.image.mount();
+      if (this.media)      this.media.mount();
       this._buildControlPanel();
       this._buildSaveBtn();
       this._wireEvents();
@@ -893,7 +897,7 @@
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
           analytics: this.analytics, components: this.components,
           scripts: this.scripts, theme: this.theme, nav: this.nav, subNav: this.subNav,
-          image: this.image,
+          image: this.image, media: this.media,
         },
       };
     }
@@ -946,10 +950,24 @@
         if (this.theme) { this.theme.toggle(); themeBtn.classList.toggle('n3-active', this.theme.isOpen()); }
       });
 
+      const mediaBtn = document.createElement('button');
+      mediaBtn.className = 'n3-fab-btn';
+      const _MM = window._n3wareModules && window._n3wareModules.N3MediaManager;
+      mediaBtn.innerHTML = (_MM && _MM.ICON)
+        ? _MM.ICON
+        : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+      mediaBtn.title = 'Media Manager';
+      mediaBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (this.media) { this.media.open(); }
+      });
+
       actions.appendChild(analyticsBtn);
       actions.appendChild(compBtn);
       actions.appendChild(themeBtn);
+      actions.appendChild(mediaBtn);
       this._themeFabBtn = themeBtn;
+      this._mediaFabBtn = mediaBtn;
 
       if (this._cloudCfg) {
         const PLUS = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
