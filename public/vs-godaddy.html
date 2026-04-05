@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="https://brand.n3ware.com/n3ware-logo.png">
+  <link rel="apple-touch-icon" href="https://brand.n3ware.com/n3ware-logo.png">
+  <title>n3ware vs GoDaddy — Actually modern. Actually yours.</title>
+  <meta name="description" content="GoDaddy Websites + Marketing locks you in with generic templates and mediocre SEO. n3ware works with any domain — including your GoDaddy one — and ships clean, fast HTML.">
+  <meta property="og:title" content="n3ware vs GoDaddy — Actually modern. Actually yours.">
+  <meta property="og:description" content="GoDaddy's website builder is a walled garden. n3ware is the modern alternative.">
+  <meta property="og:image" content="/features-assets/hero-fixed-nav.jpg">
+  <meta property="og:type" content="website">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            n3: { red: '#E31337', dark: '#111111', darker: '#0A0A0A', surface: '#1A1A1A', border: '#2A2A2A', text: '#E5E5E5', muted: '#888888' }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0A0A0A; }
+    .gradient-text { background: linear-gradient(135deg, #E31337 0%, #FF4D6A 60%, #FF8096 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .feature-img { width: 100%; height: auto; display: block; }
+    #mobile-drawer { transform: translateX(100%); transition: transform 0.3s ease; }
+    #mobile-drawer.open { transform: translateX(0); }
+    #mobile-backdrop { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    #mobile-backdrop.open { opacity: 1; pointer-events: auto; }
+    .check { color: #E31337; }
+    .cross { color: #888888; }
+    .partial { color: #F59E0B; }
+  </style>
+</head>
+<body class="text-[#E5E5E5] overflow-x-hidden">
+
+  <!-- Fixed nav -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-lg border-b border-[#2A2A2A]/70">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware" class="h-6">
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+        <a href="/features.html" class="hover:text-white transition-colors">Features</a>
+        <a href="/#templates" class="hover:text-white transition-colors">Templates</a>
+        <a href="/components" class="hover:text-white transition-colors">Components</a>
+        <a href="/brand" class="hover:text-white transition-colors">Brand</a>
+        <a href="/dashboard" class="hover:text-white transition-colors">Get Started</a>
+        <a href="/demo.html" class="bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">Live Demo →</a>
+      </div>
+      <button id="hamburger" class="md:hidden flex items-center justify-center w-9 h-9 rounded hover:bg-[#1A1A1A] transition" aria-label="Open menu">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-backdrop" class="fixed inset-0 z-40 bg-black/50 md:hidden"></div>
+  <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 z-50 w-72 bg-[#111111] border-l border-[#2A2A2A] flex flex-col md:hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-[#2A2A2A]">
+      <span class="font-bold text-sm">Menu</span>
+      <button id="drawer-close" class="flex items-center justify-center w-8 h-8 rounded hover:bg-[#1A1A1A] transition"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-3 flex flex-col">
+      <a href="/features.html" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Features</a>
+      <a href="/#templates" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Templates</a>
+      <a href="/components" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Components</a>
+      <a href="/brand" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Brand</a>
+      <a href="/dashboard" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Get Started</a>
+      <div class="px-5 pt-4">
+        <a href="/demo.html" class="block w-full text-center bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">Live Demo →</a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Hero -->
+  <section class="pt-32 pb-16 px-6 text-center" style="background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(227,19,55,0.08) 0%, transparent 60%)">
+    <div class="max-w-4xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-8">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#E31337] inline-block"></span>
+        n3ware vs GoDaddy
+      </div>
+      <h1 class="text-6xl md:text-8xl font-black tracking-tight leading-[0.95] mb-8">
+        Actually modern.<br><span class="gradient-text">Actually yours.</span>
+      </h1>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10">
+        GoDaddy Websites + Marketing is a walled garden bolted onto their registrar. You're locked in, the templates are generic, and the SEO is mediocre. n3ware works with any domain — point your GoDaddy domain at us, or buy a new one — and ships clean, fast, SEO-ready HTML.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/demo.html" class="inline-flex items-center justify-center gap-2 bg-[#E31337] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors" style="box-shadow: 0 0 32px rgba(227,19,55,0.35)">
+          Try the live demo →
+        </a>
+        <a href="/#templates" class="inline-flex items-center justify-center gap-2 bg-[#111111] hover:bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#444] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors">
+          Pick a template
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison table -->
+  <section class="py-16 px-6">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-3xl font-black tracking-tight text-center mb-12">Feature by feature</h2>
+      <div class="rounded-2xl border border-[#2A2A2A] overflow-hidden">
+        <div class="grid grid-cols-3 bg-[#1A1A1A] px-6 py-4 text-sm font-bold border-b border-[#2A2A2A]">
+          <span class="text-gray-400 col-span-1">Feature</span>
+          <span class="text-center" style="color:#E31337">n3ware</span>
+          <span class="text-center text-gray-400">GoDaddy</span>
+        </div>
+        <div class="divide-y divide-[#2A2A2A]">
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">Edit from your phone</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="minus" class="w-4 h-4 partial inline-block" title="Partial — GoDaddy has a mobile app with limited editor capabilities"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">AI-generated content per component</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="minus" class="w-4 h-4 partial inline-block" title="Partial — GoDaddy Airo offers AI site generation but not per-component AI editing"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">34+ drop-in component blocks</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="minus" class="w-4 h-4 partial inline-block" title="Partial — GoDaddy has section library but limited variety"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">Fixed responsive nav out of the box</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">Bring your own domain</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">Real Tailwind HTML you can export</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="x" class="w-4 h-4 cross inline-block"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">Theme tokens (colors, fonts, type scale)</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="minus" class="w-4 h-4 partial inline-block" title="Partial — basic color and font settings, no type scale sliders"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">Per-page sub-nav with scroll-spy</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="x" class="w-4 h-4 cross inline-block"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">Pricing</span>
+            <span class="text-center text-[#E31337] font-medium text-xs">Starter free · Pro at launch</span>
+            <span class="text-center text-gray-400 text-xs">From $11/mo</span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">SEO-ready static HTML on CDN</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="x" class="w-4 h-4 cross inline-block" title="GoDaddy's builder generates bloated JavaScript-heavy pages"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">Mobile-first editing</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="x" class="w-4 h-4 cross inline-block"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">No developer required</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-4 text-sm items-center">
+            <span class="text-gray-300">No web experience required</span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+            <span class="text-center"><i data-lucide="check" class="w-4 h-4 check inline-block"></i></span>
+          </div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-600 text-center mt-4">Competitor data based on publicly available pricing and feature documentation as of April 2026.</p>
+    </div>
+  </section>
+
+  <!-- Any domain callout -->
+  <section class="py-16 px-6">
+    <div class="max-w-4xl mx-auto">
+      <div class="rounded-2xl p-10 md:p-14" style="background:#E31337">
+        <div class="max-w-2xl">
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight text-white mb-4">Bring your own domain.<br>Or buy one from us.</h2>
+          <p class="text-white/80 leading-relaxed text-base mb-10">
+            Already have a domain from GoDaddy, Namecheap, Google, Cloudflare, or anywhere else? Just point it at n3ware — we'll handle the SSL, the CDN, and the fast serving. Don't have a domain yet? Buy one from us during onboarding at wholesale cost. Either way, your site is live in minutes, not days.
+          </p>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div class="bg-white/15 rounded-xl px-5 py-3 text-white font-semibold text-sm text-center">Your Domain</div>
+            <div class="flex items-center gap-2 text-white/60 text-sm">
+              <i data-lucide="arrow-right" class="w-4 h-4 hidden sm:block"></i>
+              <i data-lucide="arrow-down" class="w-4 h-4 sm:hidden"></i>
+            </div>
+            <div class="bg-white/15 rounded-xl px-5 py-3 text-white font-semibold text-sm text-center">n3ware CDN</div>
+            <div class="flex items-center gap-2 text-white/60 text-sm">
+              <i data-lucide="arrow-right" class="w-4 h-4 hidden sm:block"></i>
+              <i data-lucide="arrow-down" class="w-4 h-4 sm:hidden"></i>
+            </div>
+            <div class="bg-white rounded-xl px-5 py-3 font-bold text-sm text-center" style="color:#E31337">Your Site, Fast</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- No developer section -->
+  <section class="py-16 px-6">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-6">You don't need to be technical.</h2>
+      <p class="text-gray-400 leading-relaxed text-base mb-4">Most website builders say this. Most website builders lie. n3ware actually means it.</p>
+      <p class="text-gray-400 leading-relaxed text-base mb-12">
+        Anyone can launch a beautiful, fast, mobile-responsive website on n3ware <strong class="text-white">from their phone</strong>. No desktop required. No developer required. No web experience. No HTML, no CSS, no JavaScript, no Figma, no hosting setup. Click a template, drop components, describe what you want each section to say, and ship. Your site is indexed by Google within hours, loads in under a second on any device, and works for your business from day one.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="smartphone" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">Edit from your phone</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Full editing suite works on any device. No desktop, no app install needed.</p>
+        </div>
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="zap" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">Launch in minutes</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Pick a template, customize it, point your domain, go live. No setup wizard, no waiting.</p>
+        </div>
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="trending-up" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">Ranks on Google</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Static HTML assembled at the edge. Fast load times, clean markup, indexed within hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature spotlights: GoDaddy — fixed nav, placement mode, theme panel -->
+  <section class="py-8 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="border-t border-[#2A2A2A] mb-16"></div>
+
+      <div class="py-12 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+        <div class="mb-10 md:mb-0">
+          <div class="text-[#E31337] text-6xl font-black leading-none mb-6">01</div>
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+            A nav that looks like 2026, not 2014.
+          </h2>
+          <p class="text-gray-400 leading-relaxed">GoDaddy's website builder ships basic navigation that looks like every other GoDaddy site. n3ware ships a fixed, backdrop-blurred primary nav on every template — responsive out of the box, with a CTA button and mobile hamburger drawer built in.</p>
+        </div>
+        <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+          <img src="/features-assets/hero-fixed-nav.jpg" alt="Fixed responsive nav on a modern template" class="feature-img">
+        </div>
+      </div>
+
+      <div class="border-t border-[#2A2A2A] mb-16"></div>
+
+      <div class="py-12 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+        <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden order-2 md:order-1 mb-10 md:mb-0">
+          <img src="/features-assets/placement-mode.jpg" alt="Placement mode for precise section positioning" class="feature-img">
+        </div>
+        <div class="order-1 md:order-2">
+          <div class="text-[#E31337] text-6xl font-black leading-none mb-6">02</div>
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+            Your layout. Not GoDaddy's.
+          </h2>
+          <p class="text-gray-400 leading-relaxed">GoDaddy's builder gives you a fixed grid with limited flexibility. n3ware's placement mode lets you drop any component between any two sections exactly where you want it — no grid, no columns, no fighting the template.</p>
+        </div>
+      </div>
+
+      <div class="border-t border-[#2A2A2A] mb-16"></div>
+
+      <div class="py-12 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+        <div class="mb-10 md:mb-0">
+          <div class="text-[#E31337] text-6xl font-black leading-none mb-6">03</div>
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+            One panel to rule your entire brand.
+          </h2>
+          <p class="text-gray-400 leading-relaxed">GoDaddy's styling options are basic — swap a color, pick a font, and that's about it. n3ware's theme panel gives you color tokens, curated Google Font pairings, and per-heading type scale sliders so every page looks intentional, not like a stock template.</p>
+        </div>
+        <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+          <img src="/features-assets/theme-panel-top.jpg" alt="Theme panel with colors, fonts, and type scale" class="feature-img">
+        </div>
+      </div>
+
+      <div class="border-t border-[#2A2A2A] mb-8"></div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="py-24 px-6 text-center" style="background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(227,19,55,0.12) 0%, transparent 70%)">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-4xl md:text-5xl font-black tracking-tight mb-6">Ready to switch from GoDaddy?</h2>
+      <p class="text-gray-400 text-lg mb-10 leading-relaxed">Keep your GoDaddy domain. Just point it at n3ware and go live in minutes.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/dashboard" class="inline-flex items-center justify-center gap-2 bg-[#E31337] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors" style="box-shadow: 0 0 32px rgba(227,19,55,0.35)">
+          Start for free — keep your domain
+        </a>
+        <a href="/demo.html" class="inline-flex items-center justify-center gap-2 bg-[#111111] hover:bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#444] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors">
+          View a live demo
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-[#2A2A2A] py-10 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <span class="font-black text-base" style="color:#E31337">n3ware</span>
+      <div class="flex items-center gap-6">
+        <a href="/features.html" class="hover:text-gray-300 transition-colors">Features</a>
+        <a href="/components" class="hover:text-gray-300 transition-colors">Components</a>
+        <a href="/brand" class="hover:text-gray-300 transition-colors">Brand</a>
+        <a href="/demo.html" class="hover:text-gray-300 transition-colors">Demo</a>
+      </div>
+      <span>© 2026 n3ware. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    const hamburger = document.getElementById('hamburger');
+    const drawer = document.getElementById('mobile-drawer');
+    const backdrop = document.getElementById('mobile-backdrop');
+    const closeBtn = document.getElementById('drawer-close');
+    function openDrawer() { drawer.classList.add('open'); backdrop.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeDrawer() { drawer.classList.remove('open'); backdrop.classList.remove('open'); document.body.style.overflow = ''; }
+    hamburger.addEventListener('click', openDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setTimeout(closeDrawer, 150)));
+  </script>
+</body>
+</html>
