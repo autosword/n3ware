@@ -653,7 +653,8 @@
         el.closest('.n3-save-fab')       ||
         el.closest('.n3-theme-panel')    ||
         el.closest('.n3-img-backdrop')   ||
-        el.closest('.n3-media-backdrop')
+        el.closest('.n3-media-backdrop') ||
+        el.closest('.n3-preview-popover')
       ));
     }
   }
@@ -811,9 +812,11 @@
       this.image = M.N3ImageEditor ? new M.N3ImageEditor(this.events, this._cloudCfg) : null;
       this.media = M.N3MediaManager ? new M.N3MediaManager(this.events, this._cloudCfg) : null;
 
-      this._fab     = null;
-      this._fabOpen = false;
-      this._onKeyDown = this._handleKeyDown.bind(this);
+      this._fab          = null;
+      this._fabOpen      = false;
+      this._previewMode  = localStorage.getItem('n3_preview_mode') || 'none';
+      this._previewPopover = null;
+      this._onKeyDown    = this._handleKeyDown.bind(this);
 
       // v2: dirty tracking for GCS file saves
       this._dirty = { pages: new Set(), components: new Set() };
@@ -826,6 +829,30 @@
      */
     init() {
       N3UI.injectStyles();
+      if (!document.getElementById('n3-preview-style')) {
+        const ps = document.createElement('style');
+        ps.id = 'n3-preview-style';
+        ps.textContent = [
+          'body.n3-preview-mobile,body.n3-preview-tablet,body.n3-preview-desktop-sm,body.n3-preview-desktop-wide{margin:0 auto!important;transition:max-width .3s ease,box-shadow .3s ease!important}',
+          'body.n3-preview-mobile{max-width:390px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.45)!important}',
+          'body.n3-preview-tablet{max-width:768px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.45)!important}',
+          'body.n3-preview-desktop-sm{max-width:1024px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.45)!important}',
+          'body.n3-preview-desktop-wide{max-width:1440px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.45)!important}',
+          'body.n3-preview-mobile nav[data-n3-primary-nav]{max-width:390px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}',
+          'body.n3-preview-tablet nav[data-n3-primary-nav]{max-width:768px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}',
+          'body.n3-preview-desktop-sm nav[data-n3-primary-nav]{max-width:1024px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}',
+          'body.n3-preview-desktop-wide nav[data-n3-primary-nav]{max-width:1440px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}',
+          '.n3-preview-popover{position:fixed;right:80px;bottom:72px;background:#111111;border:1px solid #2A2A2A;border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:4px;box-shadow:0 4px 24px rgba(0,0,0,.5);z-index:999999;opacity:0;pointer-events:none;transform:translateX(8px);transition:opacity .15s,transform .15s}',
+          '.n3-preview-popover.n3-open{opacity:1;pointer-events:all;transform:none}',
+          '.n3-preview-opt{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;background:transparent;border:none;color:#E5E5E5;cursor:pointer;font-size:13px;font-weight:500;white-space:nowrap;width:100%;text-align:left;transition:background .12s}',
+          '.n3-preview-opt:hover{background:rgba(255,255,255,.08)}',
+          '.n3-preview-opt.n3-active{background:#E31337;color:#fff}',
+          '.n3-preview-opt .n3-preview-width{margin-left:auto;color:#888;font-size:11px;padding-left:12px}',
+          '.n3-preview-opt.n3-active .n3-preview-width{color:rgba(255,255,255,.6)}',
+        ].join('');
+        document.head.appendChild(ps);
+      }
+      if (this._previewMode !== 'none') this._setPreviewMode(this._previewMode);
       if (this.toolbar)    this.toolbar.mount();
       if (this.panel)      this.panel.mount();
       if (this.revPanel)   this.revPanel.mount();
@@ -905,10 +932,14 @@
     // ── Private ──────────────────────────────────────────────────────────────
 
     _buildControlPanel() {
-      const PENCIL  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-      const CHART   = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>`;
-      const GRID    = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`;
-      const PALETTE = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`;
+      const PENCIL   = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+      const CHART    = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>`;
+      const GRID     = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`;
+      const PALETTE  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`;
+      const MONITOR  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`;
+      const PHONE    = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`;
+      const TABLET   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`;
+      const MAXIMIZE = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
 
       this._fab = document.createElement('div');
       this._fab.className = 'n3-fab';
@@ -981,11 +1012,68 @@
         this._pageFabBtn = pageBtn;
       }
 
+      // ── Preview pill + popover ─────────────────────────────────────────────
+      const previewBtn = document.createElement('button');
+      previewBtn.className = 'n3-fab-btn' + (this._previewMode !== 'none' ? ' n3-active' : '');
+      previewBtn.innerHTML = MONITOR + '<span>Preview</span>';
+      previewBtn.title = 'Viewport preview';
+      this._previewFabBtn = previewBtn;
+
+      const EXTLINK = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+
+      const PREVIEW_OPTS = [
+        { mode: 'mobile',        label: 'Mobile',        icon: PHONE,    width: '390px'  },
+        { mode: 'tablet',        label: 'Tablet',        icon: TABLET,   width: '768px'  },
+        { mode: 'desktop-sm',   label: 'Small Desktop', icon: MONITOR,  width: '1024px' },
+        { mode: 'desktop-wide', label: 'Wide Desktop',  icon: MONITOR,  width: '1440px' },
+        { mode: 'none',         label: 'Full Width',    icon: MAXIMIZE,  width: 'auto'   },
+      ];
+
+      const previewPopover = document.createElement('div');
+      previewPopover.className = 'n3-preview-popover';
+      PREVIEW_OPTS.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'n3-preview-opt' + (this._previewMode === opt.mode ? ' n3-active' : '');
+        btn.dataset.mode = opt.mode;
+        btn.innerHTML = opt.icon + `<span>${opt.label}</span><span class="n3-preview-width">${opt.width}</span>`;
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          this._setPreviewMode(opt.mode);
+        });
+        previewPopover.appendChild(btn);
+      });
+
+      // Divider + "Open in new tab" action
+      const divider = document.createElement('div');
+      divider.style.cssText = 'height:1px;background:#2A2A2A;margin:4px 4px';
+      previewPopover.appendChild(divider);
+      const openTabBtn = document.createElement('button');
+      openTabBtn.className = 'n3-preview-opt';
+      openTabBtn.innerHTML = EXTLINK + '<span>Open in new tab</span>';
+      openTabBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        const clean = window.location.origin + window.location.pathname;
+        window.open(clean, '_blank', 'noopener');
+        previewPopover.classList.remove('n3-open');
+        previewBtn.classList.toggle('n3-active', this._previewMode !== 'none');
+      });
+      previewPopover.appendChild(openTabBtn);
+
+      document.body.appendChild(previewPopover);
+      this._previewPopover = previewPopover;
+
+      previewBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        const open = previewPopover.classList.toggle('n3-open');
+        previewBtn.classList.toggle('n3-active', open || this._previewMode !== 'none');
+      });
+
+      actions.appendChild(previewBtn);
       actions.appendChild(editBtn);
       this._editFabBtn      = editBtn;
       this._analyticsFabBtn = analyticsBtn;
       this._compFabBtn      = compBtn;
-      // this._themeFabBtn already set above
+      // this._themeFabBtn / _mediaFabBtn already set above
 
       const toggle = document.createElement('button');
       toggle.className = 'n3-fab-toggle';
@@ -994,6 +1082,7 @@
       toggle.addEventListener('click', () => {
         this._fabOpen = !this._fabOpen;
         this._fab.classList.toggle('n3-expanded', this._fabOpen);
+        if (!this._fabOpen && this._previewPopover) this._previewPopover.classList.remove('n3-open');
       });
 
       this._fab.appendChild(actions);
@@ -1006,6 +1095,22 @@
       this._editFabBtn.classList.toggle('n3-editing', on);
       const toggle = this._fab && this._fab.querySelector('.n3-fab-toggle');
       if (toggle) toggle.classList.toggle('n3-editing', on);
+    }
+
+    _setPreviewMode(mode) {
+      const ALL = ['n3-preview-mobile','n3-preview-tablet','n3-preview-desktop-sm','n3-preview-desktop-wide'];
+      document.body.classList.remove(...ALL);
+      if (mode !== 'none') document.body.classList.add(`n3-preview-${mode}`);
+      this._previewMode = mode;
+      try { localStorage.setItem('n3_preview_mode', mode); } catch (_) {}
+      if (this._previewPopover) {
+        this._previewPopover.querySelectorAll('.n3-preview-opt').forEach(btn => {
+          btn.classList.toggle('n3-active', btn.dataset.mode === mode);
+        });
+      }
+      if (this._previewFabBtn) {
+        this._previewFabBtn.classList.toggle('n3-active', mode !== 'none');
+      }
     }
 
     // ── Page Creator Modal ────────────────────────────────────────────────────
