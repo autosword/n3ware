@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="https://brand.n3ware.com/n3ware-logo.png">
+  <link rel="apple-touch-icon" href="https://brand.n3ware.com/n3ware-logo.png">
   <title>Brand Guidelines — n3ware</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -58,7 +60,7 @@
   <nav class="fixed top-0 left-0 right-0 z-50 bg-n3-dark border-b border-n3-border">
     <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <img src="/images/n3ware-logo-white.png" onerror="this.style.display='none'" alt="n3ware" class="h-8">
+        <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware" class="h-8">
         <span class="font-grotesk font-bold text-xl" style="color:#E31337">n3ware</span>
         <span class="text-xs text-n3-muted bg-n3-surface px-2 py-0.5 rounded-full ml-1 border border-n3-border">Brand</span>
       </div>
@@ -88,9 +90,7 @@
     <div class="max-w-5xl mx-auto px-6 py-28 flex flex-col items-center text-center relative">
       <!-- Logo wordmark display -->
       <div class="mb-10">
-        <div class="inline-flex items-center gap-0 bg-n3-red px-8 py-5 rounded-xl shadow-2xl" style="box-shadow: 0 0 60px rgba(227,24,55,0.25)">
-          <span class="font-grotesk font-black text-5xl text-white tracking-tight">n3</span><span class="font-grotesk font-black text-5xl text-white/80 tracking-tight">ware</span>
-        </div>
+        <img src="https://brand.n3ware.com/n3ware-logo-color.png" alt="n3ware" class="h-16 mx-auto" style="filter:drop-shadow(0 0 40px rgba(227,24,55,0.3))">
       </div>
       <h1 class="font-grotesk font-black text-4xl md:text-5xl text-white mb-4 tracking-tight">Brand Guidelines</h1>
       <p class="text-n3-muted text-lg max-w-xl leading-relaxed">The official visual identity for n3ware — the visual web editor for local business.</p>
@@ -119,69 +119,66 @@
         <p class="text-n3-muted mt-2 text-sm max-w-xl">The n3ware wordmark is built for bold, angular environments. Always use the approved variants below — never modify or reconstruct the logo.</p>
       </div>
 
-      <!-- 2x2 Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 scroll-reveal">
+      <!-- 5-variant Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12 scroll-reveal">
 
-        <!-- Card 1: Primary on Red -->
-        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
-          <div class="bg-[#E31337] flex items-center justify-center h-40 relative">
-            <img src="/images/n3ware-logo-white.png" alt="n3ware logo white" data-logo class="max-h-14 hidden" id="logo-white">
-            <div class="inline-flex items-center" id="fallback-white">
-              <span class="font-mono font-bold text-3xl text-white tracking-tight">n3</span><span class="font-mono font-bold text-3xl text-white/80 tracking-tight">ware</span>
-            </div>
+        <!-- Card 1: Square mark -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden sm:col-span-2 lg:col-span-1">
+          <div class="bg-[#E31337] flex items-center justify-center h-48">
+            <img src="https://brand.n3ware.com/n3ware-logo.png" alt="n3ware square mark" class="h-28 w-28 object-contain">
           </div>
           <div class="px-5 py-4">
-            <p class="font-grotesk font-semibold text-white text-sm">Primary — On Red</p>
-            <p class="text-n3-muted text-xs mt-1">White wordmark on n3 Red. The primary logo configuration for most use cases.</p>
-            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">#E31337 bg · #FFFFFF mark</span>
+            <p class="font-grotesk font-semibold text-white text-sm">Square mark</p>
+            <p class="text-n3-muted text-xs mt-1">Favicon, FAB icon, app icons. 256×256 PNG.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">n3ware-logo.png · 4.4 KB</span>
           </div>
         </div>
 
-        <!-- Card 2: On Black -->
+        <!-- Card 2: Color wordmark -->
         <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
-          <div class="bg-[#0A0A0A] flex items-center justify-center h-40 relative">
-            <img src="/images/n3ware-logo-red.png" alt="n3ware logo red" data-logo class="max-h-14 hidden" id="logo-red">
-            <div class="inline-flex items-center" id="fallback-red">
-              <span class="font-mono font-bold text-3xl tracking-tight" style="color:#E31337">n3</span><span class="font-mono font-bold text-3xl text-white/80 tracking-tight">ware</span>
-            </div>
+          <div class="bg-white flex items-center justify-center h-48 px-8">
+            <img src="https://brand.n3ware.com/n3ware-logo-color.png" alt="n3ware color wordmark" class="max-h-14 max-w-full object-contain">
           </div>
           <div class="px-5 py-4">
-            <p class="font-grotesk font-semibold text-white text-sm">On Black</p>
-            <p class="text-n3-muted text-xs mt-1">Red &amp; white wordmark on near-black. Ideal for product UI, dashboards, and dark contexts.</p>
-            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">#0A0A0A bg · #E31337 + #FFF mark</span>
+            <p class="font-grotesk font-semibold text-white text-sm">Color wordmark</p>
+            <p class="text-n3-muted text-xs mt-1">Primary wordmark — marketing, docs, light backgrounds.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">n3ware-logo-color.png · 15 KB</span>
           </div>
         </div>
 
-        <!-- Card 3: On White / Light -->
+        <!-- Card 3: Red transparent -->
         <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
-          <div class="bg-white flex items-center justify-center h-40 relative">
-            <img src="/images/n3ware-logo-black.png" alt="n3ware logo black" data-logo class="max-h-14 hidden" id="logo-black">
-            <div class="inline-flex items-center" id="fallback-black">
-              <span class="font-mono font-bold text-3xl tracking-tight" style="color:#E31337">n3</span><span class="font-mono font-bold text-3xl text-black/80 tracking-tight">ware</span>
-            </div>
+          <div class="bg-white flex items-center justify-center h-48 px-8">
+            <img src="https://brand.n3ware.com/n3ware-logo-transparent-red.png" alt="n3ware red wordmark" class="max-h-14 max-w-full object-contain">
           </div>
           <div class="px-5 py-4">
-            <p class="font-grotesk font-semibold text-white text-sm">On White / Light</p>
-            <p class="text-n3-muted text-xs mt-1">Red &amp; dark wordmark for light backgrounds — print, invoices, white-label documents.</p>
-            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">#FFFFFF bg · #E31337 + #000 mark</span>
+            <p class="font-grotesk font-semibold text-white text-sm">Red on transparent</p>
+            <p class="text-n3-muted text-xs mt-1">Overlays on light/mid backgrounds.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">n3ware-logo-transparent-red.png · 15 KB</span>
           </div>
         </div>
 
-        <!-- Card 4: Alternate on Dark Surface -->
+        <!-- Card 4: Black transparent -->
         <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
-          <div class="bg-[#1A1A1A] flex items-center justify-center h-40 relative border-b border-n3-border">
-            <img src="/images/n3ware-logo-red2.png" alt="n3ware logo alternate" data-logo class="max-h-14 hidden" id="logo-red2">
-            <div class="inline-flex items-center gap-2" id="fallback-red2">
-              <div style="width:28px;height:28px;background:#E31337;border-radius:5px;display:flex;align-items:center;justify-content:center;">
-                <span class="font-mono font-bold text-white text-sm">3</span>
-              </div>
-              <span class="font-grotesk font-black text-2xl text-white tracking-tight">n3ware</span>
-            </div>
+          <div class="bg-white flex items-center justify-center h-48 px-8">
+            <img src="https://brand.n3ware.com/n3ware-logo-black-transparent.png" alt="n3ware black wordmark" class="max-h-14 max-w-full object-contain">
           </div>
           <div class="px-5 py-4">
-            <p class="font-grotesk font-semibold text-white text-sm">Alternate — Icon + Wordmark</p>
-            <p class="text-n3-muted text-xs mt-1">Badge icon paired with full wordmark. Use in compact horizontal layouts.</p>
-            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">#1A1A1A bg · icon + mark</span>
+            <p class="font-grotesk font-semibold text-white text-sm">Black on transparent</p>
+            <p class="text-n3-muted text-xs mt-1">Print, light backgrounds.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">n3ware-logo-black-transparent.png · 13 KB</span>
+          </div>
+        </div>
+
+        <!-- Card 5: White transparent -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden">
+          <div class="bg-[#111111] flex items-center justify-center h-48 px-8 border-b border-n3-border">
+            <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware white wordmark" class="max-h-14 max-w-full object-contain">
+          </div>
+          <div class="px-5 py-4">
+            <p class="font-grotesk font-semibold text-white text-sm">White on transparent</p>
+            <p class="text-n3-muted text-xs mt-1">Dark backgrounds, photos.</p>
+            <span class="inline-block mt-2 text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">n3ware-logo-white-transparent.png · 15 KB</span>
           </div>
         </div>
 
@@ -656,91 +653,99 @@
         <p class="text-n3-muted mt-2 text-sm max-w-xl">Official logo files for all contexts. Always use the asset that matches your background — never adapt one variant for an unapproved use.</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 scroll-reveal">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 scroll-reveal">
 
-        <!-- Asset 1: n3ware-logo-red.png -->
+        <!-- Asset 1: Square mark -->
         <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
-          <div class="bg-[#0A0A0A] h-28 flex items-center justify-center">
-            <div class="inline-flex items-center">
-              <span class="font-mono font-bold text-xl tracking-tight" style="color:#E31337">n3</span><span class="font-mono font-bold text-xl text-white/80 tracking-tight">ware</span>
-            </div>
+          <div class="bg-[#E31337] h-28 flex items-center justify-center">
+            <img src="https://brand.n3ware.com/n3ware-logo.png" alt="n3ware square mark" class="h-16 w-16 object-contain">
           </div>
           <div class="p-5 flex flex-col flex-1">
-            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-red</p>
-            <p class="text-n3-muted text-xs mb-1">For dark backgrounds</p>
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo</p>
+            <p class="text-n3-muted text-xs mb-1">Square mark — favicon, FAB, app icons</p>
             <div class="flex gap-2 mt-1 mb-4">
               <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
-              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">SVG</span>
-              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">~12 KB</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">256×256</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">4.4 KB</span>
             </div>
             <div class="mt-auto">
-              <a href="/images/n3ware-logo-red.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+              <a href="https://brand.n3ware.com/n3ware-logo.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
             </div>
           </div>
         </div>
 
-        <!-- Asset 2: n3ware-logo-black.png -->
+        <!-- Asset 2: Color wordmark -->
         <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
-          <div class="bg-white h-28 flex items-center justify-center">
-            <div class="inline-flex items-center">
-              <span class="font-mono font-bold text-xl tracking-tight" style="color:#E31337">n3</span><span class="font-mono font-bold text-xl text-black/80 tracking-tight">ware</span>
-            </div>
+          <div class="bg-white h-28 flex items-center justify-center px-6">
+            <img src="https://brand.n3ware.com/n3ware-logo-color.png" alt="n3ware color wordmark" class="max-h-10 max-w-full object-contain">
           </div>
           <div class="p-5 flex flex-col flex-1">
-            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-black</p>
-            <p class="text-n3-muted text-xs mb-1">For light backgrounds</p>
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-color</p>
+            <p class="text-n3-muted text-xs mb-1">Primary wordmark — marketing, docs, light backgrounds</p>
             <div class="flex gap-2 mt-1 mb-4">
               <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
-              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">SVG</span>
-              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">~12 KB</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">1200×271</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">15 KB</span>
             </div>
             <div class="mt-auto">
-              <a href="/images/n3ware-logo-black.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+              <a href="https://brand.n3ware.com/n3ware-logo-color.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
             </div>
           </div>
         </div>
 
-        <!-- Asset 3: n3ware-logo-white.png -->
+        <!-- Asset 3: Red transparent -->
         <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
-          <div class="h-28 flex items-center justify-center" style="background:#E31337">
-            <div class="inline-flex items-center">
-              <span class="font-mono font-bold text-xl text-white tracking-tight">n3</span><span class="font-mono font-bold text-xl text-white/80 tracking-tight">ware</span>
-            </div>
+          <div class="bg-white h-28 flex items-center justify-center px-6">
+            <img src="https://brand.n3ware.com/n3ware-logo-transparent-red.png" alt="n3ware red wordmark" class="max-h-10 max-w-full object-contain">
           </div>
           <div class="p-5 flex flex-col flex-1">
-            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-white</p>
-            <p class="text-n3-muted text-xs mb-1">For red backgrounds</p>
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-transparent-red</p>
+            <p class="text-n3-muted text-xs mb-1">Red on transparent — overlays on light/mid bg</p>
             <div class="flex gap-2 mt-1 mb-4">
               <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
-              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">SVG</span>
-              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">~12 KB</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">1200×271</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">15 KB</span>
             </div>
             <div class="mt-auto">
-              <a href="/images/n3ware-logo-white.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+              <a href="https://brand.n3ware.com/n3ware-logo-transparent-red.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
             </div>
           </div>
         </div>
 
-        <!-- Asset 4: n3ware-logo-red2.png -->
+        <!-- Asset 4: Black transparent -->
         <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
-          <div class="bg-[#1A1A1A] h-28 flex items-center justify-center border-b border-n3-border">
-            <div class="inline-flex items-center gap-2">
-              <div style="width:24px;height:24px;background:#E31337;border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                <span class="font-mono font-bold text-white text-xs">3</span>
-              </div>
-              <span class="font-grotesk font-black text-xl text-white tracking-tight">n3ware</span>
-            </div>
+          <div class="bg-white h-28 flex items-center justify-center px-6">
+            <img src="https://brand.n3ware.com/n3ware-logo-black-transparent.png" alt="n3ware black wordmark" class="max-h-10 max-w-full object-contain">
           </div>
           <div class="p-5 flex flex-col flex-1">
-            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-red2</p>
-            <p class="text-n3-muted text-xs mb-1">Icon + wordmark lockup</p>
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-black-transparent</p>
+            <p class="text-n3-muted text-xs mb-1">Black on transparent — print, light bg</p>
             <div class="flex gap-2 mt-1 mb-4">
               <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
-              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">SVG</span>
-              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">~14 KB</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">1200×271</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">13 KB</span>
             </div>
             <div class="mt-auto">
-              <a href="/images/n3ware-logo-red2.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+              <a href="https://brand.n3ware.com/n3ware-logo-black-transparent.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asset 5: White transparent -->
+        <div class="bg-n3-surface border border-n3-border rounded-2xl overflow-hidden flex flex-col group hover:border-n3-red/50 transition-colors">
+          <div class="bg-[#111111] h-28 flex items-center justify-center px-6 border-b border-n3-border">
+            <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware white wordmark" class="max-h-10 max-w-full object-contain">
+          </div>
+          <div class="p-5 flex flex-col flex-1">
+            <p class="font-grotesk font-semibold text-white text-sm mb-1">n3ware-logo-white-transparent</p>
+            <p class="text-n3-muted text-xs mb-1">White on transparent — dark bg, photos</p>
+            <div class="flex gap-2 mt-1 mb-4">
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">PNG</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">1200×271</span>
+              <span class="text-xs font-mono bg-n3-dark border border-n3-border px-2 py-0.5 rounded text-n3-muted">15 KB</span>
+            </div>
+            <div class="mt-auto">
+              <a href="https://brand.n3ware.com/n3ware-logo-white-transparent.png" download class="block w-full text-center text-xs font-grotesk font-semibold bg-n3-red text-white rounded-lg px-4 py-2.5 hover:bg-red-700 transition-colors">Download PNG</a>
             </div>
           </div>
         </div>
