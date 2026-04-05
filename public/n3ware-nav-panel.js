@@ -16,15 +16,17 @@
     const style = document.createElement('style');
     style.id = 'n3-nav-panel-css';
     style.textContent = [
-      '.n3-nav-panel{position:fixed;top:0;right:0;bottom:0;width:300px;z-index:99999;',
+      '.n3-nav-panel{position:fixed;top:0;right:0;left:auto;bottom:0;width:300px;z-index:99999;',
       'background:#111111;border-left:1px solid #2A2A2A;display:flex;flex-direction:column;',
       'transform:translateX(110%);transition:transform 0.3s ease;',
       'font-family:system-ui,-apple-system,sans-serif;font-size:13px;color:#E5E5E5;',
       'box-shadow:-4px 0 24px rgba(0,0,0,.5);}',
 
-      '.n3-nav-open{transform:translateX(0) !important;}',
+      '.n3-nav-panel.n3-nav-open{transform:translateX(0);}',
 
-      '.n3-nav-panel h3{font-size:11px;font-weight:600;letter-spacing:.08em;',
+      '@media (max-width:640px){.n3-nav-panel{width:100vw;max-width:360px;}}',
+
+      '.n3-nav-panel h3{font-size:11px !important;font-weight:600;letter-spacing:.08em;',
       'text-transform:uppercase;color:#888888;margin:0 0 10px;}',
 
       '.n3-nav-header{display:flex;align-items:center;justify-content:space-between;',
