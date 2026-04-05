@@ -164,7 +164,7 @@
      */
     constructor(events, cloudCfg) {
       this._events       = events;
-      this._apiBase      = cloudCfg ? cloudCfg.api : '';
+      this._apiBase      = cloudCfg ? cloudCfg.api.replace(/\/$/, '') : '/api';
       this._el           = null;
       this._open         = false;
       this._components   = [];
