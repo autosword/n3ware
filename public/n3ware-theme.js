@@ -122,11 +122,11 @@
       // Force the browser to commit the closed (translateX(-100%)) state before
       // adding the open class, so the transition actually fires on first call.
       this._panel.classList.remove('n3-theme-open');
-      void this._panel.offsetHeight; // reflow
-      requestAnimationFrame(() => {
+      void this._panel.offsetHeight; // reflow — commits closed state
+      setTimeout(() => {
         this._panel.classList.add('n3-theme-open');
         this._open = true;
-      });
+      }, 0);
     }
 
     close() {

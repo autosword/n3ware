@@ -252,12 +252,12 @@
       if (!this._el) return;
       // Force browser to commit closed state before adding open class so transition fires on first call.
       this._el.classList.remove('n3-comp-open');
-      void this._el.offsetHeight; // reflow
-      requestAnimationFrame(() => {
+      void this._el.offsetHeight; // reflow — commits closed state
+      setTimeout(() => {
         this._el.classList.add('n3-comp-open');
         this._open = true;
         if (!this._loaded) this._load();
-      });
+      }, 0);
     }
 
     /** Close the component panel. */
