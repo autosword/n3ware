@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="https://brand.n3ware.com/n3ware-logo.png">
+  <link rel="apple-touch-icon" href="https://brand.n3ware.com/n3ware-logo.png">
+  <title>n3ware vs Your Agency — Stop paying $200/mo for a website you can edit yourself</title>
+  <meta name="description" content="Save hundreds to thousands a year. Built by web veterans with 30 years of experience, usable from your phone, better than anything your agency is billing you for.">
+  <meta property="og:title" content="n3ware vs Your Agency — Stop paying $200/mo for a website you can edit yourself">
+  <meta property="og:description" content="The average small business pays an agency $400/mo to maintain a site they update twice a year. Stop renting. Own it.">
+  <meta property="og:image" content="/features-assets/placement-mode.jpg">
+  <meta property="og:type" content="website">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            n3: { red: '#E31337', dark: '#111111', darker: '#0A0A0A', surface: '#1A1A1A', border: '#2A2A2A', text: '#E5E5E5', muted: '#888888' }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0A0A0A; }
+    .gradient-text { background: linear-gradient(135deg, #E31337 0%, #FF4D6A 60%, #FF8096 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .feature-img { width: 100%; height: auto; display: block; }
+    #mobile-drawer { transform: translateX(100%); transition: transform 0.3s ease; }
+    #mobile-drawer.open { transform: translateX(0); }
+    #mobile-backdrop { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    #mobile-backdrop.open { opacity: 1; pointer-events: auto; }
+  </style>
+</head>
+<body class="text-[#E5E5E5] overflow-x-hidden">
+
+  <!-- Fixed nav -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-lg border-b border-[#2A2A2A]/70">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware" class="h-6">
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+        <a href="/features.html" class="hover:text-white transition-colors">Features</a>
+        <a href="/#templates" class="hover:text-white transition-colors">Templates</a>
+        <a href="/components" class="hover:text-white transition-colors">Components</a>
+        <a href="/vs-agency.html" class="text-white font-medium transition-colors">Compare</a>
+        <a href="/dashboard" class="hover:text-white transition-colors">Get Started</a>
+        <a href="/demo.html" class="bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">Live Demo →</a>
+      </div>
+      <button id="hamburger" class="md:hidden flex items-center justify-center w-9 h-9 rounded hover:bg-[#1A1A1A] transition" aria-label="Open menu">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-backdrop" class="fixed inset-0 z-40 bg-black/50 md:hidden"></div>
+  <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 z-50 w-72 bg-[#111111] border-l border-[#2A2A2A] flex flex-col md:hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-[#2A2A2A]">
+      <span class="font-bold text-sm">Menu</span>
+      <button id="drawer-close" class="flex items-center justify-center w-8 h-8 rounded hover:bg-[#1A1A1A] transition"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-3 flex flex-col">
+      <a href="/features.html" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Features</a>
+      <a href="/#templates" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Templates</a>
+      <a href="/components" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Components</a>
+      <a href="/vs-agency.html" class="px-5 py-3 text-sm text-white font-medium border-b border-[#2A2A2A]">Compare</a>
+      <a href="/dashboard" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Get Started</a>
+      <div class="px-5 pt-4">
+        <a href="/demo.html" class="block w-full text-center bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">Live Demo →</a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Hero -->
+  <section class="pt-32 pb-16 px-6 text-center" style="background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(227,19,55,0.08) 0%, transparent 60%)">
+    <div class="max-w-4xl mx-auto">
+      <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-8">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#E31337] inline-block"></span>
+        n3ware vs agencies &amp; freelance devs
+      </div>
+      <h1 class="text-6xl md:text-8xl font-black tracking-tight leading-[0.95] mb-8">
+        Stop renting<br><span class="gradient-text">your website.</span>
+      </h1>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-4">
+        The average small business pays a web agency $400 a month to maintain a website they update twice a year. That's $4,800 a year. Over five years?
+      </p>
+      <p class="text-2xl md:text-3xl font-black text-white mb-6">$24,000 — for a site you could've edited yourself<br class="hidden md:block"> from your phone in 15 minutes.</p>
+      <p class="text-base text-gray-500 max-w-2xl mx-auto leading-relaxed mb-10">
+        n3ware was built by web veterans who've been shipping websites for 30 years. We watched this dynamic for too long. We built the tool we'd want to hand to a restaurant owner, a lawn-care operator, a real estate agent, or any small business that needs a site that works — without renewing an agency contract every year.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/features.html" class="inline-flex items-center justify-center gap-2 bg-[#E31337] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors" style="box-shadow: 0 0 32px rgba(227,19,55,0.35)">
+          See how it works →
+        </a>
+        <a href="/dashboard" class="inline-flex items-center justify-center gap-2 bg-[#111111] hover:bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#444] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors">
+          Start free
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cost calculator -->
+  <section class="py-16 px-6">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-3xl font-black tracking-tight text-center mb-4">What you're actually paying</h2>
+      <p class="text-gray-400 text-center mb-12 max-w-xl mx-auto">Conservative estimates based on publicly available agency rate data and freelancer market surveys.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+        <!-- Agency -->
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-7">
+          <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-4">Typical Agency Retainer</p>
+          <ul class="space-y-3 mb-8 text-sm text-gray-400">
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>$300–$500/month base retainer</li>
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>$100–$150/hour for changes</li>
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>3–5 business day turnaround</li>
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>You don't own the code</li>
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>Can't edit from your phone</li>
+          </ul>
+          <div class="border-t border-[#2A2A2A] pt-5">
+            <p class="text-xs text-gray-500 mb-1">5-year total (est.)</p>
+            <p class="text-2xl font-black text-white">~$24,000</p>
+          </div>
+        </div>
+
+        <!-- Freelancer -->
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-7">
+          <p class="text-xs font-mono text-gray-500 uppercase tracking-widest mb-4">Freelance Developer</p>
+          <ul class="space-y-3 mb-8 text-sm text-gray-400">
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>$75–$150/hour project work</li>
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>$50–$100/hour maintenance</li>
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>1–2 week turnaround</li>
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>Unavailable for weeks at a time</li>
+            <li class="flex items-start gap-2"><i data-lucide="minus" class="w-4 h-4 text-gray-600 mt-0.5 shrink-0"></i>Dependent on one person</li>
+          </ul>
+          <div class="border-t border-[#2A2A2A] pt-5">
+            <p class="text-xs text-gray-500 mb-1">5-year total (est.)</p>
+            <p class="text-2xl font-black text-white">~$8k–$15k</p>
+          </div>
+        </div>
+
+        <!-- n3ware — highlighted -->
+        <div class="bg-[#111111] border-2 rounded-2xl p-7 relative" style="border-color:#E31337">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+            <span class="bg-[#E31337] text-white text-xs font-bold px-3 py-1 rounded-full">The smarter move</span>
+          </div>
+          <p class="text-xs font-mono uppercase tracking-widest mb-4" style="color:#E31337">n3ware</p>
+          <ul class="space-y-3 mb-8 text-sm text-gray-300">
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 mt-0.5 shrink-0" style="color:#E31337"></i>Starter free · Pro at launch</li>
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 mt-0.5 shrink-0" style="color:#E31337"></i>Edits: instant, from your phone</li>
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 mt-0.5 shrink-0" style="color:#E31337"></i>Real Tailwind HTML you own</li>
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 mt-0.5 shrink-0" style="color:#E31337"></i>34+ components + AI copy</li>
+            <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 mt-0.5 shrink-0" style="color:#E31337"></i>Works any time, any device</li>
+          </ul>
+          <div class="border-t pt-5" style="border-color:#2A2A2A">
+            <p class="text-xs text-gray-500 mb-1">5-year total (est.)</p>
+            <p class="text-2xl font-black text-white">under $1,200</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Big callout line -->
+      <div class="text-center bg-[#111111] border border-[#2A2A2A] rounded-2xl px-8 py-10">
+        <p class="text-3xl md:text-4xl font-black text-white mb-3">Save $20,000+ over 5 years.</p>
+        <p class="text-gray-400 max-w-2xl mx-auto text-base leading-relaxed">Even the most conservative estimate of a web agency retainer costs more than 20× what n3ware does — and you still end up with a site you can't touch without calling them first.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- "Who built this" credibility section -->
+  <section class="py-16 px-6 border-t border-[#2A2A2A]">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-6">Built by people who've been shipping websites for 30 years.</h2>
+      <p class="text-gray-400 leading-relaxed text-base mb-4">
+        We're not a team of former Uber PMs who discovered small business last quarter. We've been building websites since the browser wars — hand-rolled HTML in the 90s, CMS platforms in the 2000s, headless and Jamstack in the 2010s, AI-assembled everything in the 2020s. We've watched every wave of web tooling come and go, and we know exactly where they all failed small business owners.
+      </p>
+      <p class="text-gray-400 leading-relaxed text-base mb-12">
+        <strong class="text-white">Agencies are expensive because they're slow. Builders like Wix and Squarespace are frustrating because they're rigid.</strong> We built n3ware to be neither — fast like a template, smart like an agency, and priced like a subscription you don't have to think about.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="history" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">30 years of web experience</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">From hand-rolled HTML in Notepad to AI-assembled Tailwind components in 2026. We've shipped everything.</p>
+        </div>
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="sparkles" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">AI + Tailwind + real HTML</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Not a drag-and-drop toy. Real production-grade HTML you can hand to any developer and they'll recognize immediately.</p>
+        </div>
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="smartphone" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">Editable from anywhere</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">No desktop. No developer. No appointment. Update your site from your phone between customers — in under 5 minutes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- "You own this" section -->
+  <section class="py-16 px-6">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-6">Your site. Your code. Your domain.</h2>
+      <p class="text-gray-400 leading-relaxed text-base mb-4">
+        When you pay an agency, you're renting. They own the code, the hosting, the login, and usually the domain. If you stop paying, you lose everything.
+      </p>
+      <p class="text-gray-400 leading-relaxed text-base mb-10">
+        n3ware flips that. Your site is real, exportable Tailwind HTML — the kind a developer would write if you hired them, except you didn't. Your domain stays on whatever registrar you want. Your content lives in your own Google Cloud Storage bucket. If you ever decide to leave, we'll help you export and host elsewhere. No lock-in, no hostage situations.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="flex items-start gap-3 bg-[#111111] border border-[#2A2A2A] rounded-xl p-5">
+          <i data-lucide="check" class="w-5 h-5 mt-0.5 shrink-0" style="color:#E31337"></i>
+          <div>
+            <p class="font-semibold text-white text-sm">Real HTML you can download</p>
+            <p class="text-gray-500 text-xs mt-1">Tailwind components — export any time, host anywhere.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-[#111111] border border-[#2A2A2A] rounded-xl p-5">
+          <i data-lucide="check" class="w-5 h-5 mt-0.5 shrink-0" style="color:#E31337"></i>
+          <div>
+            <p class="font-semibold text-white text-sm">Your domain, any registrar</p>
+            <p class="text-gray-500 text-xs mt-1">GoDaddy, Namecheap, Cloudflare — point it at us, keep control.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 bg-[#111111] border border-[#2A2A2A] rounded-xl p-5">
+          <i data-lucide="check" class="w-5 h-5 mt-0.5 shrink-0" style="color:#E31337"></i>
+          <div>
+            <p class="font-semibold text-white text-sm">One-click full site export</p>
+            <p class="text-gray-500 text-xs mt-1">Download everything in a zip. You own it. Always.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- No developer section -->
+  <section class="py-16 px-6 border-t border-[#2A2A2A]">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-6">You don't need to be technical.</h2>
+      <p class="text-gray-400 leading-relaxed text-base mb-4">Most website builders say this. Most website builders lie. n3ware actually means it.</p>
+      <p class="text-gray-400 leading-relaxed text-base mb-12">
+        Anyone can launch a beautiful, fast, mobile-responsive website on n3ware <strong class="text-white">from their phone</strong>. No desktop required. No developer required. No web experience. No HTML, no CSS, no JavaScript, no Figma, no hosting setup. Click a template, drop components, describe what you want each section to say, and ship. Your site is indexed by Google within hours, loads in under a second on any device, and works for your business from day one.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="smartphone" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">Edit from your phone</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Full editing suite works on any device. No desktop, no app install needed.</p>
+        </div>
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="zap" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">Launch in minutes</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Pick a template, customize it, point your domain, go live. No setup wizard, no waiting.</p>
+        </div>
+        <div class="bg-[#111111] border border-[#2A2A2A] rounded-2xl p-6">
+          <i data-lucide="trending-up" class="w-7 h-7 mb-4" style="color:#E31337"></i>
+          <h3 class="font-bold text-white mb-2">Ranks on Google</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">Static HTML assembled at the edge. Fast load times, clean markup, indexed within hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Any domain callout -->
+  <section class="py-16 px-6">
+    <div class="max-w-4xl mx-auto">
+      <div class="rounded-2xl p-10 md:p-14" style="background:#E31337">
+        <div class="max-w-2xl">
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight text-white mb-4">Bring your own domain.<br>Or buy one from us.</h2>
+          <p class="text-white/80 leading-relaxed text-base mb-10">
+            Already have a domain from GoDaddy, Namecheap, Google, Cloudflare, or anywhere else? Just point it at n3ware — we'll handle the SSL, the CDN, and the fast serving. Don't have a domain yet? Buy one from us during onboarding at wholesale cost. Either way, your site is live in minutes, not days.
+          </p>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div class="bg-white/15 rounded-xl px-5 py-3 text-white font-semibold text-sm text-center">Your Domain</div>
+            <div class="flex items-center gap-2 text-white/60">
+              <i data-lucide="arrow-right" class="w-4 h-4 hidden sm:block"></i>
+              <i data-lucide="arrow-down" class="w-4 h-4 sm:hidden"></i>
+            </div>
+            <div class="bg-white/15 rounded-xl px-5 py-3 text-white font-semibold text-sm text-center">n3ware CDN</div>
+            <div class="flex items-center gap-2 text-white/60">
+              <i data-lucide="arrow-right" class="w-4 h-4 hidden sm:block"></i>
+              <i data-lucide="arrow-down" class="w-4 h-4 sm:hidden"></i>
+            </div>
+            <div class="bg-white rounded-xl px-5 py-3 font-bold text-sm text-center" style="color:#E31337">Your Site, Fast</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature spotlights -->
+  <section class="py-8 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="border-t border-[#2A2A2A] mb-16"></div>
+
+      <!-- 1 -->
+      <div class="py-12 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+        <div class="mb-10 md:mb-0">
+          <div class="text-[#E31337] text-6xl font-black leading-none mb-6">01</div>
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+            Drop components. Don't write code.
+          </h2>
+          <p class="text-gray-400 leading-relaxed">Your agency charges $100/hour to add a testimonials section. In n3ware you drop it from the component picker, describe your customers in a sentence, and the AI writes the section copy for you. Done in under 5 minutes, at zero additional cost.</p>
+        </div>
+        <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+          <img src="/features-assets/placement-mode.jpg" alt="Placement mode dropping a component between sections" class="feature-img">
+        </div>
+      </div>
+
+      <div class="border-t border-[#2A2A2A] mb-16"></div>
+
+      <!-- 2 -->
+      <div class="py-12 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+        <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden order-2 md:order-1 mb-10 md:mb-0">
+          <img src="/features-assets/customize-modal.jpg" alt="AI customize modal generating copy for a component" class="feature-img">
+        </div>
+        <div class="order-1 md:order-2">
+          <div class="text-[#E31337] text-6xl font-black leading-none mb-6">02</div>
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+            Let AI write the copy for you.
+          </h2>
+          <p class="text-gray-400 leading-relaxed">Agencies bill copywriting as a separate line item. n3ware's customize modal generates headlines, body copy, and CTAs the moment you drop a component — just describe what the section is for. Edit what you don't like, ship what you do.</p>
+        </div>
+      </div>
+
+      <div class="border-t border-[#2A2A2A] mb-16"></div>
+
+      <!-- 3 -->
+      <div class="py-12 md:grid md:grid-cols-2 md:gap-16 md:items-center mb-8">
+        <div class="mb-10 md:mb-0">
+          <div class="text-[#E31337] text-6xl font-black leading-none mb-6">03</div>
+          <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5">
+            Brand your site in one panel.
+          </h2>
+          <p class="text-gray-400 leading-relaxed">Changing your brand color shouldn't cost $300 and 3 days. n3ware's theme panel applies color tokens, Google Fonts, and type scale across your entire site instantly — no developer, no ticket, no invoice.</p>
+        </div>
+        <div class="rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
+          <img src="/features-assets/theme-panel-top.jpg" alt="Theme panel with color tokens, fonts, and type scale" class="feature-img">
+        </div>
+      </div>
+
+      <div class="border-t border-[#2A2A2A] mb-8"></div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="py-24 px-6 text-center" style="background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(227,19,55,0.12) 0%, transparent 70%)">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-4xl md:text-5xl font-black tracking-tight mb-6">Leave your agency.<br>Keep your website.</h2>
+      <p class="text-gray-400 text-lg mb-10 leading-relaxed">Sign up free, import your current site's content, and have a better version live in an hour. Your agency can keep billing someone else.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/dashboard" class="inline-flex items-center justify-center gap-2 bg-[#E31337] hover:bg-[#FF2847] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors" style="box-shadow: 0 0 32px rgba(227,19,55,0.35)">
+          Start free
+        </a>
+        <a href="/demo.html" class="inline-flex items-center justify-center gap-2 bg-[#111111] hover:bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#444] text-white px-8 py-4 rounded-xl text-base font-semibold transition-colors">
+          View a live demo
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-[#2A2A2A] py-10 px-6">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      <span class="font-black text-base" style="color:#E31337">n3ware</span>
+      <div class="flex items-center gap-6">
+        <a href="/features.html" class="hover:text-gray-300 transition-colors">Features</a>
+        <a href="/components" class="hover:text-gray-300 transition-colors">Components</a>
+        <a href="/brand" class="hover:text-gray-300 transition-colors">Brand</a>
+        <a href="/demo.html" class="hover:text-gray-300 transition-colors">Demo</a>
+      </div>
+      <span>© 2026 n3ware. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    const hamburger = document.getElementById('hamburger');
+    const drawer = document.getElementById('mobile-drawer');
+    const backdrop = document.getElementById('mobile-backdrop');
+    const closeBtn = document.getElementById('drawer-close');
+    function openDrawer() { drawer.classList.add('open'); backdrop.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeDrawer() { drawer.classList.remove('open'); backdrop.classList.remove('open'); document.body.style.overflow = ''; }
+    hamburger.addEventListener('click', openDrawer);
+    backdrop.addEventListener('click', closeDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setTimeout(closeDrawer, 150)));
+  </script>
+</body>
+</html>
