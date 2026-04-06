@@ -1907,6 +1907,12 @@
 
       const promises = [];
 
+      // Restore raw template markers before extracting HTML so {{#each}} blocks
+      // are saved as templates, not rendered entry data.
+      const contentMgr = window._n3wareModules?.N3ContentManager
+        ? window.n3ware?._modules?.content : null;
+      contentMgr?.prepareForSave?.();
+
       for (const slug of this._dirty.pages) {
         const main = document.querySelector('main');
         const html = main ? main.innerHTML : document.body.innerHTML;
@@ -1933,6 +1939,7 @@
         const allOk = results.every(r => r.ok);
         if (!allOk) throw new Error('One or more saves failed');
 
+        contentMgr?.restoreAfterSave?.();
         this._dirty.pages.clear();
         this._dirty.components.clear();
         this._saveBtn.innerHTML = '✓ Saved';
@@ -1945,6 +1952,7 @@
           window.location.replace(url.toString());
         }, 1500);
       } catch (err) {
+        contentMgr?.restoreAfterSave?.();
         this._saveBtn.innerHTML = 'Failed';
         this._saveBtn.style.background = '#DC2626';
         N3UI.toast('Save failed: ' + err.message, 'error', 4000);
