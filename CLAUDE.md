@@ -671,90 +671,172 @@ Exercises every API route with missing, bogus, expired, and wrong-secret credent
 
 ## 23. Repeatable Content (Collections)
 
-Phase 1 backend implementation only. No editor UI yet.
+**Phase status:**
+- **Phase 1 (shipped):** Collections API, GCS storage, Go assembler template rendering
+- **Phase 2 (planned):** Editor UI — Content FAB panel, auto-generated entry forms, template insertion via component picker, live preview
+
+---
 
 ### What it is
-CMS-style collections (e.g. "Team Members", "Blog Posts") with typed field schemas and individual entries. Stored in GCS. The Go assembler renders `{{#each slug}}...{{/each}}` blocks in page HTML at request time using a lightweight Handlebars-style template processor.
 
-### Collection definition
+CMS-style collections (team members, blog posts, locations, menu items, etc.) where each entry follows a typed field schema defined by the site owner. The Go assembler renders entries into page HTML at serve time using a Handlebars-style template processor. No build step — adding an entry and saving immediately shows up on the live page.
+
+---
+
+### Data models
+
+**Collection definition** — `{siteId}/collections/{slug}.json`
 ```json
 {
   "id": "team",
   "name": "Team Members",
   "slug": "team",
   "fields": [
-    { "key": "name",  "type": "text",   "label": "Name",  "required": true },
-    { "key": "role",  "type": "text",   "label": "Role" },
-    { "key": "order", "type": "number", "label": "Order" }
+    { "key": "name",     "type": "text",    "label": "Name",    "required": true },
+    { "key": "role",     "type": "text",    "label": "Role" },
+    { "key": "photo",    "type": "image",   "label": "Photo" },
+    { "key": "featured", "type": "boolean", "label": "Featured" },
+    { "key": "bio",      "type": "richtext","label": "Bio" },
+    { "key": "order",    "type": "number",  "label": "Sort Order", "default": 0 }
   ],
   "createdAt": "ISO8601",
   "updatedAt": "ISO8601"
 }
 ```
-Valid field types: `text`, `richtext`, `image`, `url`, `number`, `date`, `boolean`, `select`.
 
-### Entry
+Valid field types: `text`, `richtext`, `image`, `email`, `url`, `number`, `boolean`, `date`, `select`
+
+**Entry** — `{siteId}/collections/{slug}/{entryId}.json`
 ```json
 {
   "id": "uuid",
   "collectionId": "team",
-  "data": { "name": "Alice", "role": "Engineer", "order": 1 },
+  "data": { "name": "Alice", "role": "Engineer", "order": 1, "featured": true },
   "createdAt": "ISO8601",
   "updatedAt": "ISO8601"
 }
 ```
 
-### GCS layout for collections
+---
+
+### GCS storage layout
+
 ```
-{siteId}/collections/{slug}.json               — collection definition
-{siteId}/collections/{slug}/{entryId}.json     — individual entry
+{siteId}/
+  site.json                              ← manifest includes collections array
+  collections/
+    team.json                            ← collection definition (slug = filename)
+    team/
+      550e8400-e29b-41d4-a716-...json    ← individual entries (UUID filenames)
+      6ba7b810-9dad-11d1-80b4-...json
+    blog.json
+    blog/
+      a87ff679-a2f3-371d-9279-...json
 ```
 
-### API routes (all require auth, GCS must be enabled)
+The `site.json` manifest contains a summary array (no need to list GCS every time):
+```json
+{
+  "collections": [
+    { "slug": "team", "name": "Team Members", "entryCount": 5 },
+    { "slug": "blog", "name": "Blog Posts",   "entryCount": 3 }
+  ]
+}
+```
+
+---
+
+### API routes
+
+All routes require `authOrApiKey`. GCS must be enabled (`GCS_BUCKET` env var) for CRUD to work.
+
 | Method | Path | Description |
 |---|---|---|
-| GET | /api/sites/:id/collections | List collection definitions |
-| POST | /api/sites/:id/collections | Create collection |
-| GET | /api/sites/:id/collections/:slug | Get collection |
-| PUT | /api/sites/:id/collections/:slug | Update collection (name, fields) |
-| DELETE | /api/sites/:id/collections/:slug | Delete collection + all its entries |
-| GET | /api/sites/:id/collections/:slug/entries | List entries (supports ?sort=field:dir&limit=N) |
-| POST | /api/sites/:id/collections/:slug/entries | Create entry |
-| GET | /api/sites/:id/collections/:slug/entries/:id | Get entry |
-| PUT | /api/sites/:id/collections/:slug/entries/:id | Update entry (data is merged) |
-| DELETE | /api/sites/:id/collections/:slug/entries/:id | Delete entry |
+| GET | `/api/sites/:id/collections` | List collection definitions |
+| POST | `/api/sites/:id/collections` | Create collection (slug + name + fields) |
+| GET | `/api/sites/:id/collections/:slug` | Get collection definition |
+| PUT | `/api/sites/:id/collections/:slug` | Update name/fields (merged) |
+| DELETE | `/api/sites/:id/collections/:slug` | Delete collection + all entries |
+| GET | `/api/sites/:id/collections/:slug/entries` | List entries (`?sort=field:dir&limit=N`) |
+| POST | `/api/sites/:id/collections/:slug/entries` | Create entry (validates required fields) |
+| GET | `/api/sites/:id/collections/:slug/entries/:entryId` | Get single entry |
+| PUT | `/api/sites/:id/collections/:slug/entries/:entryId` | Update entry (data merged) |
+| DELETE | `/api/sites/:id/collections/:slug/entries/:entryId` | Delete entry |
 
-### Template syntax (in page HTML)
+---
+
+### Template syntax reference
+
+Write these directives directly in page HTML. The assembler processes them at request time.
+
+| Directive | Description |
+|---|---|
+| `{{variable}}` | HTML-escaped value from current context |
+| `{{{variable}}}` | Unescaped value — use for `richtext` fields |
+| `{{#each slug}}...{{/each}}` | Loop over all entries in collection `slug` |
+| `{{#each slug limit=3}}...{{/each}}` | Loop, at most 3 entries |
+| `{{#each slug sort="field:asc"}}...{{/each}}` | Loop sorted by field (asc or desc) |
+| `{{#each slug limit=3 sort="date:desc"}}...{{/each}}` | Combined |
+| `{{#if field}}...{{/if}}` | Include block if field is truthy |
+| `{{#if field}}...{{else}}...{{/if}}` | Conditional with else branch |
+| `{{this.fieldKey}}` | Current entry's field value (inside `#each`) |
+| `{{site.name}}` | Site name from manifest |
+| `{{site.theme.colors.primary}}` | Nested site manifest field |
+| `{{slug.count}}` | Number of entries in a collection |
+
+**Example:**
 ```html
-{{#each team}}
-  <div>
+<section>
+  <h2>Meet the Team ({{team.count}} members)</h2>
+  {{#each team sort="order:asc"}}
+  <div class="card">
+    <img src="{{this.photo}}" alt="{{this.name}}">
     <h3>{{this.name}}</h3>
     <p>{{this.role}}</p>
-    {{#if this.featured}}<span>Featured</span>{{/if}}
-    {{#if this.featured}}<span>VIP</span>{{else}}<span>Standard</span>{{/if}}
-    {{{this.bio}}}  <!-- triple braces = unescaped HTML -->
+    {{#if this.featured}}<span class="badge">Featured</span>{{/if}}
+    {{{this.bio}}}
   </div>
-{{/each}}
-
-{{#each team limit=3 sort="order:asc"}}...{{/each}}
-
-{{team.count}} team members
-
+  {{/each}}
+</section>
 <title>{{site.name}}</title>
-<meta name="color" content="{{site.theme.colors.primary}}">
 ```
 
-### Free vs Pro limits
+---
+
+### Assembler rendering pipeline
+
+After `assemble()` combines header + nav + page content + footer into a full HTML string:
+
+1. **Scan** — `findReferencedCollections(html)` regex-scans for `{{#each <slug>}}` patterns; returns de-duplicated slug list
+2. **Load** — For each slug, `loadCollectionEntries(siteId, slug)` reads `{siteId}/collections/{slug}/*.json` from GCS; entries are LRU-cached with 30s TTL (same as pages)
+3. **Process** — `ProcessTemplate(html, manifest, collectionsMap)` in `assembler/template.go` walks the HTML character-by-character (state machine, not regex):
+   - `{{#each}}` → iterates entries, renders inner template for each, joins
+   - `{{#if}}` → truthy check on current context field, includes/excludes block
+   - `{{variable}}` → resolves path in current context (entry data, site manifest), HTML-escapes
+   - `{{{variable}}}` → same, no escaping
+4. **Return** — processed HTML is sent to the client
+
+Cache purge: entry save/delete calls `POST /purge/:siteId` on the assembler (same as page saves), which clears both page and collection caches for that site.
+
+---
+
+### Paywall limits
+
 | Limit | Free | Pro |
 |---|---|---|
 | Collections per site | 2 | Unlimited |
 | Entries per collection | 10 | Unlimited |
 
-### Implementation files
+Over-limit returns `402 { error, limit, current, upgradeUrl: "/api/billing/checkout" }`.
+
+---
+
+### Key files
+
 - `src/api/collections.js` — router, mounted at `/api/sites/:siteId/collections`
-- `src/storage/gcs-files.js` — listCollections, getCollection, saveCollection, deleteCollection, listEntries, getEntry, saveEntry, deleteEntry
-- `assembler/template.go` — ProcessTemplate(), supports {{#each}}, {{#if}}/{{else}}, {{this.*}}, {{site.*}}, {{{triple}}}
-- `assembler/assembler.go` — findReferencedCollections(), loadCollectionEntries(), integration into assemble()
-- `assembler/storage.go` — GCSClient.ListFiles() for enumerating entry objects
-- `assembler/template_test.go` — 12 Go unit tests (all pass)
-- `tests/collections.test.js` — Node integration tests (6 auth/routing assertions pass; CRUD requires GCS)
+- `src/storage/gcs-files.js` — `listCollections`, `getCollection`, `saveCollection`, `deleteCollection`, `listEntries`, `getEntry`, `saveEntry`, `deleteEntry`
+- `assembler/template.go` — `ProcessTemplate()`, `Entry`, `CollectionEntries` types, all directive handlers
+- `assembler/assembler.go` — `findReferencedCollections()`, `loadCollectionEntries()`, template call in `assemble()`
+- `assembler/storage.go` — `GCSClient.ListFiles()` for enumerating entry objects
+- `assembler/template_test.go` — 12 Go unit tests
+- `tests/collections.test.js` — Node integration tests (6 pass locally; CRUD assertions require `GCS_BUCKET`)
