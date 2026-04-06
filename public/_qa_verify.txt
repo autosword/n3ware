@@ -1,0 +1,1 @@
+https://n3ware.com/api/auth/verify?token=ebe9946b2db9c85eaa0751639c5df8b5baff8a4ba7666114b17277bfe6b7156f
