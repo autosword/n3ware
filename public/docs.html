@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="https://brand.n3ware.com/n3ware-logo.png">
+  <link rel="apple-touch-icon" href="https://brand.n3ware.com/n3ware-logo.png">
+  <title>Documentation — n3ware</title>
+  <meta name="description" content="Complete guide to using the n3ware visual website editor. Learn how to create collections, customize themes, manage navigation, and go live.">
+  <meta property="og:title" content="Documentation — n3ware">
+  <meta property="og:description" content="Complete guide to using the n3ware visual website editor. Learn how to create collections, customize themes, manage navigation, and go live.">
+  <meta property="og:type" content="website">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            n3: {
+              red: '#E31337', dark: '#111111', darker: '#0A0A0A',
+              surface: '#1A1A1A', border: '#2A2A2A', text: '#E5E5E5', muted: '#888888'
+            },
+            brand: '#E31337'
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'Fira Code', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0A0A0A; }
+    html { scroll-behavior: smooth; }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #E31337 0%, #FF4D6A 60%, #FF8096 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #111; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #E31337; }
+
+    kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      background: #1A1A1A;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #E5E5E5;
+    }
+
+    .sidebar-link { transition: color 0.15s, background 0.15s; }
+    .sidebar-link.active {
+      color: #E31337;
+      font-weight: 600;
+      background: rgba(227, 19, 55, 0.08);
+    }
+
+    .prose table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .prose table th,
+    .prose table td {
+      padding: 10px 14px;
+      border: 1px solid #2A2A2A;
+      text-align: left;
+    }
+    .prose table th { background: #1A1A1A; font-weight: 600; font-size: 13px; color: #888; }
+    .prose table td { font-size: 14px; color: #D1D5DB; }
+
+    .prose code {
+      background: #1A1A1A;
+      border: 1px solid #2A2A2A;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 13px;
+      color: #E5E5E5;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 14px;
+    }
+    pre {
+      background: #1A1A1A;
+      border: 1px solid #2A2A2A;
+      border-radius: 10px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    /* Mobile nav drawer */
+    #mobile-drawer { transform: translateX(100%); transition: transform 0.3s ease; }
+    #mobile-drawer.open { transform: translateX(0); }
+    #mobile-backdrop { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    #mobile-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    /* Mobile sidebar */
+    #docs-sidebar {
+      transition: transform 0.3s ease;
+    }
+    @media (max-width: 1023px) {
+      #docs-sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        top: 64px;
+        left: 0;
+        width: 280px;
+        z-index: 45;
+        background: #0F0F0F;
+        border-right: 1px solid #1A1A1A;
+      }
+      #docs-sidebar.sidebar-open {
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#0A0A0A] text-gray-200 overflow-x-hidden">
+
+  <!-- Fixed top nav -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/90 backdrop-blur-lg border-b border-[#2A2A2A]/70">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware" class="h-8">
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+        <a href="/features.html" class="hover:text-white transition-colors">Features</a>
+        <a href="/#templates" class="hover:text-white transition-colors">Templates</a>
+        <a href="/components.html" class="hover:text-white transition-colors">Components</a>
+        <a href="/brand.html" class="hover:text-white transition-colors">Brand</a>
+        <a href="/vs-agency.html" class="hover:text-white transition-colors">Compare</a>
+        <a href="/docs.html" class="text-white font-medium transition-colors">Docs</a>
+        <a href="/dashboard" class="hover:text-white transition-colors">Get Started</a>
+        <a href="/demo.html" class="bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">Live Demo →</a>
+      </div>
+      <!-- Hamburger -->
+      <button id="hamburger" class="md:hidden flex items-center justify-center w-9 h-9 rounded hover:bg-[#1A1A1A] transition" aria-label="Open menu">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile backdrop -->
+  <div id="mobile-backdrop" class="fixed inset-0 z-40 bg-black/50 md:hidden"></div>
+
+  <!-- Mobile drawer -->
+  <div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 z-50 w-72 bg-[#111111] border-l border-[#2A2A2A] flex flex-col md:hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-[#2A2A2A]">
+      <span class="font-bold text-sm">Menu</span>
+      <button id="drawer-close" class="flex items-center justify-center w-8 h-8 rounded hover:bg-[#1A1A1A] transition" aria-label="Close">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <nav class="flex-1 overflow-y-auto py-3 flex flex-col">
+      <a href="/features.html" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Features</a>
+      <a href="/#templates" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Templates</a>
+      <a href="/components.html" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Components</a>
+      <a href="/brand.html" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Brand</a>
+      <a href="/vs-agency.html" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Compare</a>
+      <a href="/docs.html" class="px-5 py-3 text-sm text-white font-medium border-b border-[#2A2A2A]">Docs</a>
+      <a href="/dashboard" class="px-5 py-3 text-sm text-gray-400 border-b border-[#2A2A2A] hover:text-white">Get Started</a>
+      <div class="px-5 pt-4">
+        <a href="/demo.html" class="block w-full text-center bg-[#E31337] hover:bg-[#FF2847] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">Live Demo →</a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Docs layout -->
+  <div class="flex pt-16">
+
+    <!-- Sidebar -->
+    <aside id="docs-sidebar" class="hidden lg:block fixed top-16 left-0 w-60 h-[calc(100vh-4rem)] overflow-y-auto bg-[#0F0F0F] border-r border-[#1A1A1A] z-40">
+      <nav class="p-4">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 px-3">Contents</p>
+        <ul class="space-y-0.5">
+          <li><a href="#getting-started" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Getting Started</a></li>
+          <li><a href="#editor" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">The Editor</a></li>
+          <li><a href="#components" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Components</a></li>
+          <li><a href="#theme" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Theme &amp; Branding</a></li>
+          <li><a href="#navigation" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Navigation</a></li>
+          <li><a href="#images" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Images</a></li>
+          <li><a href="#collections" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Repeatable Content</a></li>
+          <li><a href="#media" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Media Library</a></li>
+          <li><a href="#testing" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Testing Your Site</a></li>
+          <li><a href="#saving" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Saving &amp; Publishing</a></li>
+          <li><a href="#domains" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Domains &amp; Going Live</a></li>
+          <li><a href="#billing" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Billing &amp; Plans</a></li>
+          <li><a href="#shortcuts" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">Keyboard Shortcuts</a></li>
+          <li><a href="#faq" class="sidebar-link text-sm text-gray-400 hover:text-white block py-1.5 px-3 rounded-lg hover:bg-[#1A1A1A]">FAQ</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Mobile sidebar toggle -->
+    <button id="sidebar-toggle" class="lg:hidden fixed top-20 left-4 z-50 bg-[#1A1A1A] border border-[#2A2A2A] text-gray-300 text-sm px-3 py-1.5 rounded-lg hover:bg-[#2A2A2A] transition-colors">
+      ☰ Sections
+    </button>
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebar-backdrop" class="lg:hidden fixed inset-0 z-44 bg-black/50 hidden" style="z-index:44"></div>
+
+    <!-- Main content -->
+    <main class="flex-1 lg:ml-60 px-6 lg:px-12 xl:px-16 py-8 max-w-5xl mx-auto lg:mx-0 prose">
+      <div class="max-w-3xl">
+
+        <!-- Page header -->
+        <div class="mb-12 pt-4">
+          <div class="inline-flex items-center gap-2 bg-[#E31337]/10 border border-[#E31337]/30 px-4 py-2 rounded-full text-sm text-[#E31337] mb-6">
+            <span class="w-2 h-2 bg-[#E31337] rounded-full inline-block"></span>
+            Everything you need to know
+          </div>
+          <h1 class="text-4xl font-extrabold text-white mb-3">Documentation</h1>
+          <p class="text-gray-400 text-lg leading-relaxed">Everything you need to know about building with n3ware. Click a section in the sidebar to jump to it.</p>
+        </div>
+
+        <!-- ── Section 1: Getting Started ─────────────────────────── -->
+        <section id="getting-started" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">🚀</span> Getting Started
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">What is n3ware?</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">n3ware is a visual website editor that lets you build and update your own website without any coding. One click and you're editing — click on text to change it, drag sections to reorder them, drop in pre-built components, and save changes that go live instantly. Your site lives in the cloud; we handle the hosting, CDN, and SSL.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Creating an account</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">No password needed. Enter your email at n3ware.com → we send you a magic sign-in link → click it → you're in. Your session stays active for 7 days.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">The dashboard</h3>
+          <p class="text-gray-300 leading-relaxed mb-2">After signing in you'll see your <strong class="text-white">Dashboard</strong> — the control center for all your sites. From here you can:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li>Create a new site</li>
+            <li>Open an existing site in the editor</li>
+            <li>Manage billing and subscriptions</li>
+            <li>Set up analytics and third-party integrations</li>
+          </ul>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Creating your first site</h3>
+          <ol class="text-gray-300 space-y-2 mb-4 list-decimal list-inside">
+            <li>Click <strong class="text-white">New Site</strong> in the dashboard</li>
+            <li>Give your site a name</li>
+            <li>Pick a template from the gallery, or start with a blank page</li>
+            <li>Click <strong class="text-white">Open in Editor</strong> — your site loads in a new tab with the visual editor ready</li>
+          </ol>
+        </section>
+
+        <!-- ── Section 2: The Editor ───────────────────────────────── -->
+        <section id="editor" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">✏️</span> The Editor
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Entering edit mode</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">When you open your site through the dashboard, it loads with the editor active. If you ever need to toggle it: press <kbd>Ctrl+Shift+E</kbd> (Windows/Linux) or <kbd>Cmd+Shift+E</kbd> (Mac), or click the red <strong class="text-white">n3</strong> button in the top-left corner of the page.</p>
+          <p class="text-gray-300 leading-relaxed mb-4">While in edit mode, a thin red border appears around editable elements when you hover over them.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">The toolbar</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">The black toolbar appears at the top of the page in edit mode:</p>
+          <table>
+            <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Undo</strong></td><td>Revert the last change (also <kbd>Ctrl+Z</kbd>)</td></tr>
+              <tr><td><strong>Redo</strong></td><td>Re-apply a reverted change (also <kbd>Ctrl+Shift+Z</kbd>)</td></tr>
+              <tr><td><strong>Download</strong></td><td>Export your page as a clean HTML file</td></tr>
+              <tr><td><strong>Copy HTML</strong></td><td>Copy the current page HTML to your clipboard</td></tr>
+              <tr><td><strong>Diff</strong></td><td>See what changed since your last save — green = added, red = removed</td></tr>
+              <tr><td><strong>Menu</strong></td><td>Open the settings menu (analytics, integrations, shortcuts)</td></tr>
+              <tr><td><strong>Exit</strong></td><td>Leave edit mode without saving</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">The FAB (floating action button)</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">The circular button in the bottom-right corner opens a stack of action pills when clicked. Each pill opens a different panel or mode:</p>
+          <table>
+            <thead><tr><th>Pill</th><th>What it opens</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Edit</strong></td><td>Toggle text editing mode on/off</td></tr>
+              <tr><td><strong>Components</strong></td><td>Browse and drop pre-built sections onto your page</td></tr>
+              <tr><td><strong>Theme</strong></td><td>Edit colors, fonts, logo, and favicon</td></tr>
+              <tr><td><strong>Nav</strong></td><td>Edit your site's navigation menu</td></tr>
+              <tr><td><strong>Media</strong></td><td>View and manage uploaded images and files</td></tr>
+              <tr><td><strong>Test</strong></td><td>Preview your site at different device widths</td></tr>
+              <tr><td><strong>Content</strong></td><td>Manage collections (team members, blog posts, etc.)</td></tr>
+              <tr><td><strong>Analytics</strong></td><td>View traffic and visitor analytics</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Editing text</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Click any text element on the page — a heading, paragraph, button label, anything. The element becomes editable and a floating formatting toolbar appears above it. From this toolbar you can:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li>Make text <strong>bold</strong> or <em>italic</em></li>
+            <li>Add a hyperlink</li>
+            <li>Change heading level (H1–H6 or paragraph)</li>
+            <li>Change font size</li>
+            <li>Change text color</li>
+            <li>Clear formatting</li>
+          </ul>
+          <p class="text-gray-300 leading-relaxed mb-4">Press <kbd>Escape</kbd> or click outside the element to finish editing.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Selecting blocks</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Click anywhere on a section, card, image, or other block element. A control bar appears at the top of the element showing:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li>The element's tag name (e.g., <code>section</code>, <code>div</code>, <code>img</code>)</li>
+            <li>A <strong>drag handle</strong> to reorder the element by dragging</li>
+            <li><strong>Move up / Move down</strong> arrows</li>
+            <li><strong>Duplicate</strong> — make an exact copy</li>
+            <li><strong>Delete</strong> — remove the element</li>
+          </ul>
+        </section>
+
+        <!-- ── Section 3: Components ───────────────────────────────── -->
+        <section id="components" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">🧩</span> Components
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">What are components?</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Components are pre-built, fully-styled page sections built with Tailwind CSS. Think hero banners, pricing tables, testimonial grids, contact forms, team rosters — everything a small business website needs, already designed and ready to drop in.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Opening the component library</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Click the FAB (bottom-right) → <strong class="text-white">Components</strong> pill. The component panel slides in from the right.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Browsing by category</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Components are organized into categories:</p>
+          <p class="text-gray-400 text-sm mb-4 leading-relaxed"><strong class="text-gray-300">Heroes</strong> · <strong class="text-gray-300">Pricing</strong> · <strong class="text-gray-300">Testimonials</strong> · <strong class="text-gray-300">Contact</strong> · <strong class="text-gray-300">Menu</strong> · <strong class="text-gray-300">Services</strong> · <strong class="text-gray-300">Team</strong> · <strong class="text-gray-300">Gallery</strong> · <strong class="text-gray-300">FAQ</strong> · <strong class="text-gray-300">CTA</strong> · <strong class="text-gray-300">Stats</strong> · <strong class="text-gray-300">Navigation</strong> · <strong class="text-gray-300">Dynamic</strong></p>
+          <p class="text-gray-300 leading-relaxed mb-4">Click a category to filter. Use the search bar at the top to find by keyword.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Placing a component</h3>
+          <ol class="text-gray-300 space-y-2 mb-4 list-decimal list-inside">
+            <li>Find a component you like and click <strong class="text-white">+</strong></li>
+            <li>The panel closes and you enter <strong class="text-white">placement mode</strong> — the page dims and drop zones appear between existing sections</li>
+            <li>Click a drop zone to insert the component there</li>
+            <li>The AI customize modal appears</li>
+          </ol>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">The AI customize modal</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">After placing a component, a modal asks you to describe what the section should say and do. You can:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li>Type a description: <em class="text-gray-400">"Our pizza restaurant in Providence, RI, called Ember &amp; Oak — highlight our wood-fired oven and Tuesday pizza night specials"</em></li>
+            <li>Optionally upload reference images (your logo, photos of your location, etc.)</li>
+            <li>Click <strong class="text-white">Generate</strong> — Claude rewrites the component with your content</li>
+          </ul>
+          <p class="text-gray-300 leading-relaxed mb-4">Click <strong class="text-white">Skip</strong> to use the component's default placeholder text and fill it in manually.</p>
+        </section>
+
+        <!-- ── Section 4: Theme & Branding ────────────────────────── -->
+        <section id="theme" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">🎨</span> Theme &amp; Branding
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Opening the theme panel</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">FAB → <strong class="text-white">Theme</strong> pill. The theme panel slides in from the right.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Colors</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Three brand colors drive your entire site's appearance:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li><strong class="text-white">Primary</strong> — your main brand color. Used for buttons, highlights, links, and key UI elements.</li>
+            <li><strong class="text-white">Secondary</strong> — a complementary color. Used for backgrounds, cards, and supporting elements.</li>
+            <li><strong class="text-white">Accent</strong> — a pop color. Used for badges, tags, and emphasis.</li>
+          </ul>
+          <p class="text-gray-300 leading-relaxed mb-4">Click any color swatch to open the color picker. You can drag the picker, use the hue slider, or type a hex code directly (e.g., <code>#E31337</code>). Changes apply to the live page instantly.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Branding</h3>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li><strong class="text-white">Logo</strong> — upload your logo image (PNG or SVG recommended). It replaces the text wordmark in your nav and footer.</li>
+            <li><strong class="text-white">Favicon</strong> — the small icon that appears in browser tabs. Upload a square PNG (32×32 or 64×64 pixels works well).</li>
+          </ul>
+          <p class="text-gray-300 leading-relaxed mb-4">Both accept a URL (paste a link to your hosted image) or a direct file upload.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Fonts</h3>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li><strong class="text-white">Heading font</strong> — applied to all H1–H6 elements on your page</li>
+            <li><strong class="text-white">Body font</strong> — applied to paragraphs and general text</li>
+          </ul>
+          <p class="text-gray-300 leading-relaxed mb-4">Choose from a curated selection of Google Fonts. Changes load the font and apply it instantly.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Font sizes</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Sliders for H1 through H6 and body text. Values are in pixels. The default heading scale (H1 = 60px down to H6 = 18px) follows typographic best practices — adjust to match your brand's visual style.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Saving your theme</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Click <strong class="text-white">Save Theme</strong> at the bottom of the panel. Your theme is saved to your site's cloud storage and applied to all pages.</p>
+        </section>
+
+        <!-- ── Section 5: Navigation ───────────────────────────────── -->
+        <section id="navigation" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">🧭</span> Navigation
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">How the nav works</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Your site has a fixed navigation bar at the top. It includes your logo/brand name on the left, menu links in the center, and a CTA button on the right. On mobile it collapses into a hamburger menu.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Opening the nav editor</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">FAB → <strong class="text-white">Nav</strong> pill (or select the <code>&lt;nav&gt;</code> element and click the nav edit button in the control bar). The nav editor panel slides in.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Brand settings</h3>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li><strong class="text-white">Logo text</strong> — the text wordmark shown when no logo image is uploaded</li>
+            <li><strong class="text-white">Logo image</strong> — upload an image to replace the text</li>
+            <li><strong class="text-white">Logo link</strong> — where clicking the logo goes (usually <code>/</code>)</li>
+          </ul>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Menu links</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Your nav links are listed in order. For each link you can:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li>Edit the <strong class="text-white">label</strong> (the visible text)</li>
+            <li>Edit the <strong class="text-white">href</strong> (the URL it links to)</li>
+            <li>Set <strong class="text-white">target</strong> (<code>_self</code> for same tab, <code>_blank</code> for new tab)</li>
+            <li>Drag to reorder</li>
+            <li>Click <strong class="text-white">×</strong> to delete</li>
+          </ul>
+          <p class="text-gray-300 leading-relaxed mb-4">Click <strong class="text-white">+ Add link</strong> to add a new menu item.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">CTA button</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">The right-side call-to-action button. Toggle it on/off, change the label, and set the destination URL.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Sub-navigation</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Some page templates include a sticky sub-navigation bar that highlights the current section as you scroll (scroll-spy). This is separate from the main nav — it's an in-page navigation tool for long single-page sites. It auto-discovers <code>&lt;section id="..."&gt;</code> elements and generates links automatically.</p>
+        </section>
+
+        <!-- ── Section 6: Images ───────────────────────────────────── -->
+        <section id="images" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">🖼️</span> Images
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Replacing an image</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Click any <code>&lt;img&gt;</code> element on your page. The element control bar appears, and a <strong class="text-white">Replace image</strong> button is shown. Click it to open the image modal.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Using a URL</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Paste any publicly accessible image URL — from Unsplash, your own CDN, Google Drive (shared link), or anywhere else. The image loads immediately so you can preview it before confirming.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Uploading a file</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Drag and drop an image file onto the upload area, or click to open a file browser. Supported formats: JPG, PNG, GIF, WebP, SVG, AVIF. Max 5 MB per file.</p>
+          <p class="text-gray-300 leading-relaxed mb-4">On real hosted sites, the file is uploaded to cloud storage and you get a permanent URL. On the demo (n3ware.com/demo), images are embedded as base64 data URLs in the exported HTML.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Alt text</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Every image should have descriptive alt text — a short description of what the image shows. Alt text:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li>Is read aloud by screen readers for visually impaired users</li>
+            <li>Helps search engines understand your images (good for SEO)</li>
+            <li>Displays as fallback text if the image fails to load</li>
+          </ul>
+          <p class="text-gray-300 leading-relaxed mb-4">Example: instead of "photo1.jpg", write <em class="text-gray-400">"Chef Marcus Reid plating a wood-fired margherita pizza at Ember &amp; Oak."</em></p>
+        </section>
+
+        <!-- ── Section 7: Collections ──────────────────────────────── -->
+        <section id="collections" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">📋</span> Repeatable Content
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">What are collections?</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Collections let you manage structured, repeatable content — things like team members, menu items, blog posts, or testimonials. Each collection has a <strong class="text-white">schema</strong> (the shape of each item — what fields it has) and <strong class="text-white">entries</strong> (the actual data).</p>
+          <p class="text-gray-300 leading-relaxed mb-4">Instead of hard-coding your team members' names directly in the HTML, you manage them in the Content panel and your page template renders them automatically. Add a new team member → it appears on your page instantly.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Opening the Content panel</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">FAB → <strong class="text-white">Content</strong> pill.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Creating a collection</h3>
+
+          <p class="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 mt-4">AI path — just describe it</p>
+          <ol class="text-gray-300 space-y-2 mb-4 list-decimal list-inside">
+            <li>Click <strong class="text-white">+ New Collection</strong></li>
+            <li>Make sure the "Describe it" tab is active</li>
+            <li>Type what you need: <em class="text-gray-400">"team members with name, role, headshot photo, and a short bio"</em></li>
+            <li>Click <strong class="text-white">✦ Create with AI</strong> — Claude generates a field schema for you</li>
+            <li>Review the fields, adjust if needed, then click <strong class="text-white">Create Collection</strong></li>
+          </ol>
+
+          <p class="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 mt-4">Preset path — pick a template</p>
+          <ol class="text-gray-300 space-y-2 mb-4 list-decimal list-inside">
+            <li>Click <strong class="text-white">+ New Collection</strong></li>
+            <li>Click the <strong class="text-white">Pick a preset</strong> tab</li>
+            <li>Choose from: Team Members, Blog Posts, Menu Items, Services, Testimonials, Locations, Portfolio, FAQ, Events, or Products</li>
+            <li>Review the pre-filled fields, adjust the collection name, then <strong class="text-white">Create Collection</strong></li>
+          </ol>
+
+          <p class="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 mt-4">Manual path</p>
+          <ol class="text-gray-300 space-y-2 mb-4 list-decimal list-inside">
+            <li>Click <strong class="text-white">+ New Collection</strong></li>
+            <li>Type a name and slug</li>
+            <li>Click <strong class="text-white">+ Add field</strong> to build your schema field by field</li>
+            <li>Set the label, type (text, image, number, boolean, etc.), and whether the field is required</li>
+            <li>Click <strong class="text-white">Create Collection</strong></li>
+          </ol>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Adding entries</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">After creating a collection, click it in the Content panel to open the entry list. Click <strong class="text-white">+ Add Entry</strong>. An auto-generated form appears with one input per field. Fill in the fields and click <strong class="text-white">Save</strong>.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">AI sample generation</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">After creating a collection, n3ware offers to generate sample entries automatically. Type a brief description of your business and how many samples you want (up to 10), then click <strong class="text-white">✦ Generate</strong>. Claude fills in realistic data based on your business context — names, descriptions, prices, even Unsplash photo URLs.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Dropping a collection onto your page</h3>
+          <ol class="text-gray-300 space-y-2 mb-4 list-decimal list-inside">
+            <li>Open the <strong class="text-white">Components</strong> panel (FAB → Components)</li>
+            <li>Click the <strong class="text-white">Dynamic</strong> category</li>
+            <li>Your collections appear as cards — click <strong class="text-white">+</strong> on the one you want</li>
+            <li>Placement mode activates — click where you want the section</li>
+            <li>A default template block is inserted with <code>&#123;&#123;#each team&#125;&#125;...&#123;&#123;/each&#125;&#125;</code> syntax</li>
+            <li>The template is replaced with real entry data when visitors view your page</li>
+          </ol>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">How the template syntax works</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">When you save a page containing <code>&#123;&#123;#each team&#125;&#125;...&#123;&#123;/each&#125;&#125;</code>, the assembler (the part of n3ware that builds pages for visitors) replaces those markers with real data. <code>&#123;&#123;this.name&#125;&#125;</code> becomes each team member's name, <code>&#123;&#123;this.role&#125;&#125;</code> becomes their role, and so on. You never need to edit this syntax manually — it's generated for you when you drop a collection.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Free tier limits</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Free accounts include <strong class="text-white">2 collections</strong> with up to <strong class="text-white">10 entries each</strong>. Upgrade to Pro for unlimited collections and entries.</p>
+        </section>
+
+        <!-- ── Section 8: Media Library ────────────────────────────── -->
+        <section id="media" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">📁</span> Media Library
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">What the media library shows</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">The Media Library lists every image and file you've uploaded to your site — with file name, size, upload date, and a thumbnail. It's also your place to clean up unused files.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Opening the media library</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">FAB → <strong class="text-white">Media</strong> pill.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Viewing file usage</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Each file in the library shows which pages and sections it's being used in (if any). This prevents you from accidentally deleting an image that's currently on a live page.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Deleting media</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Click the trash icon on any file. If the file is in use, a warning tells you where it's being used and links you to those pages so you can replace it first before deleting.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Uploading new files</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Click <strong class="text-white">Upload</strong> in the media panel or drag files directly into the panel. Files are stored in your site's cloud storage and immediately available to use anywhere on your site.</p>
+        </section>
+
+        <!-- ── Section 9: Testing ──────────────────────────────────── -->
+        <section id="testing" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">📱</span> Testing Your Site
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Test mode</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">FAB → <strong class="text-white">Test</strong> pill. Test mode opens a full-screen overlay with your site loaded inside an iframe. This is a real browser viewport — media queries fire, responsive behavior works, JavaScript runs — exactly what a visitor would see.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Device widths</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Click a device button in the top bar to resize the iframe viewport:</p>
+          <table>
+            <thead><tr><th>Device</th><th>Width</th></tr></thead>
+            <tbody>
+              <tr><td>Mobile</td><td>390px</td></tr>
+              <tr><td>Tablet</td><td>768px</td></tr>
+              <tr><td>Small Desktop</td><td>1024px</td></tr>
+              <tr><td>Wide Desktop</td><td>1440px</td></tr>
+              <tr><td>Full Width</td><td>100%</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Open in new tab</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Click <strong class="text-white">Open in new tab</strong> to launch your site in a clean browser tab with no editor chrome. Useful for sharing a preview link or testing on a real mobile device.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Closing test mode</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Click <strong class="text-white">✕</strong> or press <kbd>Escape</kbd> to close the test overlay and return to editing.</p>
+        </section>
+
+        <!-- ── Section 10: Saving ──────────────────────────────────── -->
+        <section id="saving" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">💾</span> Saving &amp; Publishing
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">How saving works</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">When you're happy with your changes, click the green <strong class="text-white">Save</strong> button (bottom-right, next to the FAB). Your edits are written to Google Cloud Storage, the assembler cache is cleared, and your live site updates — usually within a few seconds.</p>
+          <p class="text-gray-300 leading-relaxed mb-2">What gets saved:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li><strong class="text-white">Page HTML</strong> — the main content of your page</li>
+            <li><strong class="text-white">Navigation</strong> — your menu links, logo, and CTA button</li>
+            <li><strong class="text-white">Theme</strong> — colors, fonts, and sizing</li>
+            <li><strong class="text-white">Components</strong> — header, nav, and footer sections</li>
+          </ul>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Undo / Redo</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Every edit is tracked in a history. Press <kbd>Ctrl+Z</kbd> to undo and <kbd>Ctrl+Shift+Z</kbd> to redo. The history resets when you save or reload the page.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Exporting your HTML</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Click <strong class="text-white">Download</strong> in the toolbar to export your page as a clean, standalone HTML file with Tailwind CDN included. This file opens in any browser without n3ware. You can also click <strong class="text-white">Copy HTML</strong> to copy the source to your clipboard.</p>
+        </section>
+
+        <!-- ── Section 11: Domains ─────────────────────────────────── -->
+        <section id="domains" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">🌐</span> Domains &amp; Going Live
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Your free build URL</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Every site you create on n3ware gets a permanent build URL:</p>
+          <pre><code>https://n3ware.com/sites/{your-site-id}</code></pre>
+          <p class="text-gray-300 leading-relaxed mb-4">This URL always works — no subscription required. It's where you build, test, and share previews. Share it with a client, test on your phone, or use it as a staging environment.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Going live on a custom domain</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">To make your site available at <code>yourbusiness.com</code>, you need the <strong class="text-white">Pro plan</strong> ($20/mo). With Pro active:</p>
+          <ol class="text-gray-300 space-y-2 mb-4 list-decimal list-inside">
+            <li>Go to Dashboard → your site → <strong class="text-white">Settings</strong></li>
+            <li>Enter your domain name</li>
+            <li>Follow the DNS instructions (we'll tell you exactly what record to add at your domain registrar)</li>
+            <li>n3ware handles SSL (HTTPS) and serves your site through Cloudflare's global CDN</li>
+          </ol>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Pointing an existing domain</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">If you already own <code>yourbusiness.com</code>, add a CNAME record pointing to <code>assembler.n3ware.com</code>. We'll provision an SSL certificate automatically (usually within a few minutes).</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Buying a new domain through n3ware</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Coming soon — we'll offer domain registration at cost (no markup) directly from the dashboard.</p>
+        </section>
+
+        <!-- ── Section 12: Billing ─────────────────────────────────── -->
+        <section id="billing" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">💳</span> Billing &amp; Plans
+          </h2>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Free plan</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">Everything you need to build and preview your site, at no cost:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li>Unlimited editing sessions</li>
+            <li>Up to <strong class="text-white">4 pages</strong></li>
+            <li>Up to <strong class="text-white">5 image uploads</strong></li>
+            <li>Up to <strong class="text-white">2 collections</strong> (10 entries each)</li>
+            <li>Always-on build URL at <code>n3ware.com/sites/{id}</code></li>
+          </ul>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Pro plan — $20/month</h3>
+          <p class="text-gray-300 leading-relaxed mb-3">For sites that need to go live:</p>
+          <ul class="text-gray-300 space-y-2 mb-4 list-disc list-inside">
+            <li>Everything in Free, plus:</li>
+            <li><strong class="text-white">Unlimited pages</strong></li>
+            <li><strong class="text-white">Unlimited image uploads</strong></li>
+            <li><strong class="text-white">Unlimited collections and entries</strong></li>
+            <li><strong class="text-white">Custom domain</strong> — connect <code>yourbusiness.com</code></li>
+            <li><strong class="text-white">Live public hosting</strong> — SSL + global CDN</li>
+          </ul>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">How to upgrade</h3>
+          <ol class="text-gray-300 space-y-2 mb-4 list-decimal list-inside">
+            <li>Dashboard → <strong class="text-white">Billing</strong> tab</li>
+            <li>Click <strong class="text-white">Upgrade $20/mo</strong> on the site you want to activate</li>
+            <li>You're taken to Stripe's secure checkout — enter your card</li>
+            <li>After payment, your site activates immediately</li>
+          </ol>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">Managing your subscription</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Dashboard → <strong class="text-white">Billing</strong> → <strong class="text-white">Manage →</strong> (for active Pro sites). This opens the Stripe customer portal where you can update your payment method, view invoices, or cancel.</p>
+
+          <h3 class="text-lg font-semibold text-white mt-6 mb-2">What happens if you cancel</h3>
+          <p class="text-gray-300 leading-relaxed mb-4">Your site continues to be accessible at <code>n3ware.com/sites/{id}</code> — editing still works, nothing is deleted. Your custom domain stops resolving (visitors to <code>yourbusiness.com</code> will see a "site not active" page). Re-subscribe anytime to reactivate.</p>
+        </section>
+
+        <!-- ── Section 13: Shortcuts ───────────────────────────────── -->
+        <section id="shortcuts" class="border-b border-[#1A1A1A] pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">⌨️</span> Keyboard Shortcuts
+          </h2>
+
+          <table>
+            <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><kbd>Ctrl+Shift+E</kbd> / <kbd>Cmd+Shift+E</kbd></td><td>Toggle edit mode</td></tr>
+              <tr><td><kbd>Ctrl+Z</kbd> / <kbd>Cmd+Z</kbd></td><td>Undo</td></tr>
+              <tr><td><kbd>Ctrl+Shift+Z</kbd> / <kbd>Cmd+Shift+Z</kbd></td><td>Redo</td></tr>
+              <tr><td><kbd>Escape</kbd></td><td>Cancel (placement mode, text editing, close modal)</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ── Section 14: FAQ ─────────────────────────────────────── -->
+        <section id="faq" class="pb-12 mb-4">
+          <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3 pt-4">
+            <span class="text-2xl">❓</span> Frequently Asked Questions
+          </h2>
+
+          <div class="space-y-6">
+
+            <div class="bg-[#111111] border border-[#1A1A1A] rounded-xl p-5">
+              <p class="text-white font-semibold mb-2">Can I use n3ware on my existing website?</p>
+              <p class="text-gray-300 leading-relaxed text-sm">Yes. Paste your website's URL into the "Try it with your site" box on the homepage. n3ware loads your site in the visual editor so you can experiment with it — no installation required. Save and we'll host the updated version.</p>
+            </div>
+
+            <div class="bg-[#111111] border border-[#1A1A1A] rounded-xl p-5">
+              <p class="text-white font-semibold mb-2">Do I need to know HTML or CSS?</p>
+              <p class="text-gray-300 leading-relaxed text-sm">No. The editor is entirely visual — click to edit, drag to rearrange, drop to insert. No code required. If you do want to get into the code, the Download feature exports clean HTML you can open in any editor.</p>
+            </div>
+
+            <div class="bg-[#111111] border border-[#1A1A1A] rounded-xl p-5">
+              <p class="text-white font-semibold mb-2">Can I edit my site from my phone?</p>
+              <p class="text-gray-300 leading-relaxed text-sm">Yes. The editor works on any device with a modern browser. The FAB and toolbar are touch-friendly, and the component panels are scrollable on mobile.</p>
+            </div>
+
+            <div class="bg-[#111111] border border-[#1A1A1A] rounded-xl p-5">
+              <p class="text-white font-semibold mb-2">What happens to my site if I cancel my Pro subscription?</p>
+              <p class="text-gray-300 leading-relaxed text-sm">Your site and all your content are preserved. Your build URL (<code>n3ware.com/sites/{id}</code>) keeps working. Your custom domain (<code>yourbusiness.com</code>) stops resolving until you resubscribe. Nothing is deleted.</p>
+            </div>
+
+            <div class="bg-[#111111] border border-[#1A1A1A] rounded-xl p-5">
+              <p class="text-white font-semibold mb-2">Can I export my site to host it elsewhere?</p>
+              <p class="text-gray-300 leading-relaxed text-sm">Yes. Click <strong>Download</strong> in the toolbar to get a standalone HTML file with Tailwind CSS included. This file works in any browser and can be hosted on any static hosting provider (Netlify, Vercel, GitHub Pages, etc.).</p>
+            </div>
+
+            <div class="bg-[#111111] border border-[#1A1A1A] rounded-xl p-5">
+              <p class="text-white font-semibold mb-2">Is my data safe?</p>
+              <p class="text-gray-300 leading-relaxed text-sm">Your site files are stored in Google Cloud Storage with object versioning enabled. Every save creates a new version — you can roll back to any previous version from the dashboard. We use Cloudflare for CDN and DDoS protection.</p>
+            </div>
+
+            <div class="bg-[#111111] border border-[#1A1A1A] rounded-xl p-5">
+              <p class="text-white font-semibold mb-2">Can I have multiple sites?</p>
+              <p class="text-gray-300 leading-relaxed text-sm">Yes. Each site you create is independent, with its own pages, content, and billing. You pay $20/mo per live site — inactive sites are free to keep and edit.</p>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Bottom CTA -->
+        <div class="mt-8 mb-16 p-8 bg-[#111111] border border-[#1A1A1A] rounded-2xl text-center">
+          <p class="text-gray-400 text-sm mb-4">Ready to build your site?</p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/demo.html" class="inline-flex items-center justify-center gap-2 bg-[#E31337] hover:bg-[#FF2847] text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors">
+              Try the live demo →
+            </a>
+            <a href="/dashboard" class="inline-flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-[#2A2A2A] border border-[#2A2A2A] text-white px-6 py-3 rounded-xl text-sm font-semibold transition-colors">
+              Open dashboard
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-[#2A2A2A] py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-4 gap-10 mb-12">
+        <!-- Brand -->
+        <div class="md:col-span-1">
+          <a href="/" class="flex items-center gap-2 mb-4">
+            <img src="https://brand.n3ware.com/n3ware-logo-white-transparent.png" alt="n3ware" class="h-8">
+          </a>
+          <p class="text-gray-500 text-sm leading-relaxed mb-4">The website builder small businesses should've had all along.</p>
+          <a href="mailto:hello@n3ware.com" class="text-sm text-gray-500 hover:text-[#E31337] transition-colors">hello@n3ware.com</a>
+        </div>
+
+        <!-- Product -->
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4 uppercase tracking-wider">Product</h4>
+          <ul class="space-y-3 text-sm text-gray-500">
+            <li><a href="/features.html" class="hover:text-[#E31337] transition-colors">Features</a></li>
+            <li><a href="/#templates" class="hover:text-[#E31337] transition-colors">Templates</a></li>
+            <li><a href="/components.html" class="hover:text-[#E31337] transition-colors">Components</a></li>
+            <li><a href="/docs.html" class="hover:text-[#E31337] transition-colors">Documentation</a></li>
+            <li><a href="/demo.html" class="hover:text-[#E31337] transition-colors">Live Demo</a></li>
+            <li><a href="/dashboard" class="hover:text-[#E31337] transition-colors">Get Started</a></li>
+          </ul>
+        </div>
+
+        <!-- Compare -->
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4 uppercase tracking-wider">Compare</h4>
+          <ul class="space-y-3 text-sm text-gray-500">
+            <li><a href="/vs-weebly.html" class="hover:text-[#E31337] transition-colors">n3ware vs Weebly</a></li>
+            <li><a href="/vs-wix.html" class="hover:text-[#E31337] transition-colors">n3ware vs Wix</a></li>
+            <li><a href="/vs-squarespace.html" class="hover:text-[#E31337] transition-colors">n3ware vs Squarespace</a></li>
+            <li><a href="/vs-godaddy.html" class="hover:text-[#E31337] transition-colors">n3ware vs GoDaddy</a></li>
+            <li><a href="/vs-agency.html" class="hover:text-[#E31337] transition-colors">n3ware vs Web Agency</a></li>
+          </ul>
+        </div>
+
+        <!-- Company -->
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4 uppercase tracking-wider">Company</h4>
+          <ul class="space-y-3 text-sm text-gray-500">
+            <li><a href="/brand.html" class="hover:text-[#E31337] transition-colors">Brand</a></li>
+            <li><a href="/privacy.html" class="hover:text-[#E31337] transition-colors">Privacy Policy</a></li>
+            <li><a href="/terms.html" class="hover:text-[#E31337] transition-colors">Terms of Service</a></li>
+            <li><a href="mailto:hello@n3ware.com" class="hover:text-[#E31337] transition-colors">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-[#2A2A2A] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-gray-600 text-sm">&copy; 2026 n3ware. All rights reserved.</p>
+        <p class="text-gray-600 text-sm">Built for small business owners who deserve better.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Init Lucide icons
+    lucide.createIcons();
+
+    // Mobile nav drawer
+    const hamburger = document.getElementById('hamburger');
+    const drawerClose = document.getElementById('drawer-close');
+    const mobileDrawer = document.getElementById('mobile-drawer');
+    const mobileBackdrop = document.getElementById('mobile-backdrop');
+
+    function openDrawer() {
+      mobileDrawer.classList.add('open');
+      mobileBackdrop.classList.add('open');
+    }
+    function closeDrawer() {
+      mobileDrawer.classList.remove('open');
+      mobileBackdrop.classList.remove('open');
+    }
+    hamburger?.addEventListener('click', openDrawer);
+    drawerClose?.addEventListener('click', closeDrawer);
+    mobileBackdrop?.addEventListener('click', closeDrawer);
+
+    // Mobile sidebar toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const docsSidebar = document.getElementById('docs-sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    sidebarToggle?.addEventListener('click', () => {
+      docsSidebar.classList.toggle('sidebar-open');
+      sidebarBackdrop.classList.toggle('hidden');
+    });
+    sidebarBackdrop?.addEventListener('click', () => {
+      docsSidebar.classList.remove('sidebar-open');
+      sidebarBackdrop.classList.add('hidden');
+    });
+
+    // Close mobile sidebar when a link is clicked
+    docsSidebar?.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 1024) {
+          docsSidebar.classList.remove('sidebar-open');
+          sidebarBackdrop.classList.add('hidden');
+        }
+      });
+    });
+
+    // Sidebar scroll-spy using IntersectionObserver
+    const sections = document.querySelectorAll('section[id]');
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          sidebarLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>
