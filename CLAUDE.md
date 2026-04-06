@@ -528,6 +528,9 @@ Flat legacy properties (`primaryColor`, `fontFamily`, `bg`, `fg`, `radius`) were
 ### Worktrees are not main
 Any code deployed from a worktree that wasn't committed to main is orphaned when the worktree is deleted. Always commit before deploying.
 
+### QA login endpoint — remove before public launch
+`GET /api/auth/_qa_login?secret=n3qa2026&email=...` bypasses the email send, creates a real magic token in Firestore, and redirects to `/api/auth/verify`. Useful for automated testing and dev QA. **Remove or rotate the secret before production launch.** Lives in `src/api/magic-auth.js`.
+
 ---
 
 ## 20. File Map (Quick Reference)

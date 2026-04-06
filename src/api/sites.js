@@ -20,6 +20,7 @@ const cache        = require('../cache');
 const { authOrApiKey } = require('./auth');
 const config       = require('../config');
 const gcsFiles     = require('../storage/gcs-files');
+const storageCloud = require('../integrations/storage-cloud');
 
 // Firestore for domain → siteId mapping (only used when GCS is enabled)
 let _firestoreDb = null;
@@ -57,7 +58,20 @@ router.get('/', async (req, res) => {
     const filter = req.authType === 'jwt' && req.user
       ? { ownerId: req.user.id }
       : {};
-    const sites = (await cache.listSites(storage, filter)).map(_meta);
+    const raw = (await cache.listSites(storage, filter)).map(_meta);
+    const sites = GCS_ENABLED
+      ? await Promise.all(raw.map(async (site) => {
+          const [manifest, uploads] = await Promise.allSettled([
+            gcsFiles.getManifest(site.id),
+            storageCloud.listFiles(site.id),
+          ]);
+          return {
+            ...site,
+            pageCount:   manifest.status === 'fulfilled' ? (manifest.value?.pages?.length ?? 0) : 0,
+            uploadCount: uploads.status  === 'fulfilled' ? (uploads.value?.length  ?? 0) : 0,
+          };
+        }))
+      : raw;
     res.json({ sites });
   } catch (err) {
     _error(res, 500, err);
