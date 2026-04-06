@@ -114,6 +114,18 @@ router.get('/verify', async (req, res) => {
   }
 });
 
+// ── GET /api/auth/_qa_login ──────────────────────────────────────────────────
+// TEMPORARY: QA auto-login — remove before production launch
+router.get('/_qa_login', async (req, res) => {
+  const { secret, email } = req.query;
+  if (secret !== 'n3qa2026') return res.status(403).json({ error: 'bad secret' });
+  if (!email || !EMAIL_RE.test(email)) return res.status(400).json({ error: 'valid email required' });
+
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  tokens.saveToken(rawToken, email, Date.now() + TOKEN_TTL_MS);
+  res.redirect(`/api/auth/verify?token=${rawToken}`);
+});
+
 // ── GET /api/auth/magic/status ───────────────────────────────────────────────
 router.get('/magic/status', (req, res) => {
   const { email } = req.query;
