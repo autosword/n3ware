@@ -345,7 +345,7 @@
       typeLabel.className = 'n3-type-label';
       typeLabel.textContent = el.tagName.toLowerCase();
 
-      const dragBtn = N3UI.btn('⠿', 'n3-ctrl-btn n3-drag-handle', 'Drag to reorder');
+      const dragBtn = N3UI.btn(_ic('grip-vertical') || '⠿', 'n3-ctrl-btn n3-drag-handle', 'Drag to reorder');
       dragBtn.addEventListener('mousedown', e => this._drag.startDrag(e, el));
       dragBtn.addEventListener('touchstart', e => this._drag.startDragTouch(e, el), { passive: false });
 
@@ -365,7 +365,7 @@
         if (ok) this._events.emit('controls:delete', el);
       });
 
-      const _ic = (n) => { const f = (window._n3wareModules || {}).icon; return f ? f(n, { size: 14 }) : ''; };
+      const _ic = (n) => { const f = (window._n3wareModules || {}).icon; return f ? f(n, { size: 18 }) : ''; };
 
       // "Edit Nav" button — only on primary navs (skip sub-navs)
       if (el.tagName === 'NAV' && !el.hasAttribute('data-n3-sub-nav')) {
@@ -374,7 +374,7 @@
         overlay.append(typeLabel, dragBtn, upBtn, downBtn, dupBtn, navBtn, delBtn);
       } else if (el.tagName === 'IMG') {
         // "Replace image" button — only on img elements
-        const imgBtn = N3UI.btn(_ic('image') || '🖼', 'n3-ctrl-btn', 'Replace image');
+        const imgBtn = N3UI.btn(_ic('image') || '🖼', 'n3-ctrl-btn n3-img-btn', 'Replace image');
         imgBtn.addEventListener('click', e => {
           e.stopPropagation();
           const imageEditor = window.n3ware && window.n3ware._modules && window.n3ware._modules.image;
@@ -401,7 +401,7 @@
       const rect     = el.getBoundingClientRect();
       const overlayH = this._overlay.offsetHeight || 30;
       // Preferred: float above the element
-      let absTop = rect.top + window.scrollY - overlayH - 4;
+      let absTop = rect.top + window.scrollY - overlayH - 8;
       // If that would put the overlay above the n3ware toolbar (48px) + a little margin,
       // fall back to inside the top of the element.
       const minTop = window.scrollY + 52;

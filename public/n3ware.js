@@ -284,23 +284,25 @@
         `[data-n3-editable]{cursor:text!important}`,
         `.n3-hovered{outline:1.5px dashed rgba(59,130,246,.5)!important;outline-offset:1px}`,
         `.n3-selected{outline:2px solid ${T.accent}!important;outline-offset:2px}`,
-        `.n3-controls{position:absolute;z-index:99999;display:flex;align-items:center;gap:2px;background:${T.bgPanel};border:1px solid ${T.border};border-radius:6px;padding:3px 4px;box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:all;animation:n3-fade-in .12s ease}`,
+        `.n3-controls{position:absolute;z-index:99999;display:flex;align-items:center;gap:4px;background:${T.bgPanel};border:1px solid ${T.border};border-radius:6px;padding:4px 6px;box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:all;animation:n3-fade-in .12s ease}`,
         `@keyframes n3-fade-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`,
-        `.n3-ctrl-btn{background:transparent;border:none;color:${T.muted};width:24px;height:24px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .12s}`,
+        `.n3-ctrl-btn{background:transparent;border:none;color:${T.muted};width:32px;height:32px;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .12s}`,
         `.n3-ctrl-btn:hover{background:rgba(255,255,255,.1);color:${T.text}}`,
-        `.n3-ctrl-btn.n3-drag-handle{cursor:grab;font-size:14px}`,
+        `.n3-ctrl-btn.n3-drag-handle{cursor:grab;font-size:18px}`,
         `.n3-ctrl-btn.n3-drag-handle:active{cursor:grabbing}`,
         `.n3-ctrl-btn.n3-delete:hover{background:rgba(239,68,68,.2);color:#F87171}`,
         `.n3-ctrl-btn.n3-dup:hover{background:rgba(59,130,246,.2);color:${T.accent}}`,
-        `.n3-type-label{font:11px/1 system-ui,sans-serif;color:${T.muted};padding:0 6px;border-right:1px solid ${T.border};margin-right:2px}`,
+        `.n3-ctrl-btn.n3-img-btn{color:#F87171}`,
+        `.n3-ctrl-btn.n3-img-btn:hover{background:rgba(239,68,68,.2);color:#FCA5A5}`,
+        `.n3-type-label{font:10px/1 system-ui,sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:${T.muted};background:rgba(255,255,255,.06);padding:2px 7px;border-radius:3px;margin-right:2px}`,
         `.n3-drop-line{position:fixed;height:3px;background:${T.accent};border-radius:2px;z-index:999999;pointer-events:none;box-shadow:0 0 8px rgba(59,130,246,.6);transition:top .05s,left .05s,width .05s}`,
         `.n3-dragging{opacity:.4!important;transform:scale(.98)!important;transition:opacity .1s,transform .1s!important}`,
-        `.n3-format-bar{position:fixed;z-index:999999;background:${T.bgPanel};border:1px solid ${T.border};border-radius:8px;padding:5px 6px;display:flex;align-items:center;gap:2px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:n3-fade-in .12s ease;flex-wrap:wrap;max-width:480px}`,
-        `.n3-fmt-btn{background:transparent;border:1px solid transparent;color:${T.text};min-width:28px;height:28px;border-radius:5px;cursor:pointer;font:600 13px/1 system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:0 6px;transition:all .12s;gap:4px}`,
+        `.n3-format-bar{position:fixed;z-index:999999;background:${T.bgPanel};border:1px solid ${T.border};border-radius:8px;padding:5px 8px;display:flex;align-items:center;gap:3px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:n3-fade-in .12s ease;flex-wrap:wrap;max-width:520px;min-height:36px}`,
+        `.n3-fmt-btn{background:transparent;border:1px solid transparent;color:${T.text};min-width:32px;height:32px;border-radius:5px;cursor:pointer;font:600 13px/1 system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:0 7px;transition:all .12s;gap:4px}`,
         `.n3-fmt-btn:hover{background:rgba(255,255,255,.1);border-color:${T.border}}`,
         `.n3-fmt-btn.n3-active-fmt{background:${T.accent};color:#fff}`,
-        `.n3-fmt-sep{width:1px;height:20px;background:${T.border};margin:0 2px}`,
-        `.n3-fmt-select{background:rgba(255,255,255,.06);border:1px solid ${T.border};color:${T.text};border-radius:5px;padding:0 6px;height:28px;font:12px/1 system-ui,sans-serif;cursor:pointer;outline:none}`,
+        `.n3-fmt-sep{width:1px;height:20px;background:${T.border};margin:0 4px}`,
+        `.n3-fmt-select{background:rgba(255,255,255,.06);border:1px solid ${T.border};color:${T.text};border-radius:5px;padding:0 6px;height:32px;min-width:60px;font:12px/1 system-ui,sans-serif;cursor:pointer;outline:none}`,
         `.n3-fmt-select:hover{border-color:${T.accent}}`,
         `.n3-color-btn{position:relative;width:28px;height:28px}`,
         `.n3-color-btn input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}`,
@@ -1583,9 +1585,10 @@
       if (this.toolbar)  this.toolbar.show();
       document.body.classList.add('n3-editing');
       this._syncEditBtn(true);
-      document.addEventListener('click', this._onClickEl = this._handleClick.bind(this), true);
-      document.addEventListener('focus', this._onFocus   = this._handleFocus.bind(this), true);
-      document.addEventListener('input', this._onInput   = this._handleInput.bind(this));
+      document.addEventListener('click',   this._onClickEl  = this._handleClick.bind(this),  true);
+      document.addEventListener('dblclick', this._onDblClick = this._handleDblClick.bind(this), true);
+      document.addEventListener('focus',   this._onFocus    = this._handleFocus.bind(this),   true);
+      document.addEventListener('input',   this._onInput    = this._handleInput.bind(this));
       N3UI.toast('Edit mode on — click any element to edit', 'success');
     }
 
@@ -1604,9 +1607,10 @@
       this._syncEditBtn(false);
       this._fabOpen = false;
       if (this._fab) this._fab.classList.remove('n3-expanded');
-      document.removeEventListener('click', this._onClickEl, true);
-      document.removeEventListener('focus', this._onFocus,   true);
-      document.removeEventListener('input', this._onInput);
+      document.removeEventListener('click',   this._onClickEl,  true);
+      document.removeEventListener('dblclick', this._onDblClick, true);
+      document.removeEventListener('focus',   this._onFocus,    true);
+      document.removeEventListener('input',   this._onInput);
       N3UI.toast('Edit mode off', 'info', 1500);
     }
 
@@ -1735,6 +1739,17 @@
           sel.removeAllRanges();
           sel.addRange(range);
         }
+      }
+    }
+
+    _handleDblClick(e) {
+      if (!this._editMode || N3UI.isEditorEl(e.target)) return;
+      const img = e.target.closest('img');
+      if (img) {
+        e.preventDefault();
+        e.stopPropagation();
+        const imageEditor = window.n3ware && window.n3ware._modules && window.n3ware._modules.image;
+        if (imageEditor) imageEditor.open(img);
       }
     }
 
