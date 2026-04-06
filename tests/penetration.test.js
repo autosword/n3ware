@@ -25,6 +25,7 @@ const FAKE_SITE   = 'pen-test-nonexistent-site-000';
 const FAKE_SLUG   = 'pen-test-slug';
 const FAKE_JOB    = 'pen-test-job-000';
 const FAKE_REV    = 'pen-test-rev-000';
+const FAKE_ENTRY  = 'pen-test-entry-000';
 const OVERSIZED   = 'x'.repeat(11 * 1024 * 1024);  // 11MB string
 
 // ── Minimal JWT builder (no external deps) ────────────────────────────────────
@@ -95,12 +96,32 @@ const ROUTES = [
   { method: 'PUT',  path: '/api/sites/:id/integrations',               auth: 'required' },
   { method: 'DELETE', path: '/api/sites/:id/integrations/:key',        auth: 'required' },
 
+  // ── Collections (auth required — authOrApiKey) ───────────────────────────
+  { method: 'GET',    path: '/api/sites/:siteId/collections',                             auth: 'required' },
+  { method: 'POST',   path: '/api/sites/:siteId/collections',                             auth: 'required' },
+  { method: 'GET',    path: '/api/sites/:siteId/collections/:slug',                       auth: 'required' },
+  { method: 'PUT',    path: '/api/sites/:siteId/collections/:slug',                       auth: 'required' },
+  { method: 'DELETE', path: '/api/sites/:siteId/collections/:slug',                       auth: 'required' },
+  { method: 'GET',    path: '/api/sites/:siteId/collections/:slug/entries',               auth: 'required' },
+  { method: 'POST',   path: '/api/sites/:siteId/collections/:slug/entries',               auth: 'required' },
+  { method: 'GET',    path: '/api/sites/:siteId/collections/:slug/entries/:entryId',      auth: 'required' },
+  { method: 'PUT',    path: '/api/sites/:siteId/collections/:slug/entries/:entryId',      auth: 'required' },
+  { method: 'DELETE', path: '/api/sites/:siteId/collections/:slug/entries/:entryId',      auth: 'required' },
+
+  // ── Collection generation (public — stateless AI call) ───────────────────
+  { method: 'POST',   path: '/api/collections/generate',               auth: 'public'   },
+  { method: 'POST',   path: '/api/collections/generate-entries',       auth: 'public'   },
+
+  // ── Media manager (auth required — authOrApiKey) ─────────────────────────
+  { method: 'GET',    path: '/api/sites/:id/media',                    auth: 'required' },
+  { method: 'DELETE', path: '/api/sites/:id/media/:assetId',           auth: 'required' },
+
   // ── Billing ──────────────────────────────────────────────────────────────
   { method: 'GET',  path: '/api/billing',                              auth: 'public'   },
   { method: 'POST', path: '/api/billing/checkout',                     auth: 'required' },
-  { method: 'GET',  path: '/api/billing/subscription',                 auth: 'required' },
-  { method: 'POST', path: '/api/billing/cancel',                       auth: 'required' },
-  { method: 'POST', path: '/api/billing/webhook',   auth: 'public',   skip: 'webhook — raw body, not worth probing' },
+  { method: 'POST', path: '/api/billing/portal',                       auth: 'required' },
+  { method: 'GET',  path: '/api/billing/subscription/:siteId',         auth: 'required' },
+  { method: 'POST', path: '/api/billing/webhook',   auth: 'public',   skip: 'webhook — raw body; Stripe signature required; not probed here' },
 
   // ── Domains ───────────────────────────────────────────────────────────────
   { method: 'GET',  path: '/api/domains/search',                       auth: 'required' },
@@ -157,12 +178,15 @@ const ROUTES = [
 // ── Path substitution ─────────────────────────────────────────────────────────
 function resolvePath(p) {
   return p
-    .replace(':id',   FAKE_SITE)
-    .replace(':slug', FAKE_SLUG)
-    .replace(':jobId', FAKE_JOB)
-    .replace(':revId', FAKE_REV)
-    .replace(':name', 'header')
-    .replace(':key',  'ga4');
+    .replace(':siteId', FAKE_SITE)  // collections/media use :siteId
+    .replace(':id',     FAKE_SITE)
+    .replace(':entryId', FAKE_ENTRY)
+    .replace(':assetId', 'pen-test-asset-000')
+    .replace(':slug',   FAKE_SLUG)
+    .replace(':jobId',  FAKE_JOB)
+    .replace(':revId',  FAKE_REV)
+    .replace(':name',   'header')
+    .replace(':key',    'ga4');
 }
 
 // ── HTTP helper ───────────────────────────────────────────────────────────────
@@ -308,9 +332,11 @@ async function runInputAttacks(route, resolvedPath) {
     // Substitute into URL path param positions
     const injPaths = [
       resolvedPath.replace(FAKE_SITE, SQL_INJ).replace(FAKE_SLUG, SQL_INJ)
-                  .replace(FAKE_JOB, SQL_INJ).replace(FAKE_REV, SQL_INJ),
+                  .replace(FAKE_JOB, SQL_INJ).replace(FAKE_REV, SQL_INJ)
+                  .replace(FAKE_ENTRY, SQL_INJ).replace('pen-test-asset-000', SQL_INJ),
       resolvedPath.replace(FAKE_SITE, NOSQL_INJ).replace(FAKE_SLUG, NOSQL_INJ)
-                  .replace(FAKE_JOB, NOSQL_INJ).replace(FAKE_REV, NOSQL_INJ),
+                  .replace(FAKE_JOB, NOSQL_INJ).replace(FAKE_REV, NOSQL_INJ)
+                  .replace(FAKE_ENTRY, NOSQL_INJ).replace('pen-test-asset-000', NOSQL_INJ),
     ];
     for (const [label, injPath] of [['sql', injPaths[0]], ['nosql', injPaths[1]]]) {
       const injBody = ['POST', 'PUT', 'PATCH'].includes(method)
@@ -351,6 +377,34 @@ async function runInputAttacks(route, resolvedPath) {
     }
   }
   } // end skipInjection else
+
+  // 8b. Path traversal (only for routes with slug/entryId/assetId params)
+  const hasSlugLikeParam = route.path.includes(':slug') || route.path.includes(':entryId') || route.path.includes(':assetId');
+  if (hasSlugLikeParam && !route.skipInjection) {
+    const traversalPayloads = [
+      ['path traversal (../)', '../../../etc/passwd'],
+      ['path traversal (<script>)', '<script>alert(1)</script>'],
+    ];
+    for (const [label, payload] of traversalPayloads) {
+      const travPath = resolvedPath
+        .replace(FAKE_SLUG, payload)
+        .replace(FAKE_ENTRY, payload)
+        .replace('pen-test-asset-000', payload);
+      const s = await req(method, encodeURI(travPath), {
+        body: ['POST', 'PUT', 'PATCH'].includes(method) ? { _pen: 1 } : undefined,
+      });
+      await delay(DELAY_MS);
+      if (s === 400 || s === 404 || s === 401 || s === 403) {
+        recordPass(method, resolvedPath, label, s);
+      } else if (s === 500) {
+        recordFail(method, resolvedPath, label, s, '400/404', `server crashed (500) on ${label}`);
+      } else if (is2xx(s)) {
+        recordFail(method, resolvedPath, label, s, '400/404', `server returned ${s} on ${label} — possible path traversal`);
+      } else {
+        recordPass(method, resolvedPath, `${label} (other)`, s);
+      }
+    }
+  }
 
   // 9. Oversized payload (only for POST/PUT/PATCH)
   if (['POST', 'PUT', 'PATCH'].includes(method)) {
