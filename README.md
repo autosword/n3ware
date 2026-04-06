@@ -1,237 +1,171 @@
-# n3ware Cloud
+# n3ware
 
-Visual webpage editor + hosted publishing platform.
+Visual website editor platform. One `<script>` tag turns any hosted page into an in-browser WYSIWYG editor: inline text editing, drag-and-drop layout, component placement, theme controls, nav management, CMS collections, and one-click save to cloud storage.
 
-Embed `n3ware.js` on any page, edit visually, and click **Publish** to push updates live — with cache invalidation and revision history.
+**Stack:** Node.js (Express) · Go assembler · Google Cloud Run · Firestore · GCS · Cloudflare
 
-## Quick Start (local dev)
+See **`CLAUDE.md`** for the full architecture, module map, data models, deploy pipeline, and all known gotchas.
+
+---
+
+## Quick start (local dev)
 
 ```bash
 npm install
-npm start          # http://localhost:8080
+STORAGE_BACKEND=local JWT_SECRET=dev MASTER_API_KEY=dev node server.js
+# → http://localhost:8080
 ```
 
-## Environment Variables
+---
 
-| Variable | Default | Description |
-|---|---|---|
-| `NODE_ENV` | `development` | `development` or `production` |
-| `PORT` | `8080` | HTTP port |
-| `STORAGE_BACKEND` | `local` | `local` (JSON files) or `firestore` |
-| `DATA_DIR` | `./data/sites` | Local storage root |
-| `MASTER_API_KEY` | `dev-master-key` | API key for all requests |
-| `CDN_PROVIDER` | `none` | `none`, `cloudflare`, or `gcp` |
-| `CF_ZONE_ID` | — | Cloudflare Zone ID |
-| `CF_API_TOKEN` | — | Cloudflare API token |
-| `GCP_PROJECT_ID` | — | Google Cloud project |
-| `GCP_BACKEND_NAME` | — | Cloud CDN URL map name |
+## Testing
 
-## API Reference
+### Standard suite
 
-All endpoints require `X-API-Key` header (or `?apiKey=` query param).
-
-### Sites
+All tests run against a local server with mock/local storage. No GCS, Firestore, or real secrets required.
 
 ```bash
-# Create site
-curl -X POST /api/sites \
-  -H "X-API-Key: $KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"html":"<html>...</html>","message":"Initial"}'
+# API endpoint tests
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/api.test.js
 
-# List sites
-curl /api/sites -H "X-API-Key: $KEY"
+# Comprehensive route coverage
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/comprehensive.test.js
 
-# Get site metadata
-curl /api/sites/:id -H "X-API-Key: $KEY"
+# Save pipeline (local storage backend, port 8099)
+STORAGE_BACKEND=local MASTER_API_KEY=test JWT_SECRET=test PORT=8099 NODE_ENV=test node tests/save-flow.test.js
 
-# Get raw HTML
-curl /api/sites/:id/html -H "X-API-Key: $KEY"
+# Auth flow (local storage backend, port 8099)
+STORAGE_BACKEND=local JWT_SECRET=test MASTER_API_KEY=test PORT=8099 NODE_ENV=test node tests/auth-flow.test.js
 
-# Save (publish) new HTML — invalidates cache
-curl -X POST /api/sites/:id/save \
-  -H "X-API-Key: $KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"html":"<html>...</html>","message":"Updated hero"}'
+# Domain management
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/domains.test.js
 
-# Delete site
-curl -X DELETE /api/sites/:id -H "X-API-Key: $KEY"
-```
+# Rate limiting
+node tests/rate-limit.test.js
 
-### Revisions
-
-```bash
-# List revision history
-curl /api/sites/:id/revisions -H "X-API-Key: $KEY"
-
-# Get a specific revision (includes full HTML)
-curl /api/sites/:id/revisions/:revId -H "X-API-Key: $KEY"
-
-# Rollback to a revision
-curl -X POST /api/sites/:id/revisions/:revId/rollback -H "X-API-Key: $KEY"
-```
-
-### Site Serving
-
-Published sites are served at `/sites/:siteId`. Each page has the n3ware editor auto-injected:
-
-```
-GET /sites/:siteId
-```
-
-The injected script tag looks like:
-```html
-<script src="/n3ware.js"
-        data-n3-site="site_abc123"
-        data-n3-api="/api"></script>
-```
-
-The site owner can add a `data-n3-key` attribute manually to enable the **Publish** button.
-
-## Cloud Save Integration
-
-When `n3ware.js` detects cloud config on its script tag, it enables cloud saving:
-
-```html
-<script src="https://your-app.example.com/n3ware.js"
-        data-n3-api="https://your-app.example.com/api"
-        data-n3-site="site_abc123"
-        data-n3-key="your-api-key"></script>
-```
-
-In edit mode:
-- **☁ Publish** — saves clean HTML to the API, invalidates cache
-- **↺ History** — opens revision panel with rollback support
-- **⬇ Download** — still available as local backup
-
-## Deploying to Google Cloud Run
-
-### Prerequisites
-
-```bash
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-gcloud services enable run.googleapis.com cloudbuild.googleapis.com
-```
-
-### Deploy with Cloud Build
-
-```bash
-gcloud builds submit --config cloudbuild.yaml
-```
-
-This builds the Docker image, pushes it to Artifact Registry, and deploys to Cloud Run in `us-east1`.
-
-### First-time Firestore setup
-
-```bash
-gcloud firestore databases create --region=us-east1
-```
-
-Set these environment variables on the Cloud Run service:
-
-```bash
-gcloud run services update n3ware \
-  --region=us-east1 \
-  --set-env-vars="STORAGE_BACKEND=firestore,GCP_PROJECT_ID=YOUR_PROJECT,MASTER_API_KEY=your-secure-key"
-```
-
-## Cache Invalidation Strategy
-
-| Asset | Cache-Control |
-|---|---|
-| Site HTML (`/sites/:id`) | `public, s-maxage=300, stale-while-revalidate=60` |
-| API responses | `private, no-cache` |
-| Static files (`n3ware.js`) | `public, max-age=86400` |
-
-When a site is saved:
-1. Memory cache for that site is immediately invalidated
-2. CDN purge request is fired (Cloudflare or GCP CDN, if configured)
-3. Next request fetches fresh HTML from storage
-
-## Running Tests
-
-```bash
-# API integration tests (starts server internally)
-node tests/api.test.js
-
-# n3ware.js smoke tests
+# Smoke tests
 node tests/run-tests.js
 
-# Both
-npm test
+# Collections CRUD (full assertions require GCS_BUCKET env var)
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/collections.test.js
+
+# Media management
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/media.test.js
 ```
 
-## Production Deployment with Secret Manager
+- `STORAGE_BACKEND=local` uses JSON file storage under `.data/` (no GCS or Firestore)
+- `MASTER_API_KEY=test` and `JWT_SECRET=test` are test-only values
+- Tests marked `[SKIP: GCS]` require `GCS_BUCKET` and are skipped in local dev
 
-All sensitive credentials are stored in [Google Secret Manager](https://cloud.google.com/secret-manager) and loaded automatically at startup in production. `src/secrets.js` fetches them before any integration is initialised, so the app sees them as normal environment variables.
+### Test count
 
-### 1. Enable the API
-
-```bash
-gcloud services enable secretmanager.googleapis.com --project=YOUR_PROJECT_ID
-```
-
-### 2. Create secrets
-
-Run the interactive setup script once per project:
-
-```bash
-bash scripts/setup-secrets.sh YOUR_PROJECT_ID
-```
-
-The script prompts for each of the 17 secret values (blank = skip). It creates the secret with automatic replication and adds the first version. Re-running the script adds a new version to any existing secret.
-
-Secrets managed:
-
-| Secret name | Env var |
+| Suite | Checks |
 |---|---|
-| `jwt-secret` | `JWT_SECRET` |
-| `master-api-key` | `MASTER_API_KEY` |
-| `stripe-secret-key` | `STRIPE_SECRET_KEY` |
-| `stripe-webhook-secret` | `STRIPE_WEBHOOK_SECRET` |
-| `stripe-starter-price-id` | `STRIPE_STARTER_PRICE_ID` |
-| `stripe-pro-price-id` | `STRIPE_PRO_PRICE_ID` |
-| `stripe-agency-price-id` | `STRIPE_AGENCY_PRICE_ID` |
-| `sendgrid-api-key` | `SENDGRID_API_KEY` |
-| `postmark-api-key` | `POSTMARK_API_KEY` |
-| `cloudflare-api-token` | `CLOUDFLARE_API_TOKEN` |
-| `cloudflare-account-id` | `CLOUDFLARE_ACCOUNT_ID` |
-| `cloudflare-zone-id` | `CLOUDFLARE_ZONE_ID` |
-| `r2-access-key-id` | `R2_ACCESS_KEY_ID` |
-| `r2-secret-access-key` | `R2_SECRET_ACCESS_KEY` |
-| `anthropic-api-key` | `ANTHROPIC_API_KEY` |
-| `google-client-id` | `GOOGLE_CLIENT_ID` |
-| `google-client-secret` | `GOOGLE_CLIENT_SECRET` |
+| `api.test.js` | 63 |
+| `comprehensive.test.js` | 67 |
+| `save-flow.test.js` | 21 |
+| `auth-flow.test.js` | 80 |
+| `domains.test.js` | 23 |
+| `rate-limit.test.js` | 9 |
+| `run-tests.js` | 76 |
+| `collections.test.js` | ~6 |
+| `media.test.js` | ~6 |
+| `penetration.test.js` | 637 |
+| **Total** | **~1000** |
 
-### 3. Grant Cloud Run access
+### Go assembler tests
 
 ```bash
-PROJECT_NUMBER=$(gcloud projects describe YOUR_PROJECT_ID --format='value(projectNumber)')
-SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-
-gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
-  --member="serviceAccount:${SA}" \
-  --role="roles/secretmanager.secretAccessor"
+cd assembler && /opt/homebrew/bin/go test ./... -v
 ```
 
-### 4. Deploy
+12 unit tests for the Handlebars-style template processor (`{{#each}}`, `{{#if}}`, `{{this.field}}`, `{{site.*}}`, `{{slug.count}}`).
 
-Cloud Build (`cloudbuild.yaml`) passes secrets to Cloud Run via `--set-secrets` automatically. Just push to trigger the build:
+---
+
+### Visual QA
+
+Uses Claude in Chrome MCP to open the live site, authenticate, and exercise every editor feature interactively.
+
+**QA login endpoint** — bypasses email, creates a real auth session directly:
+
+```
+GET https://n3ware.com/api/auth/_qa_login?secret=n3qa2026&email=randy@zesty.io
+```
+
+Navigate to this URL in Chrome. It creates a real magic token in Firestore, redirects to `/api/auth/verify`, sets the `n3_token` cookie server-side, and lands on `/dashboard`. No email required.
+
+> **Remove or rotate this secret before production launch.** See `CLAUDE.md §25`.
+
+**Visual QA covers:**
+- Editor loading (22 modules in `_MODULES`)
+- FAB pills: Save, Components, Theme, Nav, Content, Media
+- Component placement + AI Customize (images sent as base64 to Claude)
+- Theme panel: colors, typography, border radius, logo/favicon upload
+- Nav editor: links, logo, CTA button, mobile drawer preview
+- Image replace modal (click any `<img>` in the editor)
+- Content/Collections panel: create collection (AI or presets), add entries, live preview
+- Media manager: upload, browse, insert, delete
+- Test mode: iframe device preview (mobile/tablet/desktop)
+- Save roundtrip: edit → save → reload → verify persistence
+- Billing dashboard: usage counters (pages/uploads), plan status, Stripe checkout
+
+---
+
+### Penetration testing
+
+Run before major launches or after any auth-boundary change. **Not part of the normal dev loop.**
 
 ```bash
-git push origin main
+# Against production
+BASE_URL=https://n3ware.com node tests/penetration.test.js
+
+# Against local
+BASE_URL=http://localhost:8080 node tests/penetration.test.js
 ```
 
-### Updating a secret
+637 checks across every API route: no credentials, bogus/expired/wrong-secret JWT, bogus API key, NoSQL/SQL injection payloads in path params and bodies, 11MB oversized bodies, method mismatches, rate limit verification.
+
+**Deliberately excluded:**
+- `POST /api/domains/register` — could purchase a real domain
+- `POST /api/billing/webhook` — raw-body Stripe endpoint
+- Wrong-owner cross-site isolation — requires two real auth sessions, must be done manually
+
+---
+
+## Deploy
+
+**Critical:** always use `--source=assembler` for the Go service. Using `--source=.` deploys the Node.js Dockerfile instead. This has happened twice.
 
 ```bash
-echo -n "new-value" | gcloud secrets versions add SECRET_NAME \
-  --project=YOUR_PROJECT_ID --data-file=-
+# Go assembler
+gcloud run deploy n3ware-assembler --source=assembler --region=us-east1 --project=n3ware
+
+# Node service
+gcloud run deploy n3ware --source=. --region=us-east1 --project=n3ware
 ```
 
-The next deploy picks up the new `latest` version.
+After any deploy, purge Cloudflare cache (zone ID + token in Secret Manager).
 
-### Local development
+See `CLAUDE.md §12` for the full deploy pipeline and verification steps.
 
-`src/secrets.js` is a no-op when `NODE_ENV != production` or `GOOGLE_CLOUD_PROJECT` is unset. Use a local `.env` file (copy `.env.example`) for all credentials in development.
+---
+
+## Key file map
+
+| Question | File |
+|---|---|
+| Save flow | `src/api/pages.js` → `src/storage/gcs-files.js` |
+| Auth | `src/api/magic-auth.js` → `src/api/auth.js` |
+| Editor modules | `public/n3ware.js` (`_MODULES` array, 22 entries) |
+| Assembler entry | `assembler/assembler.go` + `assembler/main.go` |
+| Template processor | `assembler/template.go` |
+| Theme | `n3ware-theme-persist.js` → `n3ware-theme-apply.js` → `n3ware-theme.js` |
+| Nav | `n3ware-nav-persist.js` → `n3ware-nav-render.js` → `n3ware-nav.js` |
+| Collections UI | `n3ware-content-panel.js` → `n3ware-content.js` |
+| Collections API | `src/api/collections.js` + `src/storage/gcs-files.js` |
+| Billing | `src/api/billing.js` (Stripe) |
+| Media | `public/n3ware-media.js` + `src/api/media.js` |
+| Image replace | `public/n3ware-image.js` |
+
+Full file map: `CLAUDE.md §20`.
