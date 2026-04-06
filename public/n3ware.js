@@ -80,6 +80,10 @@
     'n3ware-sub-nav.js',
     'n3ware-image.js',
     'n3ware-media.js',
+    'n3ware-content-css.js',
+    'n3ware-content-render.js',
+    'n3ware-content-panel.js',
+    'n3ware-content.js',
   ];
 
   /**
@@ -656,7 +660,10 @@
         el.closest('.n3-media-backdrop') ||
         el.closest('.n3-preview-popover') ||
         el.closest('.n3-test-overlay') ||
-        el.closest('.n3-test-close')
+        el.closest('.n3-test-close')   ||
+        el.closest('.n3-content-panel') ||
+        el.closest('.n3-modal-overlay') ||
+        el.closest('.n3-modal')
       ));
     }
   }
@@ -814,6 +821,9 @@
       this.image = M.N3ImageEditor ? new M.N3ImageEditor(this.events, this._cloudCfg) : null;
       this.media = M.N3MediaManager ? new M.N3MediaManager(this.events, this._cloudCfg) : null;
 
+      // Content collections manager
+      this.content = M.N3ContentManager ? new M.N3ContentManager() : null;
+
       this._fab          = null;
       this._fabOpen      = false;
       const _VALID_MODES = new Set(['mobile','tablet','desktop-sm','desktop-wide','full','none']);
@@ -867,6 +877,11 @@
       if (this.subNav)     this.subNav.mount();
       if (this.image)      this.image.mount();
       if (this.media)      this.media.mount();
+      if (this.content)    this.content.init(
+        this._cloudCfg ? this._cloudCfg.site : null,
+        this._cloudCfg ? this._cloudCfg.key  : null,
+        { editor: this }
+      );
       this._buildControlPanel();
       this._buildSaveBtn();
       this._wireEvents();
@@ -928,7 +943,7 @@
           panel: this.panel, toolbar: this.toolbar, cloud: this.cloud,
           analytics: this.analytics, components: this.components,
           scripts: this.scripts, theme: this.theme, nav: this.nav, subNav: this.subNav,
-          image: this.image, media: this.media,
+          image: this.image, media: this.media, content: this.content,
           showUpgradeModal: (opts) => this.showUpgradeModal(opts),
         },
       };
@@ -999,12 +1014,27 @@
         if (this.media) { this.media.open(); }
       });
 
+      const DB_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>`;
+      const contentBtn = document.createElement('button');
+      contentBtn.className = 'n3-fab-btn';
+      contentBtn.innerHTML = DB_ICON + '<span>Content</span>';
+      contentBtn.title = 'Content Collections';
+      contentBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (this.content) {
+          this.content.toggle();
+          contentBtn.classList.toggle('n3-active', this.content.isOpen());
+        }
+      });
+
       actions.appendChild(analyticsBtn);
       actions.appendChild(compBtn);
+      actions.appendChild(contentBtn);
       actions.appendChild(themeBtn);
       actions.appendChild(mediaBtn);
-      this._themeFabBtn = themeBtn;
-      this._mediaFabBtn = mediaBtn;
+      this._themeFabBtn   = themeBtn;
+      this._mediaFabBtn   = mediaBtn;
+      this._contentFabBtn = contentBtn;
 
       if (this._cloudCfg) {
         const PLUS = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;

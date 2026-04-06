@@ -306,15 +306,23 @@
     }
 
     _renderCats() {
-      const cats = ['all', ...new Set(this._components.map(c => c.category))];
+      const cats = ['all', ...new Set(this._components.map(c => c.category)), 'dynamic'];
       const catsEl = this._el.querySelector('.n3-comp-cats');
       const catsHtml = cats.map(c =>
-        `<button class="n3-comp-cat-btn${c === this._category ? ' n3-comp-cat-on' : ''}" data-cat="${c}">${c === 'all' ? 'All' : c}</button>`
+        `<button class="n3-comp-cat-btn${c === this._category ? ' n3-comp-cat-on' : ''}" data-cat="${c}">${c === 'all' ? 'All' : c === 'dynamic' ? 'Dynamic' : c}</button>`
       ).join('');
       catsEl.innerHTML = catsHtml;
     }
 
     _renderList() {
+      const listEl = this._el.querySelector('.n3-comp-list');
+
+      // ── Dynamic category ──────────────────────────────────────────────────
+      if (this._category === 'dynamic') {
+        this._renderDynamic(listEl);
+        return;
+      }
+
       const filtered = this._components.filter(c => {
         const inCat    = this._category === 'all' || c.category === this._category;
         const inSearch = !this._filter ||
@@ -324,8 +332,12 @@
         return inCat && inSearch;
       });
 
-      const listEl = this._el.querySelector('.n3-comp-list');
-      if (!filtered.length) {
+      // When showing 'all', also inject dynamic collection items
+      const dynamicTemplates = (this._category === 'all' && !this._filter)
+        ? this._getDynamicTemplates()
+        : [];
+
+      if (!filtered.length && !dynamicTemplates.length) {
         const emptyHtml = '<div class="n3-comp-empty">No components match your search.</div>';
         listEl.innerHTML = emptyHtml;
         return;
@@ -335,7 +347,7 @@
       const groups = {};
       filtered.forEach(c => { (groups[c.category] = groups[c.category] || []).push(c); });
 
-      const listHtml = Object.entries(groups).map(([cat, comps]) =>
+      let listHtml = Object.entries(groups).map(([cat, comps]) =>
         `<div>
           <div class="n3-comp-group-hdr">${cat}</div>
           ${comps.map(c => `<div class="n3-comp-item" data-comp-id="${c.id}" draggable="true">
@@ -348,9 +360,15 @@
           </div>`).join('')}
         </div>`
       ).join('');
+
+      // Append dynamic group when showing all
+      if (dynamicTemplates.length) {
+        listHtml += this._dynamicGroupHtml(dynamicTemplates);
+      }
+
       listEl.innerHTML = listHtml;
 
-      // Bind drag + click events
+      // Bind drag + click events for static components
       listEl.querySelectorAll('.n3-comp-item[data-comp-id]').forEach(item => {
         const comp = this._components.find(c => c.id === item.dataset.compId);
         if (!comp) return;
@@ -374,6 +392,69 @@
           const comp = this._components.find(c => c.id === btn.dataset.compId);
           if (!comp) return;
           this._enterPlacementMode(comp);
+        });
+      });
+
+      // Bind dynamic add buttons
+      this._bindDynamicBtns(listEl, dynamicTemplates);
+    }
+
+    /** Get collection templates from content module. @private */
+    _getDynamicTemplates() {
+      try {
+        const content = window.n3ware && window.n3ware._modules && window.n3ware._modules.content;
+        if (content) return content.getCollectionTemplates() || [];
+      } catch (_) {}
+      return [];
+    }
+
+    /** HTML for the Dynamic group. @private */
+    _dynamicGroupHtml(templates) {
+      if (!templates.length) return '';
+      const DB = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>`;
+      const rows = templates.map(t =>
+        `<div class="n3-comp-item" data-dyn-id="${_esc(t.id)}">
+          <span class="n3-comp-thumb" style="display:inline-flex;align-items:center">${DB}</span>
+          <div class="n3-comp-info">
+            <div class="n3-comp-name">${_esc(t.name)}</div>
+            <div class="n3-comp-badge">${t.entryCount} entr${t.entryCount === 1 ? 'y' : 'ies'}</div>
+          </div>
+          <button class="n3-comp-add n3-dyn-add" data-dyn-id="${_esc(t.id)}" title="Insert collection block">+</button>
+        </div>`
+      ).join('');
+      return `<div><div class="n3-comp-group-hdr">Dynamic</div>${rows}</div>`;
+    }
+
+    /** Render the dynamic-only category view. @private */
+    _renderDynamic(listEl) {
+      const templates = this._getDynamicTemplates();
+      if (!templates.length) {
+        listEl.innerHTML = '<div class="n3-comp-empty">Create collections in the Content panel to add dynamic content.</div>';
+        return;
+      }
+      listEl.innerHTML = `<div><div class="n3-comp-group-hdr">Dynamic</div>${templates.map(t => {
+        const DB = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>`;
+        return `<div class="n3-comp-item" data-dyn-id="${_esc(t.id)}">
+          <span class="n3-comp-thumb" style="display:inline-flex;align-items:center">${DB}</span>
+          <div class="n3-comp-info">
+            <div class="n3-comp-name">${_esc(t.name)}</div>
+            <div class="n3-comp-badge">${t.entryCount} entr${t.entryCount === 1 ? 'y' : 'ies'}</div>
+          </div>
+          <button class="n3-comp-add n3-dyn-add" data-dyn-id="${_esc(t.id)}" title="Insert collection block">+</button>
+        </div>`;
+      }).join('')}</div>`;
+      this._bindDynamicBtns(listEl, templates);
+    }
+
+    /** Bind click handlers for dynamic collection add buttons. @private */
+    _bindDynamicBtns(listEl, templates) {
+      listEl.querySelectorAll('.n3-dyn-add').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const tpl = templates.find(t => t.id === btn.dataset.dynId);
+          if (!tpl) return;
+          const content = window.n3ware && window.n3ware._modules && window.n3ware._modules.content;
+          if (content) content.insertCollectionBlock(tpl.collection);
         });
       });
     }
