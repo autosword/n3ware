@@ -89,7 +89,7 @@ router.post('/', async (req, res) => {
         stripeCustomerId:     null,
         stripeSubscriptionId: null,
         currentPeriodEnd:     null,
-        limits:               { pages: 4, uploads: 5 },
+        limits:               { pages: 4, uploads: 5, collections: 2, entriesPerCollection: 10 },
       },
     });
 

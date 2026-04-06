@@ -33,6 +33,7 @@ const integrationsConfigApi = require('./src/api/integrations-config');
 const pagesApi              = require('./src/api/pages');
 const pageTemplatesApi      = require('./src/api/page-templates');
 const mediaApi              = require('./src/api/media');
+const collectionsApi        = require('./src/api/collections');
 
 // Initialize integrations (logs mock-mode notices)
 require('./src/integrations');
@@ -129,6 +130,9 @@ app.use('/api/components', componentCustomizeApi);
 
 // ── Page templates ────────────────────────────────────────────────────────────
 app.use('/api/page-templates', pageTemplatesApi);
+
+// ── Collections (nested under sites) ─────────────────────────────────────────
+app.use('/api/sites/:siteId/collections', collectionsApi);
 
 // ── Integrations config (nested under sites) ──────────────────────────────────
 app.use('/api/sites/:id/integrations', integrationsConfigApi);

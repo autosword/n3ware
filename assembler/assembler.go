@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -42,9 +44,17 @@ type SiteManifest struct {
 		Title string `json:"title"`
 		Path  string `json:"path"`
 	} `json:"pages"`
-	HeadScripts []string `json:"headScripts"`
-	BodyScripts []string `json:"bodyScripts"`
-	UpdatedAt   string   `json:"updatedAt"`
+	Collections []CollectionMeta `json:"collections"`
+	HeadScripts []string         `json:"headScripts"`
+	BodyScripts []string         `json:"bodyScripts"`
+	UpdatedAt   string           `json:"updatedAt"`
+}
+
+// CollectionMeta is a lightweight summary of a collection stored in site.json.
+type CollectionMeta struct {
+	Slug       string `json:"slug"`
+	Name       string `json:"name"`
+	EntryCount int    `json:"entryCount"`
 }
 
 // Assembler assembles full HTML pages from GCS components.
@@ -56,6 +66,58 @@ type Assembler struct {
 }
 
 const cacheControl = "public, max-age=10, s-maxage=30, stale-while-revalidate=5"
+
+var eachPattern = regexp.MustCompile(`\{\{#each\s+(\w+)`)
+
+// findReferencedCollections scans HTML for {{#each slug}} directives and returns unique slugs.
+func findReferencedCollections(html string) []string {
+	matches := eachPattern.FindAllStringSubmatch(html, -1)
+	seen := map[string]bool{}
+	var slugs []string
+	for _, m := range matches {
+		if !seen[m[1]] {
+			seen[m[1]] = true
+			slugs = append(slugs, m[1])
+		}
+	}
+	return slugs
+}
+
+// loadCollectionEntries reads all entry JSON files for a collection from GCS.
+// Returns entries sorted by data.order asc, then createdAt asc.
+func (a *Assembler) loadCollectionEntries(ctx context.Context, siteId, slug string) ([]Entry, error) {
+	cacheKey := "collections/" + siteId + "/" + slug
+	if cached, ok := a.cache.Get(cacheKey); ok {
+		var entries []Entry
+		if err := json.Unmarshal([]byte(cached), &entries); err == nil {
+			return entries, nil
+		}
+	}
+
+	prefix := siteId + "/collections/" + slug + "/"
+	objs, err := a.gcs.ListFiles(ctx, prefix)
+	if err != nil {
+		return nil, err
+	}
+
+	var entries []Entry
+	for _, objPath := range objs {
+		data, err := a.gcs.ReadFile(ctx, objPath)
+		if err != nil {
+			continue
+		}
+		var e Entry
+		if err := json.Unmarshal(data, &e); err != nil {
+			continue
+		}
+		entries = append(entries, e)
+	}
+
+	if b, err := json.Marshal(entries); err == nil {
+		a.cache.Set(cacheKey, string(b))
+	}
+	return entries, nil
+}
 
 // ServeRequest assembles and serves the page for the given siteId + path.
 func (a *Assembler) ServeRequest(w http.ResponseWriter, r *http.Request, siteId, pagePath string) {
@@ -207,6 +269,21 @@ func (a *Assembler) assemble(r *http.Request, siteId, pagePath string) (string, 
 		string(footer),
 		bodyScripts.String(),
 	)
+
+	// 8. Template processing — load collections referenced in page and render
+	slugs := findReferencedCollections(html)
+	if len(slugs) > 0 {
+		collections := make(CollectionEntries)
+		for _, slug := range slugs {
+			entries, err := a.loadCollectionEntries(ctx, siteId, slug)
+			if err != nil {
+				log.Printf("[assembler] collection load error site=%s slug=%s: %v", siteId, slug, err)
+				entries = []Entry{}
+			}
+			collections[slug] = entries
+		}
+		html = ProcessTemplate(html, &manifest, collections)
+	}
 
 	return html, nil
 }

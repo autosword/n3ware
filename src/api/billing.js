@@ -24,10 +24,10 @@ const FREE_SUBSCRIPTION = {
   stripeCustomerId:     null,
   stripeSubscriptionId: null,
   currentPeriodEnd:     null,
-  limits:               { pages: 4, uploads: 5 },
+  limits:               { pages: 4, uploads: 5, collections: 2, entriesPerCollection: 10 },
 };
 
-const PRO_LIMITS = { pages: Infinity, uploads: Infinity };
+const PRO_LIMITS = { pages: Infinity, uploads: Infinity, collections: Infinity, entriesPerCollection: Infinity };
 
 // ── GET / — list plans (public) ───────────────────────────────────────────────
 router.get('/', (req, res) => {

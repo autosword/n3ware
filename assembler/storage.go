@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
@@ -52,6 +54,29 @@ func (g *GCSClient) ReadFileOrEmpty(ctx context.Context, objectPath string) []by
 		return []byte{}
 	}
 	return data
+}
+
+// ListFiles lists object paths under the given prefix.
+// Returns only direct children (paths that don't contain a slash after the prefix).
+func (g *GCSClient) ListFiles(ctx context.Context, prefix string) ([]string, error) {
+	it := g.client.Bucket(g.bucket).Objects(ctx, &storage.Query{Prefix: prefix})
+	var paths []string
+	for {
+		attrs, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("list %s: %w", prefix, err)
+		}
+		// Only include direct children (no further slash after prefix)
+		rest := attrs.Name[len(prefix):]
+		if rest == "" || strings.Contains(rest, "/") {
+			continue
+		}
+		paths = append(paths, attrs.Name)
+	}
+	return paths, nil
 }
 
 // Close closes the underlying GCS client.

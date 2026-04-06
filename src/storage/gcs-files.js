@@ -143,8 +143,9 @@ async function createSite(siteId, name, ownerId, templateHtml = '', apiKey = '')
       stripeCustomerId:     null,
       stripeSubscriptionId: null,
       currentPeriodEnd:     null,
-      limits:               { pages: 4, uploads: 5 },
+      limits:               { pages: 4, uploads: 5, collections: 2, entriesPerCollection: 10 },
     },
+    collections:  [],
     headScripts:  [],
     bodyScripts:  [],
     createdAt:    now,
@@ -284,7 +285,7 @@ async function getManifest(siteId) {
 }
 
 /**
- * Update fields in the site manifest (theme, headScripts, bodyScripts, name).
+ * Update fields in the site manifest (theme, headScripts, bodyScripts, name, collections).
  *
  * @param {string} siteId
  * @param {object} updates
@@ -294,7 +295,7 @@ async function updateManifest(siteId, updates) {
   const manifest = await _readManifest(siteId);
   if (!manifest) throw new Error(`Site ${siteId} not found in GCS`);
 
-  const allowed = ['name', 'theme', 'headScripts', 'bodyScripts'];
+  const allowed = ['name', 'theme', 'headScripts', 'bodyScripts', 'collections'];
   for (const key of allowed) {
     if (updates[key] !== undefined) {
       manifest[key] = updates[key];
@@ -349,6 +350,181 @@ async function rollbackPage(siteId, slug, generation) {
   await _write(path, contents.toString('utf8'));
 }
 
+// ── Collections ───────────────────────────────────────────────────────────────
+
+/**
+ * List all collection definitions for a site.
+ * Returns only top-level collection files (not entry files inside subdirs).
+ *
+ * @param {string} siteId
+ * @returns {Promise<object[]>}
+ */
+async function listCollections(siteId) {
+  const bucket = _gcs().bucket(BUCKET);
+  const [files] = await bucket.getFiles({ prefix: `${siteId}/collections/` });
+  // Collection definitions: collections/{slug}.json (no slash in slug portion)
+  const collectionFiles = files.filter(f => {
+    const name = f.name;
+    const after = name.slice(`${siteId}/collections/`.length);
+    return /^[^/]+\.json$/.test(after);
+  });
+  const results = await Promise.all(
+    collectionFiles.map(async f => {
+      const [contents] = await f.download();
+      try { return JSON.parse(contents.toString('utf8')); } catch { return null; }
+    })
+  );
+  return results.filter(Boolean);
+}
+
+/**
+ * Get a single collection definition.
+ *
+ * @param {string} siteId
+ * @param {string} slug
+ * @returns {Promise<object|null>}
+ */
+async function getCollection(siteId, slug) {
+  const raw = await _readOrNull(`${siteId}/collections/${slug}.json`);
+  if (!raw) return null;
+  return JSON.parse(raw);
+}
+
+/**
+ * Save (create or update) a collection definition.
+ *
+ * @param {string} siteId
+ * @param {string} slug
+ * @param {object} definition
+ * @returns {Promise<void>}
+ */
+async function saveCollection(siteId, slug, definition) {
+  await _write(
+    `${siteId}/collections/${slug}.json`,
+    JSON.stringify(definition, null, 2),
+    'application/json'
+  );
+}
+
+/**
+ * Delete a collection definition and all its entries.
+ *
+ * @param {string} siteId
+ * @param {string} slug
+ * @returns {Promise<void>}
+ */
+async function deleteCollection(siteId, slug) {
+  const bucket = _gcs().bucket(BUCKET);
+
+  // Delete the collection definition file
+  await bucket.file(`${siteId}/collections/${slug}.json`).delete({ ignoreNotFound: true });
+
+  // Delete all entry files under the collection directory
+  const [entryFiles] = await bucket.getFiles({ prefix: `${siteId}/collections/${slug}/` });
+  if (entryFiles.length > 0) {
+    await Promise.all(entryFiles.map(f => f.delete({ ignoreNotFound: true })));
+  }
+}
+
+// ── Entries ───────────────────────────────────────────────────────────────────
+
+/**
+ * List all entries for a collection.
+ *
+ * @param {string} siteId
+ * @param {string} collectionSlug
+ * @param {{ sort?: string, limit?: number }} [options]
+ * @returns {Promise<object[]>}
+ */
+async function listEntries(siteId, collectionSlug, { sort, limit } = {}) {
+  const bucket = _gcs().bucket(BUCKET);
+  const prefix = `${siteId}/collections/${collectionSlug}/`;
+  const [files] = await bucket.getFiles({ prefix });
+  // Only entry files: collections/{slug}/{entryId}.json (no further nesting)
+  const entryFiles = files.filter(f => {
+    const after = f.name.slice(prefix.length);
+    return /^[^/]+\.json$/.test(after);
+  });
+
+  const entries = (await Promise.all(
+    entryFiles.map(async f => {
+      const [contents] = await f.download();
+      try { return JSON.parse(contents.toString('utf8')); } catch { return null; }
+    })
+  )).filter(Boolean);
+
+  // Sort
+  if (sort) {
+    const [field, dir = 'asc'] = sort.split(':');
+    entries.sort((a, b) => {
+      const av = a.data?.[field] ?? '';
+      const bv = b.data?.[field] ?? '';
+      if (av < bv) return dir === 'desc' ? 1 : -1;
+      if (av > bv) return dir === 'desc' ? -1 : 1;
+      return 0;
+    });
+  } else {
+    // Default: by data.order asc, then createdAt asc
+    entries.sort((a, b) => {
+      const ao = a.data?.order ?? Infinity;
+      const bo = b.data?.order ?? Infinity;
+      if (ao !== bo) return ao - bo;
+      return (a.createdAt || '').localeCompare(b.createdAt || '');
+    });
+  }
+
+  if (limit && limit > 0) {
+    return entries.slice(0, limit);
+  }
+  return entries;
+}
+
+/**
+ * Get a single entry.
+ *
+ * @param {string} siteId
+ * @param {string} collectionSlug
+ * @param {string} entryId
+ * @returns {Promise<object|null>}
+ */
+async function getEntry(siteId, collectionSlug, entryId) {
+  const raw = await _readOrNull(`${siteId}/collections/${collectionSlug}/${entryId}.json`);
+  if (!raw) return null;
+  return JSON.parse(raw);
+}
+
+/**
+ * Save (create or update) a collection entry.
+ *
+ * @param {string} siteId
+ * @param {string} collectionSlug
+ * @param {string} entryId
+ * @param {object} entryData
+ * @returns {Promise<void>}
+ */
+async function saveEntry(siteId, collectionSlug, entryId, entryData) {
+  await _write(
+    `${siteId}/collections/${collectionSlug}/${entryId}.json`,
+    JSON.stringify(entryData, null, 2),
+    'application/json'
+  );
+}
+
+/**
+ * Delete a single entry.
+ *
+ * @param {string} siteId
+ * @param {string} collectionSlug
+ * @param {string} entryId
+ * @returns {Promise<void>}
+ */
+async function deleteEntry(siteId, collectionSlug, entryId) {
+  await _gcs()
+    .bucket(BUCKET)
+    .file(`${siteId}/collections/${collectionSlug}/${entryId}.json`)
+    .delete({ ignoreNotFound: true });
+}
+
 module.exports = {
   createSite,
   savePage,
@@ -361,4 +537,12 @@ module.exports = {
   updateManifest,
   getPageVersions,
   rollbackPage,
+  listCollections,
+  getCollection,
+  saveCollection,
+  deleteCollection,
+  listEntries,
+  getEntry,
+  saveEntry,
+  deleteEntry,
 };

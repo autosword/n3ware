@@ -132,8 +132,37 @@ const T = {
     "sizes":     { "h1": 60, "h2": 48, "h3": 36, "h4": 28, "h5": 22, "h6": 18, "body": 16 }
   },
   "pages": [ { "slug": "index", "title": "Home", "path": "/" } ],
+  "collections": [ { "slug": "team", "name": "Team Members", "entryCount": 3 } ],
   "headScripts": [],
   "bodyScripts": [],
+  "createdAt": "ISO8601",
+  "updatedAt": "ISO8601"
+}
+```
+
+### Collection Definition (`{siteId}/collections/{slug}.json`)
+```json
+{
+  "id": "team",
+  "name": "Team Members",
+  "slug": "team",
+  "fields": [
+    { "key": "name",  "type": "text",   "label": "Name",  "required": true },
+    { "key": "role",  "type": "text",   "label": "Role" },
+    { "key": "order", "type": "number", "label": "Order" }
+  ],
+  "createdAt": "ISO8601",
+  "updatedAt": "ISO8601"
+}
+```
+Valid field types: `text`, `richtext`, `image`, `url`, `number`, `date`, `boolean`, `select`.
+
+### Collection Entry (`{siteId}/collections/{slug}/{entryId}.json`)
+```json
+{
+  "id": "uuid",
+  "collectionId": "team",
+  "data": { "name": "Alice", "role": "Engineer", "order": 1 },
   "createdAt": "ISO8601",
   "updatedAt": "ISO8601"
 }
@@ -176,6 +205,10 @@ Bucket: `gs://n3ware-sites` (object versioning enabled — every save = new gene
   pages/
     index.html       home page body (no <html>/<head>/<body> tags — just content)
     {slug}.html      other page bodies
+  collections/
+    {slug}.json      collection definition (fields schema)
+    {slug}/
+      {entryId}.json individual entry data
 ```
 
 The Go assembler reads all of these and assembles a full HTML document at request time.
@@ -506,6 +539,7 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 - `src/api/magic-auth.js` — magic link auth
 - `src/api/sites.js` — site CRUD + theme PUT
 - `src/api/pages.js` — multi-page management, component save, rollback
+- `src/api/collections.js` — collections + entries CRUD (GCS-only)
 - `src/api/templates.js` — template listing/serving
 - `src/api/components.js` — Tailwind component library API
 - `src/api/integrations-config.js` — tracker script config
@@ -521,7 +555,7 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 - `src/storage/local.js` — JSON file storage for dev
 - `src/storage/firestore.js` — Firestore (prod)
 - `src/storage/users.js` — user storage
-- `src/storage/gcs-files.js` — GCS file operations (createSite, savePage, saveComponent, updateManifest, rollback)
+- `src/storage/gcs-files.js` — GCS file operations (createSite, savePage, saveComponent, updateManifest, rollback, listCollections, saveEntry, etc.)
 
 ### Cache
 - `src/cache/index.js` — cache manager
@@ -560,8 +594,9 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 
 ### Go Assembler
 - `assembler/main.go` — HTTP server, routing, health + purge endpoints
-- `assembler/assembler.go` — HTML assembly from GCS parts, CSS var injection
-- `assembler/storage.go` — GCS client with caching
+- `assembler/assembler.go` — HTML assembly from GCS parts, CSS var injection, collection loading
+- `assembler/storage.go` — GCS client with caching, ListFiles helper
+- `assembler/template.go` — Handlebars-style template processor ({{#each}}, {{#if}}, {{site.*}})
 - `assembler/cache.go` — in-memory LRU
 - `assembler/domain.go` — domain → siteId resolution via Firestore
 - `assembler/Dockerfile` — Cloud Run image
@@ -571,6 +606,7 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 - `tests/api.test.js` — API endpoint tests (63 assertions)
 - `tests/auth-flow.test.js` — magic link + CRUD tests (80 assertions)
 - `tests/save-flow.test.js` — save pipeline tests (21 assertions)
+- `tests/collections.test.js` — collections + entries API tests (GCS-dependent CRUD)
 - `tests/n3ware.test.html` — browser-based editor tests
 
 ---
@@ -630,3 +666,95 @@ Exercises every API route with missing, bogus, expired, and wrong-secret credent
 - Wrong-owner isolation test (case 7) — requires two real authenticated sessions, must be done manually
 
 **This suite is NOT part of the normal dev loop.** Do not run it on every session or include it in CI. It is an on-demand check before major launches or after any auth-boundary changes. Future AI sessions: you do not need to read or run this file unless explicitly asked to verify auth security.
+
+---
+
+## 23. Repeatable Content (Collections)
+
+Phase 1 backend implementation only. No editor UI yet.
+
+### What it is
+CMS-style collections (e.g. "Team Members", "Blog Posts") with typed field schemas and individual entries. Stored in GCS. The Go assembler renders `{{#each slug}}...{{/each}}` blocks in page HTML at request time using a lightweight Handlebars-style template processor.
+
+### Collection definition
+```json
+{
+  "id": "team",
+  "name": "Team Members",
+  "slug": "team",
+  "fields": [
+    { "key": "name",  "type": "text",   "label": "Name",  "required": true },
+    { "key": "role",  "type": "text",   "label": "Role" },
+    { "key": "order", "type": "number", "label": "Order" }
+  ],
+  "createdAt": "ISO8601",
+  "updatedAt": "ISO8601"
+}
+```
+Valid field types: `text`, `richtext`, `image`, `url`, `number`, `date`, `boolean`, `select`.
+
+### Entry
+```json
+{
+  "id": "uuid",
+  "collectionId": "team",
+  "data": { "name": "Alice", "role": "Engineer", "order": 1 },
+  "createdAt": "ISO8601",
+  "updatedAt": "ISO8601"
+}
+```
+
+### GCS layout for collections
+```
+{siteId}/collections/{slug}.json               — collection definition
+{siteId}/collections/{slug}/{entryId}.json     — individual entry
+```
+
+### API routes (all require auth, GCS must be enabled)
+| Method | Path | Description |
+|---|---|---|
+| GET | /api/sites/:id/collections | List collection definitions |
+| POST | /api/sites/:id/collections | Create collection |
+| GET | /api/sites/:id/collections/:slug | Get collection |
+| PUT | /api/sites/:id/collections/:slug | Update collection (name, fields) |
+| DELETE | /api/sites/:id/collections/:slug | Delete collection + all its entries |
+| GET | /api/sites/:id/collections/:slug/entries | List entries (supports ?sort=field:dir&limit=N) |
+| POST | /api/sites/:id/collections/:slug/entries | Create entry |
+| GET | /api/sites/:id/collections/:slug/entries/:id | Get entry |
+| PUT | /api/sites/:id/collections/:slug/entries/:id | Update entry (data is merged) |
+| DELETE | /api/sites/:id/collections/:slug/entries/:id | Delete entry |
+
+### Template syntax (in page HTML)
+```html
+{{#each team}}
+  <div>
+    <h3>{{this.name}}</h3>
+    <p>{{this.role}}</p>
+    {{#if this.featured}}<span>Featured</span>{{/if}}
+    {{#if this.featured}}<span>VIP</span>{{else}}<span>Standard</span>{{/if}}
+    {{{this.bio}}}  <!-- triple braces = unescaped HTML -->
+  </div>
+{{/each}}
+
+{{#each team limit=3 sort="order:asc"}}...{{/each}}
+
+{{team.count}} team members
+
+<title>{{site.name}}</title>
+<meta name="color" content="{{site.theme.colors.primary}}">
+```
+
+### Free vs Pro limits
+| Limit | Free | Pro |
+|---|---|---|
+| Collections per site | 2 | Unlimited |
+| Entries per collection | 10 | Unlimited |
+
+### Implementation files
+- `src/api/collections.js` — router, mounted at `/api/sites/:siteId/collections`
+- `src/storage/gcs-files.js` — listCollections, getCollection, saveCollection, deleteCollection, listEntries, getEntry, saveEntry, deleteEntry
+- `assembler/template.go` — ProcessTemplate(), supports {{#each}}, {{#if}}/{{else}}, {{this.*}}, {{site.*}}, {{{triple}}}
+- `assembler/assembler.go` — findReferencedCollections(), loadCollectionEntries(), integration into assemble()
+- `assembler/storage.go` — GCSClient.ListFiles() for enumerating entry objects
+- `assembler/template_test.go` — 12 Go unit tests (all pass)
+- `tests/collections.test.js` — Node integration tests (6 auth/routing assertions pass; CRUD requires GCS)
