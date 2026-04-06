@@ -34,6 +34,7 @@ const pagesApi              = require('./src/api/pages');
 const pageTemplatesApi      = require('./src/api/page-templates');
 const mediaApi              = require('./src/api/media');
 const collectionsApi        = require('./src/api/collections');
+const collectionsGenerateApi = require('./src/api/collections-generate');
 
 // Initialize integrations (logs mock-mode notices)
 require('./src/integrations');
@@ -130,6 +131,9 @@ app.use('/api/components', componentCustomizeApi);
 
 // ── Page templates ────────────────────────────────────────────────────────────
 app.use('/api/page-templates', pageTemplatesApi);
+
+// ── Collection generation (unauthenticated) ───────────────────────────────────
+app.use('/api/collections', collectionsGenerateApi);
 
 // ── Collections (nested under sites) ─────────────────────────────────────────
 app.use('/api/sites/:siteId/collections', collectionsApi);
