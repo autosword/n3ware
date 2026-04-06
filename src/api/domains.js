@@ -36,6 +36,19 @@ router.get('/search', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const { domain, years = 1, siteId } = req.body || {};
+
+    // Subscription gate — domain registration requires an active subscription
+    if (siteId) {
+      const site = await storage.getSite(siteId);
+      const subStatus = site?.subscription?.status;
+      if (subStatus !== 'active' && subStatus !== 'trialing') {
+        return res.status(402).json({
+          error:      'Active subscription required to connect a custom domain',
+          upgradeUrl: '/api/billing/checkout',
+          siteId,
+        });
+      }
+    }
     if (!domain || typeof domain !== 'string') {
       return res.status(400).json({ error: '"domain" is required' });
     }
@@ -103,6 +116,16 @@ router.post('/sites/:siteId/connect', async (req, res) => {
 
     const site = await storage.getSite(siteId);
     if (!site) return res.status(404).json({ error: `Site "${siteId}" not found` });
+
+    // Subscription gate — custom domain connection requires an active subscription
+    const subStatus = site.subscription?.status;
+    if (subStatus !== 'active' && subStatus !== 'trialing') {
+      return res.status(402).json({
+        error:      'Active subscription required to connect a custom domain',
+        upgradeUrl: '/api/billing/checkout',
+        siteId,
+      });
+    }
 
     let zone = await cloudflare.getZone(domain);
     if (!zone) zone = await cloudflare.createZone(domain);

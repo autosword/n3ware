@@ -39,12 +39,6 @@ function serveSites() {
       const site = await cache.getSite(storage, siteId);
       if (!site) return res.status(404).send(_notFoundPage(siteId));
 
-      // Go-live gate — site must have an active subscription to be publicly served
-      const subStatus = site.subscription?.status;
-      if (subStatus !== 'active' && subStatus !== 'trialing') {
-        return res.status(402).send(_notActivePage(site));
-      }
-
       // v2 sites: assemble from GCS via the assembler service
       const assemblerResp = await fetch(
         `${ASSEMBLER_URL}/sites/${siteId}${req.path.slice(siteId.length + 1) || '/'}`,
