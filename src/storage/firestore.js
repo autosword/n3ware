@@ -38,7 +38,7 @@ class FirestoreStorage {
    * @param {{html:string, css?:string, message?:string}} data
    * @returns {Promise<object>} saved site record
    */
-  async saveSite(id, { html, css = '', message = '', name, ownerId, apiKey } = {}) {
+  async saveSite(id, { html, css = '', message = '', name, ownerId, apiKey, subdomain, subscription } = {}) {
     const now = new Date().toISOString();
     const existing = await this.getSite(id);
     const site = {
@@ -46,9 +46,11 @@ class FirestoreStorage {
       html,
       css,
       message,
-      name:      name      !== undefined ? name      : (existing ? existing.name      : 'Untitled Site'),
-      ownerId:   ownerId   !== undefined ? ownerId   : (existing ? existing.ownerId   : null),
-      apiKey:    apiKey    !== undefined ? apiKey    : (existing ? existing.apiKey    : null),
+      name:         name         !== undefined ? name         : (existing ? existing.name         : 'Untitled Site'),
+      ownerId:      ownerId      !== undefined ? ownerId      : (existing ? existing.ownerId      : null),
+      apiKey:       apiKey       !== undefined ? apiKey       : (existing ? existing.apiKey       : null),
+      subdomain:    subdomain    !== undefined ? subdomain    : (existing ? existing.subdomain    : null),
+      subscription: subscription !== undefined ? subscription : (existing ? existing.subscription : null),
       createdAt: existing ? existing.createdAt : now,
       updatedAt: now,
     };
@@ -74,6 +76,19 @@ class FirestoreStorage {
    * List all sites (metadata only).
    * @returns {Promise<object[]>}
    */
+  /**
+   * Partially update fields on a site document without touching other fields
+   * and without creating a revision. Used for subscription updates.
+   * @param {string} id
+   * @param {object} fields  Fields to merge into the site doc
+   */
+  async updateSiteFields(id, fields) {
+    await this._sites.doc(id).set(
+      { ...fields, updatedAt: new Date().toISOString() },
+      { merge: true }
+    );
+  }
+
   async findSiteByApiKey(apiKey) {
     const snap = await this._sites.where('apiKey', '==', apiKey).limit(1).get();
     if (snap.empty) return null;

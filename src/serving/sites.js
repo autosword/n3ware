@@ -39,6 +39,12 @@ function serveSites() {
       const site = await cache.getSite(storage, siteId);
       if (!site) return res.status(404).send(_notFoundPage(siteId));
 
+      // Go-live gate — site must have an active subscription to be publicly served
+      const subStatus = site.subscription?.status;
+      if (subStatus !== 'active' && subStatus !== 'trialing') {
+        return res.status(402).send(_notActivePage(site));
+      }
+
       // v2 sites: assemble from GCS via the assembler service
       const assemblerResp = await fetch(
         `${ASSEMBLER_URL}/sites/${siteId}${req.path.slice(siteId.length + 1) || '/'}`,
@@ -110,6 +116,25 @@ function _injectEditor(html, siteId, siteApiKey) {
 
 function _esc(s) {
   return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function _notActivePage(site) {
+  const name = _esc(site.name || 'This site');
+  return `<!DOCTYPE html><html><head><title>${name} — Not Live Yet</title>
+<style>body{font:16px/1.6 system-ui,sans-serif;background:#0F172A;color:#F1F5F9;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;box-sizing:border-box}
+.box{text-align:center;padding:48px;max-width:520px}.logo{color:#E31337;font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:32px}
+.icon{font-size:64px;margin-bottom:16px}.title{font-size:24px;font-weight:700;margin-bottom:12px}
+p{color:#94A3B8;margin-bottom:8px}.cta{margin-top:32px;background:#E31337;color:#fff;border:none;padding:14px 28px;border-radius:12px;font:700 15px/1 system-ui;cursor:pointer;text-decoration:none;display:inline-block}
+.note{margin-top:16px;font-size:13px;color:#475569}</style>
+</head><body><div class="box">
+<div class="logo">n3ware</div>
+<div class="icon">🚀</div>
+<div class="title">${name} isn't live yet</div>
+<p>The site owner hasn't activated hosting for this site.</p>
+<p>n3ware Pro hosting is $20/month and includes unlimited pages,<br>unlimited uploads, and a live public URL.</p>
+<a class="cta" href="https://n3ware.com/dashboard">Activate hosting →</a>
+<div class="note">Are you the site owner? <a href="https://n3ware.com/dashboard" style="color:#E31337">Log in to your dashboard</a> to go live.</div>
+</div></body></html>`;
 }
 
 function _notFoundPage(siteId) {

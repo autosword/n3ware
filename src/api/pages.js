@@ -87,12 +87,28 @@ router.get('/pages', async (req, res) => {
 // POST /api/sites/:id/pages
 router.post('/pages', async (req, res) => {
   try {
-    if (!await _requireSite(req, res)) return;
+    const site = await _requireSite(req, res);
+    if (!site) return;
     const { slug, title = '', html = '' } = req.body || {};
     if (!slug) return res.status(400).json({ error: '`slug` is required' });
 
     const safeSlug = slug.replace(/[^a-z0-9-]/g, '-').toLowerCase();
     if (safeSlug === 'index') return res.status(400).json({ error: 'Use slug "index" only for the home page (already created)' });
+
+    // Page limit gate (GCS sites only — local dev has no limits)
+    if (GCS_ENABLED) {
+      const manifest  = await gcsFiles.getManifest(req.params.id);
+      const pageLimit = site.subscription?.limits?.pages ?? 4;
+      const pageCount = manifest ? manifest.pages.length : 0;
+      if (pageCount >= pageLimit) {
+        return res.status(402).json({
+          error:      'Page limit reached',
+          limit:      pageLimit,
+          current:    pageCount,
+          upgradeUrl: '/api/billing/checkout',
+        });
+      }
+    }
 
     await gcsFiles.savePage(req.params.id, safeSlug, html, title || safeSlug);
     const manifest = await gcsFiles.getManifest(req.params.id);

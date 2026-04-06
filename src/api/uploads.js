@@ -59,6 +59,26 @@ router.post('/:siteId/upload', upload.single('file'), async (req, res) => {
     const { siteId }   = req.params;
     const { originalname, buffer, mimetype, size } = req.file;
 
+    // Upload limit gate (GCS mode only)
+    if (process.env.GCS_BUCKET) {
+      try {
+        const storage = require('../storage');
+        const site    = await storage.getSite(siteId);
+        if (site) {
+          const uploadLimit = site.subscription?.limits?.uploads ?? 5;
+          const existing    = await storageCloud.listFiles(siteId);
+          if (existing.length >= uploadLimit) {
+            return res.status(402).json({
+              error:      'Upload limit reached',
+              limit:      uploadLimit,
+              current:    existing.length,
+              upgradeUrl: '/api/billing/checkout',
+            });
+          }
+        }
+      } catch (_) { /* non-fatal — don't block upload on limit-check error */ }
+    }
+
     const result = await storageCloud.uploadFile(siteId, originalname, buffer, mimetype);
     res.status(201).json({ file: { url: result.url, name: result.name, size: size || result.size } });
   } catch (err) {

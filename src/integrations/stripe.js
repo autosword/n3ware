@@ -3,48 +3,17 @@
 /**
  * Stripe billing integration.
  *
- * Mock mode: STRIPE_SECRET_KEY not set — returns fake Stripe-formatted responses.
+ * Mock mode: STRIPE_SECRET_KEY not set — returns fake responses.
  * Real mode: Uses stripe npm package with STRIPE_SECRET_KEY.
- *
- * Plans:
- *   n3ware_starter — $29/mo: 1 site, basic editor
- *   n3ware_pro     — $79/mo: 5 sites, all features, priority support
- *   n3ware_agency  — $199/mo: unlimited sites, white-label, API access
  */
-
-const PLANS = {
-  starter: {
-    id:       'n3ware_starter',
-    name:     'Starter',
-    price:    2900,
-    interval: 'month',
-    features: ['1 site', 'Basic editor', 'Community support', '1 GB storage'],
-    limits:   { sites: 1 },
-  },
-  pro: {
-    id:       'n3ware_pro',
-    name:     'Pro',
-    price:    7900,
-    interval: 'month',
-    features: ['5 sites', 'All features', 'Priority support', '10 GB storage', 'Custom domains'],
-    limits:   { sites: 5 },
-  },
-  agency: {
-    id:       'n3ware_agency',
-    name:     'Agency',
-    price:    19900,
-    interval: 'month',
-    features: ['Unlimited sites', 'White-label', 'API access', '100 GB storage', 'Dedicated support'],
-    limits:   { sites: Infinity },
-  },
-};
 
 const isMock = !process.env.STRIPE_SECRET_KEY;
 
 let _stripe = null;
 let _mockNoticeLogged = false;
+let _cachedPriceId = process.env.STRIPE_PRICE_ID || null;
 
-function getStripe() {
+function getStripeRaw() {
   if (!_stripe) _stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
   return _stripe;
 }
@@ -61,159 +30,131 @@ function _mockId(prefix) {
 }
 
 /**
- * Create a Stripe customer.
- * @param {string} email
- * @param {string} name
- * @returns {Promise<{ id, email, name, created }>}
+ * Lazily look up or create the $20/mo n3ware Hosting product + price.
+ * Cached in memory for the lifetime of the process.
+ * @returns {Promise<string>} Stripe price ID
  */
-async function createCustomer(email, name) {
-  if (isMock) {
-    _mockNotice();
-    return {
-      id:      _mockId('cus'),
-      email,
-      name:    name || '',
-      created: Math.floor(Date.now() / 1000),
-    };
+async function getOrCreatePrice() {
+  if (_cachedPriceId) return _cachedPriceId;
+  if (isMock) { _mockNotice(); return 'price_mock_20_monthly'; }
+
+  const stripe = getStripeRaw();
+
+  // Find existing product
+  const products = await stripe.products.list({ limit: 20, active: true });
+  let product = products.data.find(p => p.name === 'n3ware Hosting');
+  if (!product) {
+    product = await stripe.products.create({
+      name: 'n3ware Hosting',
+      description: 'n3ware Pro — unlimited pages, uploads, and live site hosting.',
+    });
+    console.log('[stripe] Created product:', product.id);
   }
-  const customer = await getStripe().customers.create({ email, name });
-  return { id: customer.id, email: customer.email, name: customer.name, created: customer.created };
+
+  // Find existing $20/mo price
+  const prices = await stripe.prices.list({ product: product.id, limit: 20, active: true });
+  let price = prices.data.find(p =>
+    p.unit_amount === 2000 && p.currency === 'usd' && p.recurring?.interval === 'month'
+  );
+  if (!price) {
+    price = await stripe.prices.create({
+      product:     product.id,
+      unit_amount: 2000,
+      currency:    'usd',
+      recurring:   { interval: 'month' },
+    });
+    console.log('[stripe] Created price:', price.id);
+  }
+
+  _cachedPriceId = price.id;
+  return price.id;
 }
 
 /**
- * Create a subscription for a customer.
- * @param {string} customerId
- * @param {string} planId  — one of the PLANS[x].id values
- * @returns {Promise<{ id, status, planId, currentPeriodEnd }>}
+ * Get or create a Stripe Customer for a user.
  */
-async function createSubscription(customerId, planId) {
-  if (isMock) {
-    _mockNotice();
-    return {
-      id:               _mockId('sub'),
-      status:           'active',
-      planId,
-      currentPeriodEnd: Math.floor(Date.now() / 1000) + 30 * 24 * 3600,
-    };
-  }
-  const sub = await getStripe().subscriptions.create({
-    customer: customerId,
-    items:    [{ price: planId }],
-  });
-  return {
-    id:               sub.id,
-    status:           sub.status,
-    planId:           sub.items.data[0]?.price.id || planId,
-    currentPeriodEnd: sub.current_period_end,
-  };
+async function getOrCreateCustomer(email, existingCustomerId) {
+  if (isMock) { _mockNotice(); return existingCustomerId || _mockId('cus'); }
+  const stripe = getStripeRaw();
+  if (existingCustomerId) return existingCustomerId;
+  const customer = await stripe.customers.create({ email });
+  return customer.id;
 }
 
 /**
- * Cancel a subscription immediately.
- * @param {string} subscriptionId
- * @returns {Promise<{ id, status }>}
+ * Create a Stripe Checkout session for the $20/mo plan.
  */
-async function cancelSubscription(subscriptionId) {
-  if (isMock) {
-    _mockNotice();
-    return { id: subscriptionId, status: 'canceled' };
-  }
-  const sub = await getStripe().subscriptions.cancel(subscriptionId);
-  return { id: sub.id, status: sub.status };
-}
-
-/**
- * Retrieve a subscription by ID.
- * @param {string} subscriptionId
- * @returns {Promise<{ id, status, planId, currentPeriodEnd, cancelAtPeriodEnd }>}
- */
-async function getSubscription(subscriptionId) {
-  if (isMock) {
-    _mockNotice();
-    return {
-      id:                 subscriptionId,
-      status:             'active',
-      planId:             'n3ware_starter',
-      currentPeriodEnd:   Math.floor(Date.now() / 1000) + 20 * 24 * 3600,
-      cancelAtPeriodEnd:  false,
-    };
-  }
-  const sub = await getStripe().subscriptions.retrieve(subscriptionId);
-  return {
-    id:                sub.id,
-    status:            sub.status,
-    planId:            sub.items.data[0]?.price.id || '',
-    currentPeriodEnd:  sub.current_period_end,
-    cancelAtPeriodEnd: sub.cancel_at_period_end,
-  };
-}
-
-/**
- * Create a Stripe Checkout session.
- * @param {string} planId
- * @param {string} successUrl
- * @param {string} cancelUrl
- * @param {string} customerEmail
- * @returns {Promise<{ id, url }>}
- */
-async function createCheckoutSession(planId, successUrl, cancelUrl, customerEmail) {
+async function createCheckoutSession({ siteId, userId, customerEmail, stripeCustomerId, successUrl, cancelUrl }) {
   if (isMock) {
     _mockNotice();
     const sessionId = _mockId('cs');
-    return {
-      id:  sessionId,
-      url: `/billing/success?session=${sessionId}`,
-    };
+    return { id: sessionId, url: `${cancelUrl || '/dashboard'}?billing=mock_success&session=${sessionId}`, customerId: stripeCustomerId || _mockId('cus') };
   }
-  const session = await getStripe().checkout.sessions.create({
+  const stripe    = getStripeRaw();
+  const priceId   = await getOrCreatePrice();
+  const customerId = await getOrCreateCustomer(customerEmail, stripeCustomerId);
+
+  const session = await stripe.checkout.sessions.create({
+    customer:             customerId,
     payment_method_types: ['card'],
     mode:                 'subscription',
-    customer_email:       customerEmail || undefined,
-    line_items: [
-      { price: planId, quantity: 1 },
-    ],
-    success_url: successUrl,
-    cancel_url:  cancelUrl,
+    line_items:           [{ price: priceId, quantity: 1 }],
+    success_url:          successUrl || 'https://n3ware.com/dashboard?billing=success&session_id={CHECKOUT_SESSION_ID}',
+    cancel_url:           cancelUrl  || 'https://n3ware.com/dashboard',
+    metadata:             { siteId: siteId || '', userId: userId || '' },
+    subscription_data:    { metadata: { siteId: siteId || '', userId: userId || '' } },
   });
-  return { id: session.id, url: session.url };
+  return { id: session.id, url: session.url, customerId };
 }
 
 /**
- * Handle a Stripe webhook event.
- * @param {Buffer|string} rawBody
- * @param {string}        signature   Stripe-Signature header value
- * @returns {Promise<{ type, data }>}
+ * Create a Stripe Billing Portal session.
  */
-async function handleWebhook(rawBody, signature) {
+async function createPortalSession(stripeCustomerId, returnUrl) {
+  if (isMock) { _mockNotice(); return { url: returnUrl || '/dashboard' }; }
+  const stripe  = getStripeRaw();
+  const session = await stripe.billingPortal.sessions.create({
+    customer:   stripeCustomerId,
+    return_url: returnUrl || 'https://n3ware.com/dashboard',
+  });
+  return { url: session.url };
+}
+
+/**
+ * Verify and parse a Stripe webhook event from raw body.
+ */
+function constructWebhookEvent(rawBody, signature) {
   if (isMock) {
     _mockNotice();
     const body = typeof rawBody === 'string' ? rawBody : rawBody.toString('utf8');
-    const event = JSON.parse(body);
-    return { type: event.type || 'mock.event', data: event.data || {} };
+    return JSON.parse(body);
   }
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    throw new Error('STRIPE_WEBHOOK_SECRET is required for webhook verification');
+  if (!webhookSecret || webhookSecret.startsWith('whsec_placeholder')) {
+    throw new Error('STRIPE_WEBHOOK_SECRET is not configured — update via Secret Manager');
   }
-  const event = getStripe().webhooks.constructEvent(rawBody, signature, webhookSecret);
-  return { type: event.type, data: event.data };
+  return getStripeRaw().webhooks.constructEvent(rawBody, signature, webhookSecret);
 }
 
-/**
- * Return all available plans as an array.
- * @returns {Array}
- */
+/** Return available plans (public API). */
 function getPlans() {
-  return Object.values(PLANS);
+  return [{
+    id:       'n3ware_pro',
+    name:     'Pro',
+    price:    2000,
+    interval: 'month',
+    features: ['Unlimited pages', 'Unlimited uploads', 'Live site hosting', 'Custom domain', 'Priority support'],
+    limits:   { pages: Infinity, uploads: Infinity },
+  }];
 }
 
 module.exports = {
-  PLANS,
-  createCustomer,
-  createSubscription,
-  cancelSubscription,
-  getSubscription,
+  isMock,
+  getStripeRaw,
+  getOrCreatePrice,
+  getOrCreateCustomer,
   createCheckoutSession,
-  handleWebhook,
+  createPortalSession,
+  constructWebhookEvent,
   getPlans,
 };

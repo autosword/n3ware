@@ -83,6 +83,14 @@ router.post('/', async (req, res) => {
       ownerId,
       subdomain,
       apiKey,
+      subscription: {
+        status:               'none',
+        plan:                 'free',
+        stripeCustomerId:     null,
+        stripeSubscriptionId: null,
+        currentPeriodEnd:     null,
+        limits:               { pages: 4, uploads: 5 },
+      },
     });
 
     // v2: write decomposed files to GCS + register domain in Firestore

@@ -12,9 +12,12 @@
   const PLUS_SVG  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
 
   window._n3wareNav.injectStyles = function injectStyles() {
-    if (document.getElementById('n3-nav-panel-css')) return;
+    // Clean up stale style from old ID (dev hot-reloads)
+    const stale = document.getElementById('n3-nav-panel-css');
+    if (stale) stale.remove();
+    if (document.getElementById('n3-nav-style')) return;
     const style = document.createElement('style');
-    style.id = 'n3-nav-panel-css';
+    style.id = 'n3-nav-style';
     style.textContent = [
       '.n3-nav-panel{position:fixed;top:0;right:0;left:auto;bottom:0;width:300px;z-index:99999;',
       'background:#111111;border-left:1px solid #2A2A2A;display:flex;flex-direction:column;',

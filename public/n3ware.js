@@ -929,6 +929,7 @@
           analytics: this.analytics, components: this.components,
           scripts: this.scripts, theme: this.theme, nav: this.nav, subNav: this.subNav,
           image: this.image, media: this.media,
+          showUpgradeModal: (opts) => this.showUpgradeModal(opts),
         },
       };
     }
@@ -1494,7 +1495,11 @@
             const fd = new FormData();
             fd.append('file', images[i]);
             const r = await fetch(`${api}/uploads/${site}/upload`, { method: 'POST', headers: uploadHdrBase, credentials: 'include', body: fd });
-            if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || `Upload failed: ${r.status}`); }
+            if (!r.ok) {
+              const e = await r.json().catch(() => ({}));
+              if (r.status === 402) { _stopSpinner(); this.showUpgradeModal({ message: e.error, siteId: site }); return; }
+              throw new Error(e.error || `Upload failed: ${r.status}`);
+            }
             const { file: uploaded } = await r.json();
             imageUrls.push(uploaded.url);
           }
@@ -1509,6 +1514,7 @@
         });
         if (!genRes.ok) {
           const e = await genRes.json().catch(() => ({}));
+          if (genRes.status === 402) { _stopSpinner(); this.showUpgradeModal({ message: e.error, siteId: site }); return; }
           throw new Error(e.error || `Generation failed: ${genRes.status}`);
         }
         const genData = await genRes.json();
@@ -1754,6 +1760,42 @@
     }
 
     // ── v2 Save FAB ───────────────────────────────────────────────────────────
+
+    // ── Upgrade modal (shown when any API call returns 402) ───────────────────
+    showUpgradeModal({ message, limit, current, siteId } = {}) {
+      if (document.getElementById('n3-upgrade-overlay')) return; // already open
+      const overlay = document.createElement('div');
+      overlay.id = 'n3-upgrade-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999999;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box';
+      const sid  = siteId || (this._cloudCfg && this._cloudCfg.site) || '';
+      const auth = (() => { try { return sessionStorage.getItem('n3_auth') || localStorage.getItem('n3_token') || ''; } catch(_){return '';} })();
+      overlay.innerHTML = `<div style="background:#111;border:1px solid #2A2A2A;border-radius:20px;padding:36px;max-width:420px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.6)">
+        <div style="font-size:40px;margin-bottom:16px">🚀</div>
+        <h2 style="font:700 20px/1.2 system-ui,sans-serif;color:#F1F5F9;margin-bottom:12px">Upgrade to Pro</h2>
+        <p style="font:14px/1.6 system-ui,sans-serif;color:#94A3B8;margin-bottom:8px">${message || 'Your free plan has a limit that was reached.'}</p>
+        <p style="font:14px/1.6 system-ui,sans-serif;color:#94A3B8;margin-bottom:24px">Your free plan includes <strong style="color:#E5E5E5">4 pages</strong> and <strong style="color:#E5E5E5">5 image uploads</strong>.<br>Upgrade to Pro for <strong style="color:#E31337">$20/mo</strong> to unlock unlimited pages, uploads, and live hosting.</p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <button id="n3-upgrade-btn" style="background:#E31337;color:#fff;border:none;padding:12px 24px;border-radius:12px;font:700 14px/1 system-ui,sans-serif;cursor:pointer">Upgrade now →</button>
+          <button id="n3-upgrade-close" style="background:#2A2A2A;color:#E5E5E5;border:none;padding:12px 24px;border-radius:12px;font:600 14px/1 system-ui,sans-serif;cursor:pointer">Maybe later</button>
+        </div>
+      </div>`;
+      document.body.appendChild(overlay);
+      document.getElementById('n3-upgrade-close').onclick = () => overlay.remove();
+      overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+      document.getElementById('n3-upgrade-btn').onclick = async () => {
+        try {
+          const resp = await fetch((this._cloudCfg?.api || '/api') + '/billing/checkout', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', ...(auth ? { Authorization: `Bearer ${auth}` } : {}) },
+            body:    JSON.stringify({ siteId: sid }),
+          });
+          const data = await resp.json();
+          if (data.url) window.open(data.url, '_blank');
+          else N3UI.toast('Checkout error: ' + (data.error || 'unknown'), 'error');
+        } catch (err) { N3UI.toast('Checkout failed: ' + err.message, 'error'); }
+        overlay.remove();
+      };
+    }
 
     _buildSaveBtn() {
       if (!this._cloudCfg) return; // only when cloud-configured

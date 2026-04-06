@@ -55,7 +55,7 @@ class LocalStorage {
    * @param {{html:string, css?:string, message?:string}} data
    * @returns {object} saved site record
    */
-  saveSite(id, { html, css = '', message = '', name, ownerId, apiKey } = {}) {
+  saveSite(id, { html, css = '', message = '', name, ownerId, apiKey, subdomain, subscription } = {}) {
     const now = new Date().toISOString();
     const existing = this.getSite(id);
     const site = {
@@ -63,9 +63,11 @@ class LocalStorage {
       html,
       css,
       message,
-      name:      name !== undefined ? name : (existing ? existing.name : 'Untitled Site'),
-      ownerId:   ownerId !== undefined ? ownerId : (existing ? existing.ownerId : null),
-      apiKey:    apiKey  !== undefined ? apiKey  : (existing ? existing.apiKey  : null),
+      name:         name         !== undefined ? name         : (existing ? existing.name         : 'Untitled Site'),
+      ownerId:      ownerId      !== undefined ? ownerId      : (existing ? existing.ownerId      : null),
+      apiKey:       apiKey       !== undefined ? apiKey       : (existing ? existing.apiKey       : null),
+      subdomain:    subdomain    !== undefined ? subdomain    : (existing ? existing.subdomain    : null),
+      subscription: subscription !== undefined ? subscription : (existing ? existing.subscription : null),
       createdAt: existing ? existing.createdAt : now,
       updatedAt: now,
     };
@@ -87,6 +89,18 @@ class LocalStorage {
    * List all site records (metadata only, no HTML body).
    * @returns {object[]}
    */
+  /**
+   * Partially update fields on a site record without creating a revision.
+   * @param {string} id
+   * @param {object} fields
+   */
+  updateSiteFields(id, fields) {
+    const existing = this.getSite(id);
+    if (!existing) throw new Error(`Site ${id} not found`);
+    const updated = { ...existing, ...fields, updatedAt: new Date().toISOString() };
+    this._writeJSON(this._sitePath(id), updated);
+  }
+
   findSiteByApiKey(apiKey) {
     if (!fs.existsSync(this._root)) return null;
     for (const d of fs.readdirSync(this._root)) {

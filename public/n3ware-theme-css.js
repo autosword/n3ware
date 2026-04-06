@@ -5,10 +5,16 @@
 (function () { 'use strict';
   window._n3wareTheme = window._n3wareTheme || {};
 
+  // TODO: theme/nav panels slide in from the right; components/analytics slide from
+  // the left. A future session should standardise all panels to one side.
+
   window._n3wareTheme.injectStyles = function injectStyles() {
-    if (document.getElementById('n3-theme-panel-css')) return;
+    // Clean up stale style from old ID (dev hot-reloads)
+    const stale = document.getElementById('n3-theme-panel-css');
+    if (stale) stale.remove();
+    if (document.getElementById('n3-theme-style')) return;
     const style = document.createElement('style');
-    style.id = 'n3-theme-panel-css';
+    style.id = 'n3-theme-style';
     style.textContent = [
       '.n3-theme-panel{position:fixed;top:0;right:0;left:auto;bottom:0;width:280px;z-index:99999;',
       'background:#111111;border-left:1px solid #2A2A2A;display:flex;flex-direction:column;',

@@ -137,6 +137,14 @@ async function createSite(siteId, name, ownerId, templateHtml = '', apiKey = '')
     pages: [
       { slug: 'index', title: 'Home', path: '/' },
     ],
+    subscription: {
+      status:               'none',
+      plan:                 'free',
+      stripeCustomerId:     null,
+      stripeSubscriptionId: null,
+      currentPeriodEnd:     null,
+      limits:               { pages: 4, uploads: 5 },
+    },
     headScripts:  [],
     bodyScripts:  [],
     createdAt:    now,
