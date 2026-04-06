@@ -1,8 +1,10 @@
 # n3ware — Visual Website Editor Platform
 
+> **Start here for new AI sessions:** Read §2 for the file map. Read §4 for the module list. Read §12 for deploy (critical assembler gotcha). The QA login endpoint at §25 lets you authenticate in Chrome without Randy's email. The test guide at §24 tells you what to run before deploying.
+
 ## 1. What n3ware Is
 
-n3ware lets small business owners edit their own websites by clicking on them. One `<script>` tag turns any hosted page into an in-browser WYSIWYG editor: inline text editing, drag-and-drop layout, styling panels, nav management, theme controls, and one-click save back to cloud storage.
+n3ware lets small business owners edit their own websites by clicking on them. One `<script>` tag turns any hosted page into an in-browser WYSIWYG editor: inline text editing, drag-and-drop layout, styling panels, nav management, theme controls, CMS collections, media manager, and one-click save back to cloud storage.
 
 **Pre-launch / no live users.** The database was wiped clean in April 2026. There is no backwards-compatible legacy data to worry about.
 
@@ -15,10 +17,16 @@ n3ware lets small business owners edit their own websites by clicking on them. O
 | Where does a save go? | `src/api/pages.js` → `src/storage/gcs-files.js` |
 | How does a page get served? | `assembler/assembler.go` → `assembler/main.go` |
 | How does auth work? | `src/api/magic-auth.js` → `src/api/auth.js` |
-| How does the editor load? | `public/n3ware.js` `_MODULES` array |
+| How does the editor load? | `public/n3ware.js` `_MODULES` array (§4) |
 | How does theme work? | `public/n3ware-theme-persist.js` → `n3ware-theme-apply.js` → `n3ware-theme.js` |
 | How does nav work? | `public/n3ware-nav-persist.js` → `n3ware-nav-render.js` → `n3ware-nav.js` |
-| How to deploy? | Section 12 (Deploy Pipeline) — read the critical note |
+| How do collections work? | `src/api/collections.js` → `assembler/template.go` (§23) |
+| How does billing work? | `src/api/billing.js` (Stripe) — subscription on site doc |
+| How does media work? | `public/n3ware-media.js` + `src/api/media.js` |
+| How does image replace work? | `public/n3ware-image.js` |
+| How to authenticate for QA? | §25 — QA login endpoint |
+| How to run tests? | §24 — Testing guide |
+| How to deploy? | §12 (Deploy Pipeline) — read the critical assembler note |
 
 ---
 
@@ -63,7 +71,7 @@ Secret Manager (project: n3ware / 196247551045)
 
 ## 4. Editor Module Map
 
-`public/n3ware.js` is the core. It defines `N3Events`, `N3UI`, `N3History`, `N3Editor`, then runs `_loadModules()` which fetches these 16 scripts in order:
+`public/n3ware.js` is the core. It defines `N3Events`, `N3UI`, `N3History`, `N3Editor`, then runs `_loadModules()` which fetches these 22 scripts in order:
 
 ```js
 const _MODULES = [
@@ -72,17 +80,23 @@ const _MODULES = [
   'n3ware-style.js',          // style panel + toolbar
   'n3ware-charts.js',         // N3Chart canvas charting
   'n3ware-analytics.js',      // analytics overlay + script placeholders
-  'n3ware-components.js',     // component panel, cloud save, revisions
-  'n3ware-theme-css.js',      // ← MISSING / planned
+  'n3ware-components.js',     // component panel, cloud save, revisions, AI customize
+  'n3ware-theme-css.js',      // ← MISSING / planned (skipped gracefully)
   'n3ware-theme-persist.js',  // DEFAULTS, FONTS, loadState, save to localStorage + API
   'n3ware-theme-apply.js',    // CSS vars, Tailwind config, font injection, typography
-  'n3ware-theme-panel.js',    // ← MISSING / planned
+  'n3ware-theme-panel.js',    // ← MISSING / planned (skipped gracefully)
   'n3ware-theme.js',          // theme orchestrator (init, open panel, apply, save)
   'n3ware-nav-persist.js',    // nav data localStorage + cloud save
   'n3ware-nav-render.js',     // renders <nav> with mobile drawer, _wireMobileNav
-  'n3ware-nav-panel.js',      // ← MISSING / planned
+  'n3ware-nav-panel.js',      // ← MISSING / planned (skipped gracefully)
   'n3ware-nav.js',            // nav orchestrator (init, open panel, save)
   'n3ware-sub-nav.js',        // IntersectionObserver scroll-spy sub-nav
+  'n3ware-image.js',          // image replace modal (click any <img> to swap)
+  'n3ware-media.js',          // media manager panel: upload, browse, insert, delete
+  'n3ware-content-css.js',    // CSS injection for content panel + modals
+  'n3ware-content-render.js', // client-side Handlebars renderer (mirrors assembler logic)
+  'n3ware-content-panel.js',  // Content panel: collections list/detail/entry, AI create, presets
+  'n3ware-content.js',        // content orchestrator: init, open/close, live preview, prepareForSave
 ];
 ```
 
@@ -113,6 +127,19 @@ const T = {
   message,
   theme,         // nested — see Theme below
   integrations,  // { ga4, gtm, fb, … }
+  subscription: {
+    status:               'none' | 'active' | 'trialing' | 'past_due' | 'canceled',
+    plan:                 'free' | 'pro',
+    stripeCustomerId:     string | null,
+    stripeSubscriptionId: string | null,
+    currentPeriodEnd:     string | null,  // ISO8601
+    limits: {
+      pages:                4,   // Infinity for pro
+      uploads:              5,   // Infinity for pro
+      collections:          2,   // Infinity for pro
+      entriesPerCollection: 10,  // Infinity for pro
+    },
+  },
   updatedAt, createdAt
 }
 ```
@@ -221,15 +248,16 @@ The Go assembler reads all of these and assembles a full HTML document at reques
 | Method | Path | Description |
 |---|---|---|
 | POST | /api/auth/magic | Send magic link email |
-| GET | /api/auth/verify | Validate magic token, issue JWT |
+| GET | /api/auth/verify | Validate magic token, issue JWT, redirect to dashboard |
 | GET | /api/auth/me | Get current user from JWT |
 | POST | /api/auth/logout | Clear cookie |
+| GET | /api/auth/_qa_login | QA: bypass email, create token, redirect to verify (see §25) |
 
 ### Sites
 | Method | Path | Description |
 |---|---|---|
 | POST | /api/sites | Create site |
-| GET | /api/sites | List sites (owner-filtered for JWT) |
+| GET | /api/sites | List sites (owner-filtered; includes `pageCount` + `uploadCount`) |
 | GET | /api/sites/:id | Get site metadata |
 | DELETE | /api/sites/:id | Delete site |
 | POST | /api/sites/:id/save | Legacy save (full HTML) |
@@ -240,20 +268,70 @@ The Go assembler reads all of these and assembles a full HTML document at reques
 | Method | Path | Description |
 |---|---|---|
 | GET | /api/sites/:id/pages | List pages |
-| POST | /api/sites/:id/pages | Create page |
+| POST | /api/sites/:id/pages | Create page (402 at plan limit) |
 | GET | /api/sites/:id/pages/:slug | Get page body |
 | PUT | /api/sites/:id/pages/:slug | Save page body (primary save path) |
 | DELETE | /api/sites/:id/pages/:slug | Delete page |
 | GET | /api/sites/:id/pages/:slug/versions | List GCS versions |
 | POST | /api/sites/:id/pages/:slug/rollback | Rollback to generation |
-| GET | /api/sites/:id/components | Get shared components (header/nav/footer) |
+| POST | /api/sites/:id/pages/generate | AI-generate page from description |
+| GET | /api/sites/:id/components/:name | Get shared component (header/nav/footer) |
 | PUT | /api/sites/:id/components/:name | Save component |
+| GET | /api/sites/:id/manifest | Get full site.json |
+| PATCH | /api/sites/:id/manifest | Update theme/scripts in manifest |
+
+### Collections
+| Method | Path | Description |
+|---|---|---|
+| GET | /api/sites/:id/collections | List collection definitions |
+| POST | /api/sites/:id/collections | Create collection (402 at plan limit) |
+| GET | /api/sites/:id/collections/:slug | Get collection definition |
+| PUT | /api/sites/:id/collections/:slug | Update name/fields |
+| DELETE | /api/sites/:id/collections/:slug | Delete collection + all entries |
+| GET | /api/sites/:id/collections/:slug/entries | List entries (`?sort=field:dir&limit=N`) |
+| POST | /api/sites/:id/collections/:slug/entries | Create entry (402 at plan limit) |
+| GET | /api/sites/:id/collections/:slug/entries/:entryId | Get single entry |
+| PUT | /api/sites/:id/collections/:slug/entries/:entryId | Update entry |
+| DELETE | /api/sites/:id/collections/:slug/entries/:entryId | Delete entry |
+
+### Collection Generation (AI — no auth required)
+| Method | Path | Description |
+|---|---|---|
+| POST | /api/collections/generate | AI-generate collection schema from text prompt |
+| POST | /api/collections/generate-entries | AI-generate sample entries for a collection |
+
+### Media
+| Method | Path | Description |
+|---|---|---|
+| GET | /api/sites/:id/media | List all assets with usage info |
+| DELETE | /api/sites/:id/media/:assetId | Delete asset (409 if in use; `?force=true` overrides) |
+
+### Billing
+| Method | Path | Description |
+|---|---|---|
+| GET | /api/billing | List plans (public) |
+| POST | /api/billing/checkout | Create Stripe Checkout session (JWT required) |
+| POST | /api/billing/portal | Create Stripe Billing Portal session (JWT required) |
+| GET | /api/billing/subscription/:siteId | Get site subscription status |
+| POST | /api/billing/webhook | Stripe webhook (raw body, no auth) |
+
+### Domains
+| Method | Path | Description |
+|---|---|---|
+| GET | /api/domains/search | Search domain availability |
+| POST | /api/domains/register | Register domain via Cloudflare (402 if no active subscription) |
+| GET | /api/domains | List registered domains |
+| POST | /api/domains/sites/:siteId/connect | Connect custom domain (402 if no active subscription) |
+| DELETE | /api/domains/sites/:siteId/connect | Disconnect custom domain |
+| GET | /api/domains/sites/:siteId/verify | Verify DNS CNAME points to assembler |
 
 ### Other
 | Method | Path | Description |
 |---|---|---|
-| GET/POST | /api/integrations | Tracker config |
-| POST | /api/uploads | File upload to GCS |
+| GET/POST | /api/integrations | Tracker script config (GA4, GTM, FB, etc.) |
+| POST | /api/uploads/:siteId/upload | File upload to GCS (402 at plan limit) |
+| GET | /api/uploads/:siteId/files | List uploaded files |
+| DELETE | /api/uploads/:siteId/files/:name | Delete uploaded file |
 | GET | /api/templates | List templates |
 | GET | /api/analytics/* | Analytics data |
 | GET | /api/migrate | Migrate/scrape external site |
@@ -299,6 +377,8 @@ Browser → assembler.n3ware.com/sites/{siteId}/{path}
 
 ```
 Editor (browser):
+  0. contentMgr.prepareForSave() — restores {{#each}} template markers from
+     el.dataset.n3Template (base64) so rendered entry data isn't written to GCS
   1. User edits, clicks green Save FAB
   2. n3ware.js extracts body HTML from <main>, header from <header>, nav from <nav>
   3. PUT /api/sites/:id/pages/:slug  { html: bodyHtml }
@@ -313,7 +393,9 @@ Node API:
   10. Purges Cloudflare CDN cache
 
 Browser:
-  11. On success, reloads page with ?v={timestamp} to bypass CDN cache
+  11. contentMgr.restoreAfterSave() — re-renders live preview (called on both
+      success and error)
+  12. On success, reloads page with ?v={timestamp} to bypass CDN cache
 ```
 
 ---
@@ -529,7 +611,13 @@ Flat legacy properties (`primaryColor`, `fontFamily`, `bg`, `fg`, `radius`) were
 Any code deployed from a worktree that wasn't committed to main is orphaned when the worktree is deleted. Always commit before deploying.
 
 ### QA login endpoint — remove before public launch
-`GET /api/auth/_qa_login?secret=n3qa2026&email=...` bypasses the email send, creates a real magic token in Firestore, and redirects to `/api/auth/verify`. Useful for automated testing and dev QA. **Remove or rotate the secret before production launch.** Lives in `src/api/magic-auth.js`.
+`GET /api/auth/_qa_login?secret=n3qa2026&email=...` bypasses the email send, creates a real magic token in Firestore, and redirects to `/api/auth/verify`. Useful for automated testing and dev QA. **Remove or rotate the secret before production launch.** Lives in `src/api/magic-auth.js`. See §25.
+
+### Assembler must be redeployed separately
+The assembler and the Node service are independent Cloud Run services. Committing code to `assembler/` does NOT automatically update the live assembler. You must run `gcloud run deploy n3ware-assembler --source=assembler ...` explicitly. The April 2026 template-processing bug was caused by this: the collections template code was committed but the assembler wasn't redeployed.
+
+### Dashboard billing usage counters
+`GET /api/sites` now computes `pageCount` (from manifest.pages.length) and `uploadCount` (from storageCloud.listFiles) per site at query time. These are O(sites × 2 GCS calls). Acceptable now (few sites); switch to maintained counters on the site doc when site count grows.
 
 ---
 
@@ -538,20 +626,23 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 ### Server (Node.js)
 - `server.js` — Express app, mounts all routes
 - `src/config.js` — environment config
-- `src/api/auth.js` — JWT/API key middleware
-- `src/api/magic-auth.js` — magic link auth
-- `src/api/sites.js` — site CRUD + theme PUT
-- `src/api/pages.js` — multi-page management, component save, rollback
-- `src/api/collections.js` — collections + entries CRUD (GCS-only)
+- `src/api/auth.js` — JWT/API key middleware (`authOrApiKey`)
+- `src/api/magic-auth.js` — magic link auth + `_qa_login` endpoint
+- `src/api/sites.js` — site CRUD + theme PUT; `GET /` injects pageCount/uploadCount
+- `src/api/pages.js` — multi-page management, component save, rollback, AI generate
+- `src/api/collections.js` — collections + entries CRUD (GCS-only, auth-gated)
+- `src/api/collections-generate.js` — AI collection schema + entry generation (no auth)
+- `src/api/media.js` — asset list + delete with usage check
 - `src/api/templates.js` — template listing/serving
 - `src/api/components.js` — Tailwind component library API
 - `src/api/integrations-config.js` — tracker script config
-- `src/api/billing.js` — Stripe (mock)
-- `src/api/domains.js` — domain management (mock)
-- `src/api/uploads.js` — file upload to GCS
+- `src/api/billing.js` — Stripe Checkout, Portal, webhook, subscription read
+- `src/api/domains.js` — domain management (subscription-gated)
+- `src/api/uploads.js` — file upload to GCS (plan-limited)
 - `src/api/analytics-routes.js` — analytics API
 - `src/api/migrate.js` — website migration/scraper
-- `src/serving/sites.js` — site serving middleware (proxies to assembler)
+- `src/serving/sites.js` — site serving middleware (proxies to assembler; no paywall gate)
+- `src/middleware/rate-limit.js` — rate limiting middleware
 
 ### Storage
 - `src/storage/index.js` — factory (local or Firestore)
@@ -574,12 +665,12 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 - `src/integrations/migrator.js` — AI migration
 
 ### Frontend (Editor modules)
-- `public/n3ware.js` — core: N3Events, N3UI, N3History, N3Editor, _loadModules
-- `public/n3ware-text.js` — text editing, drag-and-drop
+- `public/n3ware.js` — core: N3Events, N3UI, N3History, N3Editor, _loadModules (22 modules)
+- `public/n3ware-text.js` — text editing, drag-and-drop, element controls
 - `public/n3ware-style.js` — style panel, toolbar, export
 - `public/n3ware-charts.js` — N3Chart canvas charts
 - `public/n3ware-analytics.js` — analytics overlay
-- `public/n3ware-components.js` — component panel, cloud save, revisions
+- `public/n3ware-components.js` — component panel, cloud save, revisions, AI customize
 - `public/n3ware-theme-persist.js` — DEFAULTS, FONTS, loadState, save
 - `public/n3ware-theme-apply.js` — CSS vars, Tailwind config, font injection
 - `public/n3ware-theme.js` — theme orchestrator
@@ -587,11 +678,18 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 - `public/n3ware-nav-render.js` — renders `<nav>` with mobile drawer
 - `public/n3ware-nav.js` — nav orchestrator
 - `public/n3ware-sub-nav.js` — IntersectionObserver scroll-spy
+- `public/n3ware-image.js` — image replace modal (click any `<img>` to swap)
+- `public/n3ware-media.js` — media manager panel: upload, browse, insert, delete
+- `public/n3ware-content-css.js` — CSS injection for content panel and entry modals
+- `public/n3ware-content-render.js` — client-side Handlebars renderer (mirrors assembler logic, used for editor live preview)
+- `public/n3ware-content-panel.js` — collections list/detail/entry UI, AI create, 10 presets, sample entry generation
+- `public/n3ware-content.js` — content orchestrator: init, open/close, live preview, prepareForSave/restoreAfterSave
 
 ### Frontend (Pages)
 - `public/index.html` — landing page
-- `public/dashboard.html` — customer dashboard
+- `public/dashboard.html` — customer dashboard (sites list, billing tab, analytics)
 - `public/demo.html` — editor demo
+- `public/docs.html` — product documentation (14 sections, sticky sidebar, scroll-spy)
 - `public/components.html` — component browser
 - `public/brand.html` — brand guidelines
 
@@ -609,8 +707,14 @@ Any code deployed from a worktree that wasn't committed to main is orphaned when
 - `tests/api.test.js` — API endpoint tests (63 assertions)
 - `tests/auth-flow.test.js` — magic link + CRUD tests (80 assertions)
 - `tests/save-flow.test.js` — save pipeline tests (21 assertions)
-- `tests/collections.test.js` — collections + entries API tests (GCS-dependent CRUD)
+- `tests/comprehensive.test.js` — broad route coverage (67 assertions)
+- `tests/domains.test.js` — domain management tests (23 assertions)
+- `tests/rate-limit.test.js` — rate limiter tests (9 assertions)
+- `tests/collections.test.js` — collections + entries API tests (~6; full CRUD requires GCS_BUCKET)
+- `tests/media.test.js` — media API tests (~6)
+- `tests/penetration.test.js` — auth security suite (637 checks; see §22)
 - `tests/n3ware.test.html` — browser-based editor tests
+- `assembler/template_test.go` — Go template processor unit tests (12)
 
 ---
 
@@ -676,7 +780,8 @@ Exercises every API route with missing, bogus, expired, and wrong-secret credent
 
 **Phase status:**
 - **Phase 1 (shipped):** Collections API, GCS storage, Go assembler template rendering
-- **Phase 2 (planned):** Editor UI — Content FAB panel, auto-generated entry forms, template insertion via component picker, live preview
+- **Phase 2 (shipped):** Editor UI — Content FAB panel, entry forms, AI collection creation, 10 presets, sample entry generation, template insertion via component picker, live preview in editor
+- **Phase 3 (planned):** Rich text editor for `richtext` fields, image upload directly from entry form
 
 ---
 
@@ -843,3 +948,104 @@ Over-limit returns `402 { error, limit, current, upgradeUrl: "/api/billing/check
 - `assembler/storage.go` — `GCSClient.ListFiles()` for enumerating entry objects
 - `assembler/template_test.go` — 12 Go unit tests
 - `tests/collections.test.js` — Node integration tests (6 pass locally; CRUD assertions require `GCS_BUCKET`)
+
+---
+
+## 24. Testing Guide
+
+### Before deploying any change
+
+```bash
+# Standard suite (no GCS needed)
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/api.test.js
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/comprehensive.test.js
+STORAGE_BACKEND=local MASTER_API_KEY=test JWT_SECRET=test PORT=8099 NODE_ENV=test node tests/save-flow.test.js
+STORAGE_BACKEND=local JWT_SECRET=test MASTER_API_KEY=test PORT=8099 NODE_ENV=test node tests/auth-flow.test.js
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/domains.test.js
+node tests/rate-limit.test.js
+node tests/run-tests.js
+```
+
+### Before deploying auth changes
+
+Also run the penetration suite:
+```bash
+# Against local first
+BASE_URL=http://localhost:8080 node tests/penetration.test.js
+
+# Against production to confirm
+BASE_URL=https://n3ware.com node tests/penetration.test.js
+```
+
+### Go assembler tests
+
+```bash
+cd assembler && /opt/homebrew/bin/go test ./... -v
+```
+
+Run these any time `assembler/template.go` is modified.
+
+### Collections / media (GCS required)
+
+```bash
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/collections.test.js
+MASTER_API_KEY=test JWT_SECRET=test NODE_ENV=test node tests/media.test.js
+```
+
+These require a real `GCS_BUCKET` env var. Skip in local dev if GCS isn't configured.
+
+### Visual QA
+
+Use the QA login endpoint (§25) to authenticate in Chrome, then exercise every editor feature manually or via Claude in Chrome MCP. The full checklist is in `README.md` under "Visual QA".
+
+### What NOT to do
+
+- Do not include the penetration suite in CI — it runs against real auth boundaries and is slow
+- Do not run `POST /api/domains/register` in the pen suite — it can register a real domain
+- Do not run tests against production with `MASTER_API_KEY` set to the real production key
+
+---
+
+## 25. QA Login Endpoint
+
+**REMOVE OR ROTATE SECRET BEFORE PRODUCTION LAUNCH.**
+
+### What it is
+
+A development/QA shortcut that bypasses the email send step of the magic link flow. Useful for AI-assisted testing sessions where you can't read email.
+
+### Endpoint
+
+```
+GET /api/auth/_qa_login?secret=n3qa2026&email=randy@zesty.io
+```
+
+### What it does
+
+1. Validates the `secret` query param against the hardcoded value `n3qa2026`
+2. Generates a 32-byte random token (same as normal magic link)
+3. Calls `tokens.saveToken(rawToken, email, Date.now() + 15min)` — creates a real Firestore entry
+4. Redirects to `/api/auth/verify?token=<rawToken>`
+5. The verify endpoint does everything it normally does: finds/creates user, issues JWT, sets `n3_token` cookie on `.n3ware.com`, redirects to `/dashboard#token=JWT`
+
+The user ends up fully authenticated, with a real Firestore user record and a real JWT cookie — identical to completing a normal magic link flow.
+
+### Usage in a Chrome QA session
+
+Navigate Chrome to:
+```
+https://n3ware.com/api/auth/_qa_login?secret=n3qa2026&email=randy@zesty.io
+```
+
+You'll land on `/dashboard` authenticated as `randy@zesty.io`.
+
+### Location
+
+`src/api/magic-auth.js` — look for `// TEMPORARY: QA auto-login`
+
+### Pre-launch checklist
+
+Before any public launch or major security audit:
+- [ ] Remove the `/_qa_login` route entirely, OR
+- [ ] Move the secret to an environment variable and set it to something cryptographically random in production
+- [ ] Run the penetration suite after removing it to confirm the route returns 404
